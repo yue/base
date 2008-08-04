@@ -30,7 +30,9 @@
 #ifndef BASE_PORT_H__
 #define BASE_PORT_H__
 
-#ifdef MSC_VER
+#include "build/build_config.h"
+
+#ifdef COMPILER_MSVC
 #define GG_LONGLONG(x) x##I64
 #define GG_ULONGLONG(x) x##UI64
 #else

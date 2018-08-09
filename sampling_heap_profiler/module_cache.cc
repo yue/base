@@ -5,27 +5,9 @@
 #include "base/sampling_heap_profiler/module_cache.h"
 
 #include "base/no_destructor.h"
+#include "base/profiler/native_stack_sampler.h"
 
 namespace base {
-
-ModuleCache::Module::Module() : is_valid(false) {}
-
-ModuleCache::Module::Module(uintptr_t base_address,
-                            const std::string& id,
-                            const FilePath& filename)
-    : Module(base_address, id, filename, 0) {}
-
-ModuleCache::Module::Module(uintptr_t base_address,
-                            const std::string& id,
-                            const FilePath& filename,
-                            size_t size)
-    : base_address(base_address),
-      id(id),
-      filename(filename),
-      is_valid(true),
-      size(size) {}
-
-ModuleCache::Module::~Module() = default;
 
 ModuleCache::ModuleCache() = default;
 ModuleCache::~ModuleCache() = default;
@@ -41,7 +23,7 @@ const ModuleCache::Module& ModuleCache::GetModuleForAddress(uintptr_t address) {
       return module;
   }
 
-  auto module = CreateModuleForAddress(address);
+  auto module = NativeStackSampler::GetModuleForAddress(address);
   if (!module.is_valid)
     return *invalid_module;
   return modules_cache_map_.emplace(module.base_address, std::move(module))

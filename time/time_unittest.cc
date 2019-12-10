@@ -22,6 +22,8 @@
 
 #if defined(OS_ANDROID)
 #include "base/android/jni_android.h"
+#elif defined(OS_FUCHSIA)
+#include "base/test/icu_test_util.h"
 #elif defined(OS_WIN)
 #include <windows.h>
 #endif
@@ -91,6 +93,15 @@ TEST(TimeTestOutOfBounds, FromExplodedOutOfBoundsTime) {
 // See also pr_time_unittests.cc
 class TimeTest : public testing::Test {
  protected:
+#if defined(OS_FUCHSIA)
+  // POSIX local time functions always use UTC on Fuchsia. As this is not very
+  // interesting for any "local" tests, set a different default ICU timezone for
+  // the test. This only affects code that uses ICU, such as Exploded time.
+  // Chicago is a non-Pacific time zone known to observe daylight saving time.
+  TimeTest() : chicago_time_("America/Chicago") {}
+  test::ScopedRestoreDefaultTimezone chicago_time_;
+#endif
+
   void SetUp() override {
     // Use mktime to get a time_t, and turn it into a PRTime by converting
     // seconds to microseconds.  Use 15th Oct 2007 12:45:00 local.  This
@@ -188,10 +199,21 @@ TEST_F(TimeTest, LocalTimeT) {
   // C library time and exploded time.
   time_t now_t_1 = time(nullptr);
   struct tm tms;
+
 #if defined(OS_WIN)
   localtime_s(&tms, &now_t_1);
-#elif defined(OS_POSIX) || defined(OS_FUCHSIA)
+#elif defined(OS_POSIX)
   localtime_r(&now_t_1, &tms);
+#elif defined(OS_FUCHSIA)
+  // POSIX local time functions always use UTC on Fuchsia, so set a known time
+  // zone and manually obtain the local |tms| values by using an adjusted input.
+  // Hawaii does not observe daylight saving time, which is useful for having a
+  // constant offset below.
+  const int kHonoluluOffsetHours = -10;
+  const int kHonoluluOffsetSeconds = kHonoluluOffsetHours * 60 * 60;
+  test::ScopedRestoreDefaultTimezone honolulu_time("Pacific/Honolulu");
+  time_t adjusted_now_t_1 = now_t_1 + kHonoluluOffsetSeconds;
+  localtime_r(&adjusted_now_t_1, &tms);
 #endif
 
   // Convert to ours.

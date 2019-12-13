@@ -88,19 +88,17 @@ public class PromiseTest {
         Promise<Integer> promise = new Promise<Integer>();
         final Value value = new Value();
 
-        promise.then(new Function<Integer, String>() {
-                   @Override
-                   public String apply(Integer arg) {
-                       return arg.toString();
-                   }
-               })
-                .then(new Function<String, String>() {
+        promise.then(new Promise.Function<Integer, String>(){
+                    @Override
+                    public String apply(Integer arg) {
+                        return arg.toString();
+                    }
+                }).then(new Promise.Function<String, String>(){
                     @Override
                     public String apply(String arg) {
                         return arg + arg;
                     }
-                })
-                .then(new Callback<String>() {
+                }).then(new Callback<String>() {
                     @Override
                     public void onResult(String result) {
                         value.set(result.length());
@@ -231,13 +229,12 @@ public class PromiseTest {
     public void rejectOnThrow() {
         Value value = new Value();
         Promise<Integer> promise = new Promise<Integer>();
-        promise.then(new Function<Integer, Integer>() {
-                   @Override
-                   public Integer apply(Integer argument) {
-                       throw new IllegalArgumentException();
-                   }
-               })
-                .then(PromiseTest.<Integer>pass(), PromiseTest.<Exception>setValue(value, 5));
+        promise.then(new Promise.Function<Integer, Integer>() {
+            @Override
+            public Integer apply(Integer argument) {
+                throw new IllegalArgumentException();
+            }
+        }).then(PromiseTest.<Integer>pass(), PromiseTest.<Exception>setValue(value, 5));
 
         promise.fulfill(0);
 
@@ -298,8 +295,8 @@ public class PromiseTest {
     }
 
     /** Convenience method that returns a Function that just passes through its argument. */
-    private static <T> Function<T, T> identity() {
-        return new Function<T, T>() {
+    private static <T> Promise.Function<T, T> identity() {
+        return new Promise.Function<T, T>() {
             @Override
             public T apply(T argument) {
                 return argument;

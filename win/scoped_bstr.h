@@ -6,6 +6,7 @@
 #define BASE_WIN_SCOPED_BSTR_H_
 
 #include <windows.h>
+
 #include <oleauto.h>
 #include <stddef.h>
 

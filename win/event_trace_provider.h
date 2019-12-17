@@ -8,6 +8,7 @@
 #define BASE_WIN_EVENT_TRACE_PROVIDER_H_
 
 #include <windows.h>
+
 #include <wmistr.h>
 #include <evntrace.h>
 #include <stddef.h>

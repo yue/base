@@ -5,6 +5,7 @@
 #include "base/win/com_init_check_hook.h"
 
 #include <windows.h>
+
 #include <objbase.h>
 #include <stdint.h>
 #include <string.h>

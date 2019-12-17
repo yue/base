@@ -5,6 +5,7 @@
 #include "base/win/registry.h"
 
 #include <windows.h>
+
 #include <stdint.h>
 
 #include <cstring>

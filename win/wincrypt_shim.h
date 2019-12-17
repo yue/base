@@ -10,6 +10,7 @@
 // Chromium headers which include wincrypt should instead include this header.
 
 #include <windows.h>
+
 #include <wincrypt.h>
 
 // Undefine the macros which conflict with OpenSSL and define replacements. See

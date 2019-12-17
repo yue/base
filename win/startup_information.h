@@ -5,10 +5,11 @@
 #ifndef BASE_WIN_STARTUP_INFORMATION_H_
 #define BASE_WIN_STARTUP_INFORMATION_H_
 
-#include <memory>
-
 #include <windows.h>
+
 #include <stddef.h>
+
+#include <memory>
 
 #include "base/base_export.h"
 #include "base/macros.h"

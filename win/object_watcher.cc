@@ -4,11 +4,11 @@
 
 #include "base/win/object_watcher.h"
 
+#include <windows.h>
+
 #include "base/bind.h"
 #include "base/logging.h"
 #include "base/threading/sequenced_task_runner_handle.h"
-
-#include <windows.h>
 
 namespace base {
 namespace win {

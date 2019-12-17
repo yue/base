@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 //
 #include "base/win/event_trace_provider.h"
+
 #include <windows.h>
+
 #include <cguid.h>
 
 namespace base {

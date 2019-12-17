@@ -21,9 +21,11 @@
 #define BASE_WIN_EVENT_TRACE_CONTROLLER_H_
 
 #include <windows.h>
+
 #include <wmistr.h>
 #include <evntrace.h>
 #include <stddef.h>
+
 #include <string>
 
 #include "base/base_export.h"

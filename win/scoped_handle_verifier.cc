@@ -4,8 +4,9 @@
 
 #include "base/win/scoped_handle_verifier.h"
 
-#include <stddef.h>
 #include <windows.h>
+
+#include <stddef.h>
 
 #include <unordered_map>
 

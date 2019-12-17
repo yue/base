@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include <windows.h>
+
 #include <winternl.h>
 
 #include "base/base_switches.h"

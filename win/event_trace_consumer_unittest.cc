@@ -220,10 +220,12 @@ TEST_F(EtwTraceConsumerRealtimeTest, ConsumerReturnsWhenSessionClosed) {
 
 namespace {
 
+// clang-format off
 // {57E47923-A549-476f-86CA-503D57F59E62}
 DEFINE_GUID(
     kTestEventType,
     0x57e47923, 0xa549, 0x476f, 0x86, 0xca, 0x50, 0x3d, 0x57, 0xf5, 0x9e, 0x62);
+// clang-format on
 
 }  // namespace
 

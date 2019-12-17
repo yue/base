@@ -5,7 +5,8 @@
 // Unit tests for event trace controller.
 
 #include <objbase.h>
-#include <initguid.h>
+
+#include <initguid.h>  // NOLINT - has to be last
 
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -26,9 +27,6 @@ namespace base {
 namespace win {
 
 namespace {
-
-DEFINE_GUID(kGuidNull,
-    0x0000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0);
 
 const ULONG kTestProviderFlags = 0xCAFEBABE;
 
@@ -63,7 +61,7 @@ TEST(EtwTracePropertiesTest, Initialization) {
   EXPECT_EQ(0u, p->Wnode.ProviderId);
   EXPECT_EQ(0u, p->Wnode.HistoricalContext);
 
-  EXPECT_TRUE(kGuidNull == p->Wnode.Guid);
+  EXPECT_TRUE(GUID_NULL == p->Wnode.Guid);
   EXPECT_EQ(0u, p->Wnode.ClientContext);
   EXPECT_EQ(static_cast<ULONG>(WNODE_FLAG_TRACED_GUID), p->Wnode.Flags);
 

@@ -147,7 +147,7 @@ TEST_F(ShortcutTest, CreateAndResolveShortcut) {
                                          SHORTCUT_CREATE_ALWAYS));
 
   FilePath resolved_name;
-  EXPECT_TRUE(ResolveShortcut(link_file_, &resolved_name, NULL));
+  EXPECT_TRUE(ResolveShortcut(link_file_, &resolved_name, nullptr));
 
   char read_contents[base::size(kFileContents)];
   base::ReadFile(resolved_name, read_contents, base::size(read_contents));
@@ -211,7 +211,7 @@ TEST_F(ShortcutTest, UpdateShortcutUpdateOnlyTargetAndResolve) {
   ValidateShortcut(link_file_, expected_properties);
 
   FilePath resolved_name;
-  EXPECT_TRUE(ResolveShortcut(link_file_, &resolved_name, NULL));
+  EXPECT_TRUE(ResolveShortcut(link_file_, &resolved_name, nullptr));
 
   char read_contents[base::size(kFileContents2)];
   base::ReadFile(resolved_name, read_contents, base::size(read_contents));

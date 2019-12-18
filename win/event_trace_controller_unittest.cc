@@ -34,7 +34,7 @@ class TestingProvider : public EtwTraceProvider {
  public:
   explicit TestingProvider(const GUID& provider_name)
       : EtwTraceProvider(provider_name) {
-    callback_event_.Set(::CreateEvent(NULL, TRUE, FALSE, NULL));
+    callback_event_.Set(::CreateEvent(nullptr, TRUE, FALSE, nullptr));
   }
 
   void WaitForCallback() {
@@ -80,7 +80,7 @@ TEST(EtwTracePropertiesTest, Initialization) {
   EXPECT_EQ(0u, p->BuffersWritten);
   EXPECT_EQ(0u, p->LogBuffersLost);
   EXPECT_EQ(0u, p->RealTimeBuffersLost);
-  EXPECT_EQ(0u, p->LoggerThreadId);
+  EXPECT_EQ(nullptr, p->LoggerThreadId);
   EXPECT_NE(0u, p->LogFileNameOffset);
   EXPECT_NE(0u, p->LoggerNameOffset);
 }
@@ -149,7 +149,7 @@ TEST_F(EtwTraceControllerTest, StartRealTimeSession) {
   EXPECT_NE(0u, controller.session());
   EXPECT_STREQ(session_name_.c_str(), controller.session_name());
 
-  EXPECT_HRESULT_SUCCEEDED(controller.Stop(NULL));
+  EXPECT_HRESULT_SUCCEEDED(controller.Stop(nullptr));
   EXPECT_EQ(0u, controller.session());
   EXPECT_STREQ(L"", controller.session_name());
 }
@@ -172,7 +172,7 @@ TEST_F(EtwTraceControllerTest, StartFileSession) {
   EXPECT_NE(0u, controller.session());
   EXPECT_STREQ(session_name_.c_str(), controller.session_name());
 
-  EXPECT_HRESULT_SUCCEEDED(controller.Stop(NULL));
+  EXPECT_HRESULT_SUCCEEDED(controller.Stop(nullptr));
   EXPECT_EQ(0u, controller.session());
   EXPECT_STREQ(L"", controller.session_name());
   DeleteFile(temp, false);
@@ -224,7 +224,7 @@ TEST_F(EtwTraceControllerTest, DISABLED_EnableDisable) {
   // Consume the callback event of the previous controller.EnableProvider().
   provider.WaitForCallback();
 
-  EXPECT_HRESULT_SUCCEEDED(controller.Stop(NULL));
+  EXPECT_HRESULT_SUCCEEDED(controller.Stop(nullptr));
 
   // Windows 7 does not call the callback when Stop() is called so we
   // can't wait, and enable_level and enable_flags are not zeroed.

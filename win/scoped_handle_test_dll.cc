@@ -100,7 +100,7 @@ bool InternalRunLocationTest() {
   if (!my_module)
     return false;
 
-  HMODULE main_module = ::GetModuleHandle(NULL);
+  HMODULE main_module = ::GetModuleHandle(nullptr);
 
 #if BUILDFLAG(SINGLE_MODULE_MODE_HANDLE_VERIFIER)
   // In a component build ActiveVerifier will always be created inside base.dll

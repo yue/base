@@ -22,11 +22,11 @@ namespace win {
 template <typename T>
 class ScopedCoMem {
  public:
-  ScopedCoMem() : mem_ptr_(NULL) {}
-  ~ScopedCoMem() { Reset(NULL); }
+  ScopedCoMem() : mem_ptr_(nullptr) {}
+  ~ScopedCoMem() { Reset(nullptr); }
 
-  T** operator&() {            // NOLINT
-    DCHECK(mem_ptr_ == NULL);  // To catch memory leaks.
+  T** operator&() {               // NOLINT
+    DCHECK(mem_ptr_ == nullptr);  // To catch memory leaks.
     return &mem_ptr_;
   }
 

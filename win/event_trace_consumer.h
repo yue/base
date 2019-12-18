@@ -121,9 +121,9 @@ template <class ImplClass>
 inline HRESULT EtwTraceConsumerBase<ImplClass>::Consume() {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
-  ULONG err =
-      ::ProcessTrace(&trace_handles_[0],
-                     static_cast<ULONG>(trace_handles_.size()), NULL, NULL);
+  ULONG err = ::ProcessTrace(&trace_handles_[0],
+                             static_cast<ULONG>(trace_handles_.size()), nullptr,
+                             nullptr);
   return HRESULT_FROM_WIN32(err);
 }
 

@@ -19,7 +19,7 @@ bool CheckAndDuplicateHandle(HANDLE source, ScopedHandle* target) {
   if (!source)
     return true;
 
-  HANDLE temp = NULL;
+  HANDLE temp = nullptr;
   if (!::DuplicateHandle(::GetCurrentProcess(), source, ::GetCurrentProcess(),
                          &temp, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
     DWORD last_error = ::GetLastError();

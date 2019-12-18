@@ -45,12 +45,12 @@ MessageWindow::WindowClass::WindowClass()
   window_class.cbClsExtra = 0;
   window_class.cbWndExtra = 0;
   window_class.hInstance = instance_;
-  window_class.hIcon = NULL;
-  window_class.hCursor = NULL;
-  window_class.hbrBackground = NULL;
-  window_class.lpszMenuName = NULL;
+  window_class.hIcon = nullptr;
+  window_class.hCursor = nullptr;
+  window_class.hbrBackground = nullptr;
+  window_class.lpszMenuName = nullptr;
   window_class.lpszClassName = kMessageWindowClassName;
-  window_class.hIconSm = NULL;
+  window_class.hIconSm = nullptr;
   atom_ = RegisterClassEx(&window_class);
   if (atom_ == 0) {
     PLOG(ERROR)
@@ -69,19 +69,19 @@ MessageWindow::WindowClass::~WindowClass() {
   }
 }
 
-MessageWindow::MessageWindow() : window_(NULL) {}
+MessageWindow::MessageWindow() : window_(nullptr) {}
 
 MessageWindow::~MessageWindow() {
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
 
-  if (window_ != NULL) {
+  if (window_ != nullptr) {
     BOOL result = DestroyWindow(window_);
     DCHECK(result);
   }
 }
 
 bool MessageWindow::Create(MessageCallback message_callback) {
-  return DoCreate(std::move(message_callback), NULL);
+  return DoCreate(std::move(message_callback), nullptr);
 }
 
 bool MessageWindow::CreateNamed(MessageCallback message_callback,
@@ -91,7 +91,7 @@ bool MessageWindow::CreateNamed(MessageCallback message_callback,
 
 // static
 HWND MessageWindow::FindWindow(const string16& window_name) {
-  return FindWindowEx(HWND_MESSAGE, NULL, kMessageWindowClassName,
+  return FindWindowEx(HWND_MESSAGE, nullptr, kMessageWindowClassName,
                       as_wcstr(window_name));
 }
 
@@ -104,8 +104,9 @@ bool MessageWindow::DoCreate(MessageCallback message_callback,
   message_callback_ = std::move(message_callback);
 
   WindowClass& window_class = g_window_class.Get();
-  window_ = CreateWindow(MAKEINTATOM(window_class.atom()), window_name, 0, 0, 0,
-                         0, 0, HWND_MESSAGE, 0, window_class.instance(), this);
+  window_ =
+      CreateWindow(MAKEINTATOM(window_class.atom()), window_name, 0, 0, 0, 0, 0,
+                   HWND_MESSAGE, nullptr, window_class.instance(), this);
   if (!window_) {
     PLOG(ERROR) << "Failed to create a message-only window";
     return false;

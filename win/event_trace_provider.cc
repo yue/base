@@ -12,7 +12,7 @@ namespace base {
 namespace win {
 
 TRACE_GUID_REGISTRATION EtwTraceProvider::obligatory_guid_registration_ = {
-    &GUID_NULL, NULL};
+    &GUID_NULL, nullptr};
 
 EtwTraceProvider::EtwTraceProvider(const GUID& provider_name)
     : provider_name_(provider_name),
@@ -86,7 +86,7 @@ ULONG EtwTraceProvider::Register() {
     return ERROR_INVALID_NAME;
 
   return ::RegisterTraceGuids(ControlCallback, this, &provider_name_, 1,
-                              &obligatory_guid_registration_, NULL, NULL,
+                              &obligatory_guid_registration_, nullptr, nullptr,
                               &registration_handle_);
 }
 

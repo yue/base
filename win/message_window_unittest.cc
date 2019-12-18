@@ -56,7 +56,7 @@ TEST(MessageWindowTest, FindWindow) {
   EXPECT_TRUE(window.CreateNamed(base::BindRepeating(&HandleMessage), name));
 
   HWND hwnd = win::MessageWindow::FindWindow(name);
-  EXPECT_TRUE(hwnd != NULL);
+  EXPECT_TRUE(hwnd != nullptr);
   EXPECT_EQ(SendMessage(hwnd, WM_USER, 200, 0), 200);
 }
 

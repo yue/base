@@ -120,11 +120,11 @@ class HandleTraits {
 
   // Returns true if the handle value is valid.
   static bool IsHandleValid(HANDLE handle) {
-    return handle != NULL && handle != INVALID_HANDLE_VALUE;
+    return handle != nullptr && handle != INVALID_HANDLE_VALUE;
   }
 
   // Returns NULL handle value.
-  static HANDLE NullHandle() { return NULL; }
+  static HANDLE NullHandle() { return nullptr; }
 
  private:
   DISALLOW_IMPLICIT_CONSTRUCTORS(HandleTraits);

@@ -23,7 +23,7 @@ bool GetResourceFromModule(HMODULE module,
 
   HRSRC hres_info =
       FindResource(module, MAKEINTRESOURCE(resource_id), resource_type);
-  if (NULL == hres_info)
+  if (nullptr == hres_info)
     return false;
 
   DWORD data_size = SizeofResource(module, hres_info);

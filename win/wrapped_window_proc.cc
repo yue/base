@@ -10,10 +10,10 @@
 
 namespace {
 
-base::win::WinProcExceptionFilter s_exception_filter = NULL;
+base::win::WinProcExceptionFilter s_exception_filter = nullptr;
 
 HMODULE GetModuleFromWndProc(WNDPROC window_proc) {
-  HMODULE instance = NULL;
+  HMODULE instance = nullptr;
   // Converting a pointer-to-function to a void* is undefined behavior, but
   // Windows (and POSIX) APIs require it to work.
   void* address = reinterpret_cast<void*>(window_proc);
@@ -70,7 +70,7 @@ BASE_EXPORT void InitializeWindowClass(const char16* class_name,
   class_out->hIconSm = small_icon;
 
   // Check if |window_proc| is valid.
-  DCHECK(class_out->hInstance != NULL);
+  DCHECK(class_out->hInstance != nullptr);
 }
 
 }  // namespace win

@@ -56,8 +56,9 @@ void ScopedProcessInformationTest::DoCreateProcess(
   STARTUPINFO startup_info = {};
   startup_info.cb = sizeof(startup_info);
 
-  EXPECT_TRUE(::CreateProcess(NULL, base::data(cmd_line), NULL, NULL, false, 0,
-                              NULL, NULL, &startup_info, process_handle));
+  EXPECT_TRUE(::CreateProcess(nullptr, base::data(cmd_line), nullptr, nullptr,
+                              false, 0, nullptr, nullptr, &startup_info,
+                              process_handle));
 }
 
 TEST_F(ScopedProcessInformationTest, InitiallyInvalid) {
@@ -83,7 +84,7 @@ TEST_F(ScopedProcessInformationTest, TakeProcess) {
 
   HANDLE process = process_info.TakeProcessHandle();
   EXPECT_EQ(kProcessHandle, process);
-  EXPECT_EQ(NULL, process_info.process_handle());
+  EXPECT_EQ(nullptr, process_info.process_handle());
   EXPECT_EQ(0u, process_info.process_id());
   EXPECT_TRUE(process_info.IsValid());
   process_info.Take();
@@ -95,7 +96,7 @@ TEST_F(ScopedProcessInformationTest, TakeThread) {
 
   HANDLE thread = process_info.TakeThreadHandle();
   EXPECT_EQ(kThreadHandle, thread);
-  EXPECT_EQ(NULL, process_info.thread_handle());
+  EXPECT_EQ(nullptr, process_info.thread_handle());
   EXPECT_EQ(0u, process_info.thread_id());
   EXPECT_TRUE(process_info.IsValid());
   process_info.Take();

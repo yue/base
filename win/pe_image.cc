@@ -107,7 +107,7 @@ PIMAGE_SECTION_HEADER PEImage::GetSectionHeader(UINT section) const {
   if (section < nt_headers->FileHeader.NumberOfSections)
     return first_section + section;
   else
-    return NULL;
+    return nullptr;
 }
 
 WORD PEImage::GetNumSections() const {
@@ -128,7 +128,7 @@ PIMAGE_SECTION_HEADER PEImage::GetImageSectionFromAddr(PVOID address) const {
   PBYTE target = reinterpret_cast<PBYTE>(address);
   PIMAGE_SECTION_HEADER section;
 
-  for (UINT i = 0; NULL != (section = GetSectionHeader(i)); i++) {
+  for (UINT i = 0; nullptr != (section = GetSectionHeader(i)); i++) {
     // Don't use the virtual RVAToAddr.
     PBYTE start =
         reinterpret_cast<PBYTE>(PEImage::RVAToAddr(section->VirtualAddress));
@@ -139,15 +139,15 @@ PIMAGE_SECTION_HEADER PEImage::GetImageSectionFromAddr(PVOID address) const {
       return section;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 PIMAGE_SECTION_HEADER PEImage::GetImageSectionHeaderByName(
     LPCSTR section_name) const {
-  if (NULL == section_name)
-    return NULL;
+  if (nullptr == section_name)
+    return nullptr;
 
-  PIMAGE_SECTION_HEADER ret = NULL;
+  PIMAGE_SECTION_HEADER ret = nullptr;
   int num_sections = GetNumSections();
 
   for (int i = 0; i < num_sections; i++) {
@@ -210,12 +210,12 @@ bool PEImage::GetDebugId(LPGUID guid,
 PDWORD PEImage::GetExportEntry(LPCSTR name) const {
   PIMAGE_EXPORT_DIRECTORY exports = GetExportDirectory();
 
-  if (NULL == exports)
-    return NULL;
+  if (nullptr == exports)
+    return nullptr;
 
   WORD ordinal = 0;
   if (!GetProcOrdinal(name, &ordinal))
-    return NULL;
+    return nullptr;
 
   PDWORD functions =
       reinterpret_cast<PDWORD>(RVAToAddr(exports->AddressOfFunctions));
@@ -225,8 +225,8 @@ PDWORD PEImage::GetExportEntry(LPCSTR name) const {
 
 FARPROC PEImage::GetProcAddress(LPCSTR function_name) const {
   PDWORD export_entry = GetExportEntry(function_name);
-  if (NULL == export_entry)
-    return NULL;
+  if (nullptr == export_entry)
+    return nullptr;
 
   PBYTE function = reinterpret_cast<PBYTE>(RVAToAddr(*export_entry));
 
@@ -234,7 +234,7 @@ FARPROC PEImage::GetProcAddress(LPCSTR function_name) const {
       GetImageDirectoryEntryAddr(IMAGE_DIRECTORY_ENTRY_EXPORT));
   DWORD size = GetImageDirectoryEntrySize(IMAGE_DIRECTORY_ENTRY_EXPORT);
   if (!exports || !size)
-    return NULL;
+    return nullptr;
 
   // Check for forwarded exports as a special case.
   if (exports <= function && exports + size > function)
@@ -244,12 +244,12 @@ FARPROC PEImage::GetProcAddress(LPCSTR function_name) const {
 }
 
 bool PEImage::GetProcOrdinal(LPCSTR function_name, WORD* ordinal) const {
-  if (NULL == ordinal)
+  if (nullptr == ordinal)
     return false;
 
   PIMAGE_EXPORT_DIRECTORY exports = GetExportDirectory();
 
-  if (NULL == exports)
+  if (nullptr == exports)
     return false;
 
   if (IsOrdinal(function_name)) {
@@ -329,11 +329,11 @@ bool PEImage::EnumExports(EnumExportsFunction callback, PVOID cookie) const {
 
   for (UINT count = 0; count < num_funcs; count++) {
     PVOID func = RVAToAddr(functions[count]);
-    if (NULL == func)
+    if (nullptr == func)
       continue;
 
     // Check for a name.
-    LPCSTR name = NULL;
+    LPCSTR name = nullptr;
     UINT hint;
     for (hint = 0; hint < num_names; hint++) {
       if (ordinals[hint] == count) {
@@ -342,16 +342,16 @@ bool PEImage::EnumExports(EnumExportsFunction callback, PVOID cookie) const {
       }
     }
 
-    if (name == NULL)
+    if (name == nullptr)
       hint = 0;
 
     // Check for forwarded exports.
-    LPCSTR forward = NULL;
+    LPCSTR forward = nullptr;
     if (reinterpret_cast<char*>(func) >= reinterpret_cast<char*>(directory) &&
         reinterpret_cast<char*>(func) <=
             reinterpret_cast<char*>(directory) + size) {
       forward = reinterpret_cast<LPCSTR>(func);
-      func = 0;
+      func = nullptr;
     }
 
     if (!callback(*this, ordinal_base + count, hint, name, func, forward,
@@ -399,7 +399,7 @@ bool PEImage::EnumImportChunks(EnumImportChunksFunction callback,
   DWORD size = GetImageDirectoryEntrySize(IMAGE_DIRECTORY_ENTRY_IMPORT);
   PIMAGE_IMPORT_DESCRIPTOR import = GetFirstImportChunk();
 
-  if (import == NULL || size < sizeof(IMAGE_IMPORT_DESCRIPTOR))
+  if (import == nullptr || size < sizeof(IMAGE_IMPORT_DESCRIPTOR))
     return true;
 
   for (; import->FirstThunk; import++) {
@@ -424,11 +424,11 @@ bool PEImage::EnumOneImportChunk(EnumImportsFunction callback,
                                  PIMAGE_THUNK_DATA name_table,
                                  PIMAGE_THUNK_DATA iat,
                                  PVOID cookie) const {
-  if (NULL == name_table)
+  if (nullptr == name_table)
     return false;
 
   for (; name_table && name_table->u1.Ordinal; name_table++, iat++) {
-    LPCSTR name = NULL;
+    LPCSTR name = nullptr;
     WORD ordinal = 0;
     WORD hint = 0;
 
@@ -528,7 +528,7 @@ bool PEImage::EnumOneDelayImportChunk(EnumImportsFunction callback,
                                       PIMAGE_THUNK_DATA iat,
                                       PVOID cookie) const {
   for (; name_table->u1.Ordinal; name_table++, iat++) {
-    LPCSTR name = NULL;
+    LPCSTR name = nullptr;
     WORD ordinal = 0;
     WORD hint = 0;
 
@@ -594,12 +594,12 @@ bool PEImage::ImageRVAToOnDiskOffset(uintptr_t rva,
 
 bool PEImage::ImageAddrToOnDiskOffset(LPVOID address,
                                       DWORD* on_disk_offset) const {
-  if (NULL == address)
+  if (nullptr == address)
     return false;
 
   // Get the section that this address belongs to.
   PIMAGE_SECTION_HEADER section_header = GetImageSectionFromAddr(address);
-  if (NULL == section_header)
+  if (nullptr == section_header)
     return false;
 
   // Don't follow the virtual RVAToAddr, use the one on the base.
@@ -614,7 +614,7 @@ bool PEImage::ImageAddrToOnDiskOffset(LPVOID address,
 
 PVOID PEImage::RVAToAddr(uintptr_t rva) const {
   if (rva == 0)
-    return NULL;
+    return nullptr;
 
   return reinterpret_cast<char*>(module_) + rva;
 }
@@ -638,13 +638,13 @@ const IMAGE_DATA_DIRECTORY* PEImage::GetDataDirectory(UINT directory) const {
 
 PVOID PEImageAsData::RVAToAddr(uintptr_t rva) const {
   if (rva == 0)
-    return NULL;
+    return nullptr;
 
   PVOID in_memory = PEImage::RVAToAddr(rva);
   DWORD disk_offset;
 
   if (!ImageAddrToOnDiskOffset(in_memory, &disk_offset))
-    return NULL;
+    return nullptr;
 
   return PEImage::RVAToAddr(disk_offset);
 }

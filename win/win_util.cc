@@ -85,7 +85,7 @@ bool SetPropVariantValueForPropertyStore(
 }
 
 void __cdecl ForceCrashOnSigAbort(int) {
-  *((volatile int*)0) = 0x1337;
+  *((volatile int*)nullptr) = 0x1337;
 }
 
 // Returns the current platform role. We use the PowerDeterminePlatformRoleEx
@@ -316,8 +316,8 @@ bool IsKeyboardPresentOnSlate(HWND hwnd, std::string* reason) {
       {0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18}};
 
   // Query for all the keyboard devices.
-  HDEVINFO device_info =
-      SetupDiGetClassDevs(&KEYBOARD_CLASS_GUID, NULL, NULL, DIGCF_PRESENT);
+  HDEVINFO device_info = SetupDiGetClassDevs(&KEYBOARD_CLASS_GUID, nullptr,
+                                             nullptr, DIGCF_PRESENT);
   if (device_info == INVALID_HANDLE_VALUE) {
     if (reason)
       *reason += "No keyboard info\n";
@@ -364,7 +364,7 @@ static bool g_crash_on_process_detach = false;
 
 bool GetUserSidString(std::wstring* user_sid) {
   // Get the current token.
-  HANDLE token = NULL;
+  HANDLE token = nullptr;
   if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &token))
     return false;
   ScopedHandle token_scoped(token);
@@ -657,7 +657,7 @@ bool GetLoadedModulesSnapshot(HANDLE process, std::vector<HMODULE>* snapshot) {
       // Buffer size was too small. Try again with a larger buffer. A little
       // more room is given to avoid multiple expensive calls to
       // ::EnumProcessModules() just because one module has been added.
-      snapshot->resize(num_modules + 8, NULL);
+      snapshot->resize(num_modules + 8, nullptr);
     }
   } while (--retries_remaining);
 

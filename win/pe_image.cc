@@ -59,9 +59,11 @@ struct PdbInfo {
 }  // namespace
 
 // Callback used to enumerate imports. See EnumImportChunksFunction.
-bool ProcessImportChunk(const PEImage &image, LPCSTR module,
+bool ProcessImportChunk(const PEImage& image,
+                        LPCSTR module,
                         PIMAGE_THUNK_DATA name_table,
-                        PIMAGE_THUNK_DATA iat, PVOID cookie) {
+                        PIMAGE_THUNK_DATA iat,
+                        PVOID cookie) {
   EnumAllImportsStorage& storage =
       *reinterpret_cast<EnumAllImportsStorage*>(cookie);
 
@@ -128,8 +130,8 @@ PIMAGE_SECTION_HEADER PEImage::GetImageSectionFromAddr(PVOID address) const {
 
   for (UINT i = 0; NULL != (section = GetSectionHeader(i)); i++) {
     // Don't use the virtual RVAToAddr.
-    PBYTE start = reinterpret_cast<PBYTE>(
-                      PEImage::RVAToAddr(section->VirtualAddress));
+    PBYTE start =
+        reinterpret_cast<PBYTE>(PEImage::RVAToAddr(section->VirtualAddress));
 
     DWORD size = section->Misc.VirtualSize;
 
@@ -168,7 +170,7 @@ bool PEImage::GetDebugId(LPGUID guid,
       GetImageDirectoryEntrySize(IMAGE_DIRECTORY_ENTRY_DEBUG);
   PIMAGE_DEBUG_DIRECTORY debug_directory =
       reinterpret_cast<PIMAGE_DEBUG_DIRECTORY>(
-      GetImageDirectoryEntryAddr(IMAGE_DIRECTORY_ENTRY_DEBUG));
+          GetImageDirectoryEntryAddr(IMAGE_DIRECTORY_ENTRY_DEBUG));
   if (!debug_directory)
     return false;
 
@@ -215,8 +217,8 @@ PDWORD PEImage::GetExportEntry(LPCSTR name) const {
   if (!GetProcOrdinal(name, &ordinal))
     return NULL;
 
-  PDWORD functions = reinterpret_cast<PDWORD>(
-                         RVAToAddr(exports->AddressOfFunctions));
+  PDWORD functions =
+      reinterpret_cast<PDWORD>(RVAToAddr(exports->AddressOfFunctions));
 
   return functions + ordinal - exports->Base;
 }
@@ -241,7 +243,7 @@ FARPROC PEImage::GetProcAddress(LPCSTR function_name) const {
   return reinterpret_cast<FARPROC>(function);
 }
 
-bool PEImage::GetProcOrdinal(LPCSTR function_name, WORD *ordinal) const {
+bool PEImage::GetProcOrdinal(LPCSTR function_name, WORD* ordinal) const {
   if (NULL == ordinal)
     return false;
 
@@ -281,9 +283,8 @@ bool PEImage::GetProcOrdinal(LPCSTR function_name, WORD *ordinal) const {
     if (cmp != 0)
       return false;
 
-
-    PWORD ordinals = reinterpret_cast<PWORD>(
-                         RVAToAddr(exports->AddressOfNameOrdinals));
+    PWORD ordinals =
+        reinterpret_cast<PWORD>(RVAToAddr(exports->AddressOfNameOrdinals));
 
     *ordinal = ordinals[lower - names] + static_cast<WORD>(exports->Base);
   }
@@ -315,16 +316,16 @@ bool PEImage::EnumExports(EnumExportsFunction callback, PVOID cookie) const {
   if (!directory || !size)
     return true;
 
-  PIMAGE_EXPORT_DIRECTORY exports = reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(
-                                        directory);
+  PIMAGE_EXPORT_DIRECTORY exports =
+      reinterpret_cast<PIMAGE_EXPORT_DIRECTORY>(directory);
   UINT ordinal_base = exports->Base;
   UINT num_funcs = exports->NumberOfFunctions;
   UINT num_names = exports->NumberOfNames;
-  PDWORD functions  = reinterpret_cast<PDWORD>(RVAToAddr(
-                          exports->AddressOfFunctions));
+  PDWORD functions =
+      reinterpret_cast<PDWORD>(RVAToAddr(exports->AddressOfFunctions));
   PDWORD names = reinterpret_cast<PDWORD>(RVAToAddr(exports->AddressOfNames));
-  PWORD ordinals = reinterpret_cast<PWORD>(RVAToAddr(
-                       exports->AddressOfNameOrdinals));
+  PWORD ordinals =
+      reinterpret_cast<PWORD>(RVAToAddr(exports->AddressOfNameOrdinals));
 
   for (UINT count = 0; count < num_funcs; count++) {
     PVOID func = RVAToAddr(functions[count]);
@@ -347,8 +348,8 @@ bool PEImage::EnumExports(EnumExportsFunction callback, PVOID cookie) const {
     // Check for forwarded exports.
     LPCSTR forward = NULL;
     if (reinterpret_cast<char*>(func) >= reinterpret_cast<char*>(directory) &&
-        reinterpret_cast<char*>(func) <= reinterpret_cast<char*>(directory) +
-            size) {
+        reinterpret_cast<char*>(func) <=
+            reinterpret_cast<char*>(directory) + size) {
       forward = reinterpret_cast<LPCSTR>(func);
       func = 0;
     }
@@ -373,8 +374,8 @@ bool PEImage::EnumRelocs(EnumRelocsFunction callback, PVOID cookie) const {
   while (size >= sizeof(IMAGE_BASE_RELOCATION) && base->SizeOfBlock &&
          size >= base->SizeOfBlock) {
     PWORD reloc = reinterpret_cast<PWORD>(base + 1);
-    UINT num_relocs = (base->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) /
-        sizeof(WORD);
+    UINT num_relocs =
+        (base->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
 
     for (UINT i = 0; i < num_relocs; i++, reloc++) {
       WORD type = *reloc >> 12;
@@ -386,7 +387,7 @@ bool PEImage::EnumRelocs(EnumRelocsFunction callback, PVOID cookie) const {
 
     size -= base->SizeOfBlock;
     base = reinterpret_cast<PIMAGE_BASE_RELOCATION>(
-               reinterpret_cast<char*>(base) + base->SizeOfBlock);
+        reinterpret_cast<char*>(base) + base->SizeOfBlock);
   }
 
   return true;
@@ -404,9 +405,9 @@ bool PEImage::EnumImportChunks(EnumImportChunksFunction callback,
   for (; import->FirstThunk; import++) {
     LPCSTR module_name = reinterpret_cast<LPCSTR>(RVAToAddr(import->Name));
     PIMAGE_THUNK_DATA name_table = reinterpret_cast<PIMAGE_THUNK_DATA>(
-                                       RVAToAddr(import->OriginalFirstThunk));
-    PIMAGE_THUNK_DATA iat = reinterpret_cast<PIMAGE_THUNK_DATA>(
-                                RVAToAddr(import->FirstThunk));
+        RVAToAddr(import->OriginalFirstThunk));
+    PIMAGE_THUNK_DATA iat =
+        reinterpret_cast<PIMAGE_THUNK_DATA>(RVAToAddr(import->FirstThunk));
 
     if (target_module_name == nullptr ||
         (lstrcmpiA(module_name, target_module_name) == 0)) {
@@ -421,7 +422,8 @@ bool PEImage::EnumImportChunks(EnumImportChunksFunction callback,
 bool PEImage::EnumOneImportChunk(EnumImportsFunction callback,
                                  LPCSTR module_name,
                                  PIMAGE_THUNK_DATA name_table,
-                                 PIMAGE_THUNK_DATA iat, PVOID cookie) const {
+                                 PIMAGE_THUNK_DATA iat,
+                                 PVOID cookie) const {
   if (NULL == name_table)
     return false;
 
@@ -450,15 +452,15 @@ bool PEImage::EnumOneImportChunk(EnumImportsFunction callback,
 bool PEImage::EnumAllImports(EnumImportsFunction callback,
                              PVOID cookie,
                              LPCSTR target_module_name) const {
-  EnumAllImportsStorage temp = { callback, cookie };
+  EnumAllImportsStorage temp = {callback, cookie};
   return EnumImportChunks(ProcessImportChunk, &temp, target_module_name);
 }
 
 bool PEImage::EnumDelayImportChunks(EnumDelayImportChunksFunction callback,
                                     PVOID cookie,
                                     LPCSTR target_module_name) const {
-  PVOID directory = GetImageDirectoryEntryAddr(
-                        IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT);
+  PVOID directory =
+      GetImageDirectoryEntryAddr(IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT);
   DWORD size = GetImageDirectoryEntrySize(IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT);
 
   if (!directory || !size)
@@ -538,10 +540,10 @@ bool PEImage::EnumOneDelayImportChunk(EnumImportsFunction callback,
 
       if (rvas) {
         import = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(
-                     RVAToAddr(name_table->u1.ForwarderString));
+            RVAToAddr(name_table->u1.ForwarderString));
       } else {
         import = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(
-                     name_table->u1.ForwarderString);
+            name_table->u1.ForwarderString);
       }
 
       hint = import->Hint;
@@ -558,7 +560,7 @@ bool PEImage::EnumOneDelayImportChunk(EnumImportsFunction callback,
 bool PEImage::EnumAllDelayImports(EnumImportsFunction callback,
                                   PVOID cookie,
                                   LPCSTR target_module_name) const {
-  EnumAllImportsStorage temp = { callback, cookie };
+  EnumAllImportsStorage temp = {callback, cookie};
   return EnumDelayImportChunks(ProcessDelayImportChunk, &temp,
                                target_module_name);
 }

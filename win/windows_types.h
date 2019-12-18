@@ -129,7 +129,6 @@ struct CHROME_CONDITION_VARIABLE {
   PVOID Ptr;
 };
 
-
 // Define some commonly used Windows constants. Note that the layout of these
 // macros - including internal spacing - must be 100% consistent with windows.h.
 

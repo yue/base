@@ -69,9 +69,7 @@ MessageWindow::WindowClass::~WindowClass() {
   }
 }
 
-MessageWindow::MessageWindow()
-    : window_(NULL) {
-}
+MessageWindow::MessageWindow() : window_(NULL) {}
 
 MessageWindow::~MessageWindow() {
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
@@ -121,8 +119,8 @@ LRESULT CALLBACK MessageWindow::WindowProc(HWND hwnd,
                                            UINT message,
                                            WPARAM wparam,
                                            LPARAM lparam) {
-  MessageWindow* self = reinterpret_cast<MessageWindow*>(
-      GetWindowLongPtr(hwnd, GWLP_USERDATA));
+  MessageWindow* self =
+      reinterpret_cast<MessageWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
   switch (message) {
     // Set up the self before handling WM_CREATE.
@@ -136,8 +134,8 @@ LRESULT CALLBACK MessageWindow::WindowProc(HWND hwnd,
 
       // Store pointer to the self to the window's user data.
       SetLastError(ERROR_SUCCESS);
-      LONG_PTR result = SetWindowLongPtr(
-          hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(self));
+      LONG_PTR result = SetWindowLongPtr(hwnd, GWLP_USERDATA,
+                                         reinterpret_cast<LONG_PTR>(self));
       CHECK(result != 0 || GetLastError() == ERROR_SUCCESS);
       break;
     }

@@ -11,8 +11,8 @@
 
 namespace {
 
-using base::win::EtwTraceProvider;
 using base::win::EtwMofEvent;
+using base::win::EtwTraceProvider;
 
 // clang-format off
 // {7F0FD37F-FA3C-4cd6-9242-DF60967A2CB2}

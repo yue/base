@@ -78,9 +78,7 @@ class BASE_EXPORT ScopedBstr {
   // Returns the number of bytes allocated for the BSTR.
   size_t ByteLength() const;
 
-  operator BSTR() const {
-    return bstr_;
-  }
+  operator BSTR() const { return bstr_; }
 
   // Forbid comparison of ScopedBstr types.  You should never have the same
   // BSTR owned by two different scoped_ptrs.

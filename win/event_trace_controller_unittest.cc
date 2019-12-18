@@ -30,7 +30,7 @@ namespace {
 
 const ULONG kTestProviderFlags = 0xCAFEBABE;
 
-class TestingProvider: public EtwTraceProvider {
+class TestingProvider : public EtwTraceProvider {
  public:
   explicit TestingProvider(const GUID& provider_name)
       : EtwTraceProvider(provider_name) {
@@ -107,8 +107,7 @@ namespace {
 class EtwTraceControllerTest : public testing::Test {
  public:
   EtwTraceControllerTest()
-      : session_name_(StringPrintf(L"TestSession-%d", GetCurrentProcId())) {
-  }
+      : session_name_(StringPrintf(L"TestSession-%d", GetCurrentProcId())) {}
 
   void SetUp() override {
     EtwTraceProperties ignore;
@@ -137,12 +136,11 @@ TEST_F(EtwTraceControllerTest, Initialize) {
   EXPECT_STREQ(L"", controller.session_name());
 }
 
-
 TEST_F(EtwTraceControllerTest, StartRealTimeSession) {
   EtwTraceController controller;
 
-  HRESULT hr = controller.StartRealtimeSession(session_name_.c_str(),
-                                               100 * 1024);
+  HRESULT hr =
+      controller.StartRealtimeSession(session_name_.c_str(), 100 * 1024);
   if (hr == E_ACCESSDENIED) {
     VLOG(1) << "You must be an administrator to run this test on Vista";
     return;
@@ -188,15 +186,15 @@ TEST_F(EtwTraceControllerTest, DISABLED_EnableDisable) {
   EXPECT_EQ(0u, provider.session_handle());
 
   EtwTraceController controller;
-  HRESULT hr = controller.StartRealtimeSession(session_name_.c_str(),
-                                               100 * 1024);
+  HRESULT hr =
+      controller.StartRealtimeSession(session_name_.c_str(), 100 * 1024);
   if (hr == E_ACCESSDENIED) {
     VLOG(1) << "You must be an administrator to run this test on Vista";
     return;
   }
 
-  EXPECT_HRESULT_SUCCEEDED(controller.EnableProvider(test_provider_,
-                           TRACE_LEVEL_VERBOSE, kTestProviderFlags));
+  EXPECT_HRESULT_SUCCEEDED(controller.EnableProvider(
+      test_provider_, TRACE_LEVEL_VERBOSE, kTestProviderFlags));
 
   provider.WaitForCallback();
 
@@ -213,8 +211,8 @@ TEST_F(EtwTraceControllerTest, DISABLED_EnableDisable) {
   EXPECT_EQ(static_cast<DWORD>(ERROR_SUCCESS), provider.Unregister());
 
   // Enable the provider again, before registering.
-  EXPECT_HRESULT_SUCCEEDED(controller.EnableProvider(test_provider_,
-                           TRACE_LEVEL_VERBOSE, kTestProviderFlags));
+  EXPECT_HRESULT_SUCCEEDED(controller.EnableProvider(
+      test_provider_, TRACE_LEVEL_VERBOSE, kTestProviderFlags));
 
   // Register the provider again, the settings above
   // should take immediate effect.

@@ -71,14 +71,12 @@ bool RegKey::Watcher::StartWatching(HKEY key, ChangeCallback callback) {
   if (!watch_event_.IsValid())
     return false;
 
-  DWORD filter = REG_NOTIFY_CHANGE_NAME |
-                 REG_NOTIFY_CHANGE_ATTRIBUTES |
-                 REG_NOTIFY_CHANGE_LAST_SET |
-                 REG_NOTIFY_CHANGE_SECURITY;
+  DWORD filter = REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_ATTRIBUTES |
+                 REG_NOTIFY_CHANGE_LAST_SET | REG_NOTIFY_CHANGE_SECURITY;
 
   // Watch the registry key for a change of value.
-  LONG result = RegNotifyChangeKeyValue(key, TRUE, filter, watch_event_.Get(),
-                                        TRUE);
+  LONG result =
+      RegNotifyChangeKeyValue(key, TRUE, filter, watch_event_.Get(), TRUE);
   if (result != ERROR_SUCCESS) {
     watch_event_.Close();
     return false;
@@ -90,11 +88,9 @@ bool RegKey::Watcher::StartWatching(HKEY key, ChangeCallback callback) {
 
 // RegKey ----------------------------------------------------------------------
 
-RegKey::RegKey() : key_(NULL), wow64access_(0) {
-}
+RegKey::RegKey() : key_(NULL), wow64access_(0) {}
 
-RegKey::RegKey(HKEY key) : key_(key), wow64access_(0) {
-}
+RegKey::RegKey(HKEY key) : key_(key), wow64access_(0) {}
 
 RegKey::RegKey(HKEY rootkey, const wchar_t* subkey, REGSAM access)
     : key_(NULL), wow64access_(0) {
@@ -393,8 +389,8 @@ LONG RegKey::ReadValues(const wchar_t* name,
 }
 
 LONG RegKey::WriteValue(const wchar_t* name, DWORD in_value) {
-  return WriteValue(
-      name, &in_value, static_cast<DWORD>(sizeof(in_value)), REG_DWORD);
+  return WriteValue(name, &in_value, static_cast<DWORD>(sizeof(in_value)),
+                    REG_DWORD);
 }
 
 LONG RegKey::WriteValue(const wchar_t* name, const wchar_t* in_value) {
@@ -525,8 +521,8 @@ RegistryValueIterator::~RegistryValueIterator() {
 
 DWORD RegistryValueIterator::ValueCount() const {
   DWORD count = 0;
-  LONG result = ::RegQueryInfoKey(key_, NULL, 0, NULL, NULL, NULL, NULL,
-                                  &count, NULL, NULL, NULL, NULL);
+  LONG result = ::RegQueryInfoKey(key_, NULL, 0, NULL, NULL, NULL, NULL, &count,
+                                  NULL, NULL, NULL, NULL);
   if (result != ERROR_SUCCESS)
     return 0;
 
@@ -602,8 +598,8 @@ RegistryKeyIterator::~RegistryKeyIterator() {
 
 DWORD RegistryKeyIterator::SubkeyCount() const {
   DWORD count = 0;
-  LONG result = ::RegQueryInfoKey(key_, NULL, 0, NULL, &count, NULL, NULL,
-                                  NULL, NULL, NULL, NULL, NULL);
+  LONG result = ::RegQueryInfoKey(key_, NULL, 0, NULL, &count, NULL, NULL, NULL,
+                                  NULL, NULL, NULL, NULL);
   if (result != ERROR_SUCCESS)
     return 0;
 

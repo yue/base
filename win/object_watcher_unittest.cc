@@ -26,8 +26,7 @@ class QuitDelegate : public ObjectWatcher::Delegate {
 
 class DecrementCountDelegate : public ObjectWatcher::Delegate {
  public:
-  explicit DecrementCountDelegate(int* counter) : counter_(counter) {
-  }
+  explicit DecrementCountDelegate(int* counter) : counter_(counter) {}
   void OnObjectSignaled(HANDLE object) override { --(*counter_); }
 
  private:

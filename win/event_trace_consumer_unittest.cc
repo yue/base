@@ -31,7 +31,7 @@ namespace {
 
 typedef std::list<EVENT_TRACE> EventQueue;
 
-class TestConsumer: public EtwTraceConsumerBase<TestConsumer> {
+class TestConsumer : public EtwTraceConsumerBase<TestConsumer> {
  public:
   TestConsumer() {
     sank_event_.Set(::CreateEvent(NULL, TRUE, FALSE, NULL));
@@ -77,11 +77,10 @@ class TestConsumer: public EtwTraceConsumerBase<TestConsumer> {
 ScopedHandle TestConsumer::sank_event_;
 EventQueue TestConsumer::events_;
 
-class EtwTraceConsumerBaseTest: public testing::Test {
+class EtwTraceConsumerBaseTest : public testing::Test {
  public:
   EtwTraceConsumerBaseTest()
-      : session_name_(StringPrintf(L"TestSession-%d", GetCurrentProcId())) {
-  }
+      : session_name_(StringPrintf(L"TestSession-%d", GetCurrentProcId())) {}
 
   void SetUp() override {
     // Cleanup any potentially dangling sessions.
@@ -124,7 +123,7 @@ TEST_F(EtwTraceConsumerBaseTest, ConsumerImmediateFailureWhenNoSession) {
 
 namespace {
 
-class EtwTraceConsumerRealtimeTest: public EtwTraceConsumerBaseTest {
+class EtwTraceConsumerRealtimeTest : public EtwTraceConsumerBaseTest {
  public:
   void SetUp() override {
     EtwTraceConsumerBaseTest::SetUp();
@@ -143,19 +142,19 @@ class EtwTraceConsumerRealtimeTest: public EtwTraceConsumerBaseTest {
   }
 
   static DWORD WINAPI ConsumerThreadMainProc(void* arg) {
-    return reinterpret_cast<EtwTraceConsumerRealtimeTest*>(arg)->
-        ConsumerThread();
+    return reinterpret_cast<EtwTraceConsumerRealtimeTest*>(arg)
+        ->ConsumerThread();
   }
 
   HRESULT StartConsumerThread() {
     consumer_ready_.Set(::CreateEvent(NULL, TRUE, FALSE, NULL));
     EXPECT_TRUE(consumer_ready_.IsValid());
-    consumer_thread_.Set(::CreateThread(NULL, 0, ConsumerThreadMainProc, this,
-                                        0, NULL));
+    consumer_thread_.Set(
+        ::CreateThread(NULL, 0, ConsumerThreadMainProc, this, 0, NULL));
     if (consumer_thread_.Get() == NULL)
       return HRESULT_FROM_WIN32(::GetLastError());
 
-    HANDLE events[] = { consumer_ready_.Get(), consumer_thread_.Get() };
+    HANDLE events[] = {consumer_ready_.Get(), consumer_thread_.Get()};
     DWORD result =
         ::WaitForMultipleObjects(size(events), events, FALSE, INFINITE);
     switch (result) {
@@ -163,15 +162,15 @@ class EtwTraceConsumerRealtimeTest: public EtwTraceConsumerBaseTest {
         // The event was set, the consumer_ is ready.
         return S_OK;
       case WAIT_OBJECT_0 + 1: {
-          // The thread finished. This may race with the event, so check
-          // explicitly for the event here, before concluding there's trouble.
-          if (::WaitForSingleObject(consumer_ready_.Get(), 0) == WAIT_OBJECT_0)
-            return S_OK;
-          DWORD exit_code = 0;
-          if (::GetExitCodeThread(consumer_thread_.Get(), &exit_code))
-            return exit_code;
-          return HRESULT_FROM_WIN32(::GetLastError());
-        }
+        // The thread finished. This may race with the event, so check
+        // explicitly for the event here, before concluding there's trouble.
+        if (::WaitForSingleObject(consumer_ready_.Get(), 0) == WAIT_OBJECT_0)
+          return S_OK;
+        DWORD exit_code = 0;
+        if (::GetExitCodeThread(consumer_thread_.Get(), &exit_code))
+          return exit_code;
+        return HRESULT_FROM_WIN32(::GetLastError());
+      }
       default:
         return E_UNEXPECTED;
     }
@@ -260,10 +259,9 @@ namespace {
 
 // We run events through a file session to assert that
 // the content comes through.
-class EtwTraceConsumerDataTest: public EtwTraceConsumerBaseTest {
+class EtwTraceConsumerDataTest : public EtwTraceConsumerBaseTest {
  public:
-  EtwTraceConsumerDataTest() {
-  }
+  EtwTraceConsumerDataTest() {}
 
   void SetUp() override {
     EtwTraceConsumerBaseTest::SetUp();
@@ -345,7 +343,6 @@ class EtwTraceConsumerDataTest: public EtwTraceConsumerBaseTest {
 };
 
 }  // namespace
-
 
 TEST_F(EtwTraceConsumerDataTest, RoundTrip) {
   EtwMofEvent<1> event(kTestEventType, 1, TRACE_LEVEL_ERROR);

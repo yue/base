@@ -11,8 +11,10 @@ DWORD kExceptionCode = 12345;
 WPARAM kCrashMsg = 98765;
 
 // A trivial WindowProc that generates an exception.
-LRESULT CALLBACK TestWindowProc(HWND hwnd, UINT message,
-                                WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK TestWindowProc(HWND hwnd,
+                                UINT message,
+                                WPARAM wparam,
+                                LPARAM lparam) {
   if (message == kCrashMsg)
     RaiseException(kExceptionCode, 0, 0, NULL);
   return DefWindowProc(hwnd, message, wparam, lparam);
@@ -32,9 +34,7 @@ class TestWrappedExceptionFiter {
     s_filter_ = NULL;
   }
 
-  bool called() {
-    return called_;
-  }
+  bool called() { return called_; }
 
   // The actual exception filter just records the exception.
   static int Filter(EXCEPTION_POINTERS* info) {

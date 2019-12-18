@@ -18,9 +18,8 @@ HMODULE GetModuleFromWndProc(WNDPROC window_proc) {
   // Windows (and POSIX) APIs require it to work.
   void* address = reinterpret_cast<void*>(window_proc);
   if (!::GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                            static_cast<char*>(address),
-                            &instance)) {
+                                GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                            static_cast<char*>(address), &instance)) {
     NOTREACHED();
   }
   return instance;
@@ -40,8 +39,8 @@ WinProcExceptionFilter SetWinProcExceptionFilter(
 }
 
 int CallExceptionFilter(EXCEPTION_POINTERS* info) {
-  return s_exception_filter ? s_exception_filter(info) :
-                              EXCEPTION_CONTINUE_SEARCH;
+  return s_exception_filter ? s_exception_filter(info)
+                            : EXCEPTION_CONTINUE_SEARCH;
 }
 
 BASE_EXPORT void InitializeWindowClass(const char16* class_name,

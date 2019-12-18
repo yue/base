@@ -28,8 +28,7 @@ void GiveMeAVariant(VARIANT* ret) {
 // when AddRef is called and decrements it when Release is called.
 class FakeComObject : public IDispatch {
  public:
-  FakeComObject() : ref_(0) {
-  }
+  FakeComObject() : ref_(0) {}
 
   STDMETHOD_(DWORD, AddRef)() override {
     ref_++;
@@ -51,21 +50,14 @@ class FakeComObject : public IDispatch {
     return E_NOTIMPL;
   }
 
-  STDMETHOD(Invoke)(DISPID,
-                    REFIID,
-                    LCID,
-                    WORD,
-                    DISPPARAMS*,
-                    VARIANT*,
-                    EXCEPINFO*,
-                    UINT*) override {
+  STDMETHOD(Invoke)
+  (DISPID, REFIID, LCID, WORD, DISPPARAMS*, VARIANT*, EXCEPINFO*, UINT*)
+      override {
     return E_NOTIMPL;
   }
 
   // A way to check the internal reference count of the class.
-  int ref_count() const {
-    return ref_;
-  }
+  int ref_count() const { return ref_; }
 
  protected:
   int ref_;

@@ -96,8 +96,8 @@ bool ObjectWatcher::StartWatchingInternal(HANDLE object,
                             delegate);
   object_ = object;
 
-  if (!RegisterWaitForSingleObject(&wait_object_, object, DoneWaiting,
-                                   this, INFINITE, wait_flags)) {
+  if (!RegisterWaitForSingleObject(&wait_object_, object, DoneWaiting, this,
+                                   INFINITE, wait_flags)) {
     DPLOG(FATAL) << "RegisterWaitForSingleObject failed";
     Reset();
     return false;

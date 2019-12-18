@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "base/win/message_window.h"
 #include "base/bind.h"
 #include "base/guid.h"
 #include "base/strings/utf_string_conversions.h"
-#include "base/win/message_window.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -13,8 +13,10 @@ namespace base {
 
 namespace {
 
-bool HandleMessage(
-    UINT message, WPARAM wparam, LPARAM lparam, LRESULT* result) {
+bool HandleMessage(UINT message,
+                   WPARAM wparam,
+                   LPARAM lparam,
+                   LRESULT* result) {
   // Return |wparam| as the result of WM_USER message.
   if (message == WM_USER) {
     *result = wparam;

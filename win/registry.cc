@@ -90,7 +90,7 @@ bool RegKey::Watcher::StartWatching(HKEY key, ChangeCallback callback) {
 
 // RegKey ----------------------------------------------------------------------
 
-RegKey::RegKey() : key_(nullptr), wow64access_(0) {}
+RegKey::RegKey() {}
 
 RegKey::RegKey(HKEY key) : key_(key), wow64access_(0) {}
 

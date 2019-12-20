@@ -1495,6 +1495,12 @@ jumbo_component("base") {
         "trace_event/cfi_backtrace_android.h",
       ]
     }
+    if (current_cpu == "arm") {
+      sources += [
+        "profiler/chrome_unwinder_android.cc",
+        "profiler/chrome_unwinder_android.h",
+      ]
+    }
 
     if (current_cpu != "arm") {
       # The reached code profiler is only supported on Android with 32-bit arm
@@ -2913,6 +2919,9 @@ test("base_unittests") {
       }
       add_unwind_tables_in_apk = true
       sources += [ "trace_event/cfi_backtrace_android_unittest.cc" ]
+    }
+    if (current_cpu == "arm") {
+      sources += [ "profiler/chrome_unwinder_android_unittest.cc" ]
     }
 
     sources += [

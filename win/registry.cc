@@ -7,6 +7,8 @@
 #include <stddef.h>
 
 #include <algorithm>
+#include <memory>
+
 #include <string>
 #include <utility>
 
@@ -419,7 +421,7 @@ LONG RegKey::WriteValue(const wchar_t* name,
 
 bool RegKey::StartWatching(ChangeCallback callback) {
   if (!key_watcher_)
-    key_watcher_.reset(new Watcher());
+    key_watcher_ = std::make_unique<Watcher>();
 
   if (!key_watcher_->StartWatching(key_, std::move(callback)))
     return false;

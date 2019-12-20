@@ -45,9 +45,8 @@ void StackSamplerImpl::RecordStackFrames(StackBuffer* stack_buffer,
 
   RegisterContext thread_context;
   uintptr_t stack_top;
-  TimeTicks timestamp;
-  bool success = stack_copier_->CopyStack(
-      stack_buffer, &stack_top, profile_builder, &timestamp, &thread_context);
+  bool success = stack_copier_->CopyStack(stack_buffer, &stack_top,
+                                          profile_builder, &thread_context);
   if (!success)
     return;
 
@@ -56,8 +55,7 @@ void StackSamplerImpl::RecordStackFrames(StackBuffer* stack_buffer,
 
   profile_builder->OnSampleCompleted(
       WalkStack(module_cache_, &thread_context, stack_top,
-                native_unwinder_.get(), aux_unwinder_.get()),
-      timestamp);
+                native_unwinder_.get(), aux_unwinder_.get()));
 }
 // static
 

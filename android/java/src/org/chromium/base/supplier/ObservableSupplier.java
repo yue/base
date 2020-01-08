@@ -2,7 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.base;
+package org.chromium.base.supplier;
+
+import org.chromium.base.Callback;
 
 /**
  * ObservableSupplier wraps an asynchronously provided object E, notifying observers when the

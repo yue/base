@@ -2156,7 +2156,10 @@ buildflag_header("clang_coverage_buildflags") {
   header = "clang_coverage_buildflags.h"
   header_dir = "base"
 
-  flags = [ "CLANG_COVERAGE=$use_clang_coverage" ]
+  flags = [
+    "CLANG_COVERAGE=$use_clang_coverage",
+    "CLANG_COVERAGE_INSIDE_SANDBOX=$use_clang_coverage_inside_sandbox"
+  ]
 }
 
 buildflag_header("sanitizer_buildflags") {

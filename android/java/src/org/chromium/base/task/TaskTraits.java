@@ -22,7 +22,9 @@ public class TaskTraits {
     // Keep in sync with base::TaskTraitsExtensionStorage::kStorageSize
     public static final int EXTENSION_STORAGE_SIZE = 8;
 
-    // Convenience variables explicitly specifying common priorities
+    // Convenience variables explicitly specifying common priorities.
+    // These also imply THREAD_POOL unless explicitly overwritten.
+    // TODO(1026641): Make destination explicit in Java too.
 
     // This task will only be scheduled when machine resources are available. Once
     // running, it may be descheduled if higher priority work arrives (in this
@@ -174,6 +176,21 @@ public class TaskTraits {
         taskTraits.mExtensionId = (byte) id;
         taskTraits.mExtensionData = data;
         return taskTraits;
+    }
+
+    /**
+     * Returns a TaskTraits with an explicit destination.
+     *
+     * The C++ side enforces that a destination _must_ be specified. The Java
+     * side loosely considers lack of destination as implying THREAD_POOL
+     * destination.
+     * TODO(1026641): Bring the Java side inline with the C++ side.
+     */
+    public TaskTraits withExplicitDestination() {
+        if (!mUseThreadPool && !mUseCurrentThread && !hasExtension()) {
+            return this.threadPool();
+        }
+        return this;
     }
 
     @Override

@@ -57,7 +57,7 @@ public class TaskRunnerImpl implements TaskRunner {
      */
     protected TaskRunnerImpl(
             TaskTraits traits, String traceCategory, @TaskRunnerType int taskRunnerType) {
-        mTaskTraits = traits;
+        mTaskTraits = traits.withExplicitDestination();
         mTraceEvent = traceCategory + ".PreNativeTask.run";
         mTaskRunnerType = taskRunnerType;
         if (!PostTask.registerPreNativeTaskRunnerLocked(this)) initNativeTaskRunner();

@@ -386,6 +386,16 @@ class BASE_EXPORT TaskTraits {
         use_thread_pool_(use_thread_pool),
         use_current_thread_(use_current_thread) {
     static_assert(sizeof(TaskTraits) == 16, "Keep this constructor up to date");
+
+    // Same assert as in the regular TaskTraits constructor.
+    const bool has_extension =
+        (extension_.extension_id !=
+         TaskTraitsExtensionStorage::kInvalidExtensionId);
+    DCHECK(!use_current_thread_ || !use_thread_pool_)
+        << "base::CurrentThread is mutually exclusive with base::ThreadPool";
+    DCHECK(use_thread_pool_ ^ has_extension || use_current_thread_)
+        << "Traits must explicitly specify a destination (e.g. ThreadPool or a "
+           "named thread like BrowserThread, or CurrentThread)";
   }
 
   // This bit is set in |priority_|, |shutdown_behavior_| and |thread_policy_|

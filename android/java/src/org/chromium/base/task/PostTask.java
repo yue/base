@@ -87,10 +87,11 @@ public class PostTask {
             if (sPreNativeTaskRunners != null || taskTraits.mIsChoreographerFrame) {
                 getTaskExecutorForTraits(taskTraits).postDelayedTask(taskTraits, task, delay);
             } else {
-                PostTaskJni.get().postDelayedTask(taskTraits.mPrioritySetExplicitly,
-                        taskTraits.mPriority, taskTraits.mMayBlock, taskTraits.mUseThreadPool,
-                        taskTraits.mUseCurrentThread, taskTraits.mExtensionId,
-                        taskTraits.mExtensionData, task, delay);
+                TaskTraits postedTraits = taskTraits.withExplicitDestination();
+                PostTaskJni.get().postDelayedTask(postedTraits.mPrioritySetExplicitly,
+                        postedTraits.mPriority, postedTraits.mMayBlock, postedTraits.mUseThreadPool,
+                        postedTraits.mUseCurrentThread, postedTraits.mExtensionId,
+                        postedTraits.mExtensionData, task, delay);
             }
         }
     }

@@ -76,6 +76,9 @@ TEST(JSONReaderTest, EmbeddedComments) {
   ASSERT_TRUE(root);
   EXPECT_TRUE(root->is_int());
   EXPECT_EQ(44, root->GetInt());
+
+  // At one point, this parsed successfully as the value three.
+  EXPECT_FALSE(JSONReader::Read("/33"));
 }
 
 TEST(JSONReaderTest, Ints) {

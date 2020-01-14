@@ -248,11 +248,12 @@ void JSONParser::EatWhitespaceAndComments() {
 }
 
 bool JSONParser::EatComment() {
-  Optional<StringPiece> comment_start = ConsumeChars(2);
+  Optional<StringPiece> comment_start = PeekChars(2);
   if (!comment_start)
     return false;
 
   if (comment_start == "//") {
+    ConsumeChars(2);
     // Single line comment, read to newline.
     while (Optional<char> c = PeekChar()) {
       if (c == '\n' || c == '\r')
@@ -260,6 +261,7 @@ bool JSONParser::EatComment() {
       ConsumeChar();
     }
   } else if (comment_start == "/*") {
+    ConsumeChars(2);
     char previous_char = '\0';
     // Block comment, read until end marker.
     while (Optional<char> c = PeekChar()) {

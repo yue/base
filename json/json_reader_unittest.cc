@@ -165,6 +165,12 @@ TEST(JSONReaderTest, Doubles) {
   double_val = 0.0;
   EXPECT_TRUE(root->GetAsDouble(&double_val));
   EXPECT_DOUBLE_EQ(1.0, double_val);
+
+  // This is syntaxtically valid, but out of range of a double.
+  auto value_with_error =
+      JSONReader::ReadAndReturnValueWithError("1e1000", JSON_PARSE_RFC);
+  ASSERT_FALSE(value_with_error.value);
+  ASSERT_NE(value_with_error.error_code, JSONReader::JSON_NO_ERROR);
 }
 
 TEST(JSONReaderTest, FractionalNumbers) {

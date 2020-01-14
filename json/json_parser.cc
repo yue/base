@@ -667,6 +667,7 @@ Optional<Value> JSONParser::ConsumeNumber() {
     return Value(num_double);
   }
 
+  ReportError(JSONReader::JSON_UNREPRESENTABLE_NUMBER, 1);
   return nullopt;
 }
 

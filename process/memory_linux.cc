@@ -10,7 +10,6 @@
 
 #include "base/allocator/allocator_shim.h"
 #include "base/allocator/buildflags.h"
-#include "base/allocator/partition_allocator/page_allocator.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/logging.h"
@@ -38,16 +37,8 @@ void OnNoMemorySize(size_t size) {
   LOG(FATAL) << "Out of memory.";
 }
 
-// NOINLINE as base::`anonymous namespace`::OnNoMemory() is recognized by the
-// crash server.
-NOINLINE void OnNoMemory() {
+void OnNoMemory() {
   OnNoMemorySize(0);
-}
-
-void ReleaseReservationOrTerminate() {
-  if (ReleaseReservation())
-    return;
-  OnNoMemory();
 }
 
 }  // namespace
@@ -58,7 +49,7 @@ void EnableTerminationOnHeapCorruption() {
 
 void EnableTerminationOnOutOfMemory() {
   // Set the new-out of memory handler.
-  std::set_new_handler(&ReleaseReservationOrTerminate);
+  std::set_new_handler(&OnNoMemory);
   // If we're using glibc's allocator, the above functions will override
   // malloc and friends and make them die on out of memory.
 

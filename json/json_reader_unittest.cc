@@ -240,6 +240,10 @@ TEST(JSONReaderTest, UnicodeEscapes) {
   std::string str_val;
   EXPECT_TRUE(root->GetAsString(&str_val));
   EXPECT_EQ(std::wstring(L"A\0\x1234\0", 4), UTF8ToWide(str_val));
+
+  // The contents of a Unicode escape may only be four hex chars. Previously the
+  // parser accepted things like "0x01" and "0X01".
+  EXPECT_FALSE(JSONReader::Read("\"\\u0x12\""));
 }
 
 TEST(JSONReaderTest, InvalidStrings) {

@@ -3204,9 +3204,13 @@ if (is_android) {
   java_library("jni_java") {
     supports_android = true
     sources = [
+      "android/java/src/org/chromium/base/JniException.java",
       "android/java/src/org/chromium/base/JniStaticTestMocker.java",
+      "android/java/src/org/chromium/base/NativeLibraryLoadedStatus.java",
       "android/java/src/org/chromium/base/annotations/NativeMethods.java",
     ]
+    srcjar_deps = [ ":base_build_config_gen" ]
+    jar_excluded_patterns = [ "*/BuildConfig.class" ]
   }
 
   android_library("base_java") {

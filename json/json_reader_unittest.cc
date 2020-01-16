@@ -630,7 +630,7 @@ TEST(JSONReaderTest, StringOptimizations) {
     ASSERT_EQ(2u, list->GetList().size());
     list_value_0 = std::move(list->GetList()[0]);
     list_value_1 = std::move(list->GetList()[1]);
-    list->GetList().clear();
+    list->ClearList();
   }
 
   ASSERT_TRUE(dict_literal_0.is_bool());

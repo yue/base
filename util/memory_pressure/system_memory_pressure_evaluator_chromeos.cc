@@ -297,9 +297,10 @@ void SystemMemoryPressureEvaluator::ScheduleWaitForKernelNotification() {
       FROM_HERE,
       {base::ThreadPool(), base::MayBlock(),
        base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN},
-      base::BindOnce(kernel_waiting_callback_),
-      base::BindOnce(&SystemMemoryPressureEvaluator::HandleKernelNotification,
-                     weak_ptr_factory_.GetWeakPtr()));
+      kernel_waiting_callback_,
+      base::BindRepeating(
+          &SystemMemoryPressureEvaluator::HandleKernelNotification,
+          weak_ptr_factory_.GetWeakPtr()));
 }
 
 }  // namespace chromeos

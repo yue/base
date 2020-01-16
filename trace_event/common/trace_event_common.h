@@ -506,27 +506,6 @@
                                    value1_name, static_cast<int>(value1_val), \
                                    value2_name, static_cast<int>(value2_val))
 
-// TRACE_EVENT_SAMPLE_* events are injected by the sampling profiler.
-#define TRACE_EVENT_SAMPLE_WITH_TID_AND_TIMESTAMP0(category_group, name,       \
-                                                   thread_id, timestamp)       \
-  INTERNAL_TRACE_EVENT_ADD_WITH_ID_TID_AND_TIMESTAMP(                          \
-      TRACE_EVENT_PHASE_SAMPLE, category_group, name, 0, thread_id, timestamp, \
-      TRACE_EVENT_FLAG_NONE)
-
-#define TRACE_EVENT_SAMPLE_WITH_TID_AND_TIMESTAMP1(                            \
-    category_group, name, thread_id, timestamp, arg1_name, arg1_val)           \
-  INTERNAL_TRACE_EVENT_ADD_WITH_ID_TID_AND_TIMESTAMP(                          \
-      TRACE_EVENT_PHASE_SAMPLE, category_group, name, 0, thread_id, timestamp, \
-      TRACE_EVENT_FLAG_NONE, arg1_name, arg1_val)
-
-#define TRACE_EVENT_SAMPLE_WITH_TID_AND_TIMESTAMP2(category_group, name,       \
-                                                   thread_id, timestamp,       \
-                                                   arg1_name, arg1_val,        \
-                                                   arg2_name, arg2_val)        \
-  INTERNAL_TRACE_EVENT_ADD_WITH_ID_TID_AND_TIMESTAMP(                          \
-      TRACE_EVENT_PHASE_SAMPLE, category_group, name, 0, thread_id, timestamp, \
-      TRACE_EVENT_FLAG_NONE, arg1_name, arg1_val, arg2_name, arg2_val)
-
 #define TRACE_EVENT_SAMPLE_WITH_ID1(category_group, name, id, arg1_name,       \
                                     arg1_val)                                  \
   INTERNAL_TRACE_EVENT_ADD_WITH_ID(TRACE_EVENT_PHASE_SAMPLE, category_group,   \

@@ -27,33 +27,6 @@
 // OSX SDK being compiled against.
 // ----------------------------------------------------------------------------
 
-#if !defined(MAC_OS_X_VERSION_10_11) || \
-    MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11
-
-enum {
-  NSPressureBehaviorUnknown = -1,
-  NSPressureBehaviorPrimaryDefault = 0,
-  NSPressureBehaviorPrimaryClick = 1,
-  NSPressureBehaviorPrimaryGeneric = 2,
-  NSPressureBehaviorPrimaryAccelerator = 3,
-  NSPressureBehaviorPrimaryDeepClick = 5,
-  NSPressureBehaviorPrimaryDeepDrag = 6
-};
-typedef NSInteger NSPressureBehavior;
-
-@interface NSPressureConfiguration : NSObject
-- (instancetype)initWithPressureBehavior:(NSPressureBehavior)pressureBehavior;
-@end
-
-enum {
-  NSSpringLoadingHighlightNone = 0,
-  NSSpringLoadingHighlightStandard,
-  NSSpringLoadingHighlightEmphasized
-};
-typedef NSUInteger NSSpringLoadingHighlight;
-
-#endif  // MAC_OS_X_VERSION_10_11
-
 #if !defined(MAC_OS_X_VERSION_10_12) || \
     MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
 

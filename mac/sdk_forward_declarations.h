@@ -69,56 +69,6 @@ BASE_EXPORT extern NSString* const CIDetectorTypeText;
 #endif  // MAC_OS_X_VERSION_10_11
 }  // extern "C"
 
-// Once Chrome no longer supports OSX 10.10, everything within this
-// preprocessor block can be removed.
-#if !defined(MAC_OS_X_VERSION_10_11) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_11
-
-@class NSLayoutDimension;
-@class NSLayoutXAxisAnchor;
-@class NSLayoutYAxisAnchor;
-
-@interface NSObject (ElCapitanSDK)
-- (NSLayoutConstraint*)constraintEqualToConstant:(CGFloat)c;
-- (NSLayoutConstraint*)constraintGreaterThanOrEqualToConstant:(CGFloat)c;
-@end
-
-@interface NSView (ElCapitanSDK)
-- (void)setPressureConfiguration:(NSPressureConfiguration*)aConfiguration
-    API_AVAILABLE(macos(10.11));
-@property(readonly, strong)
-    NSLayoutXAxisAnchor* leftAnchor API_AVAILABLE(macos(10.11));
-@property(readonly, strong)
-    NSLayoutXAxisAnchor* rightAnchor API_AVAILABLE(macos(10.11));
-@property(readonly, strong)
-    NSLayoutYAxisAnchor* bottomAnchor API_AVAILABLE(macos(10.11));
-@property(readonly, strong)
-    NSLayoutDimension* widthAnchor API_AVAILABLE(macos(10.11));
-@end
-
-@interface NSWindow (ElCapitanSDK)
-- (void)performWindowDragWithEvent:(NSEvent*)event;
-@end
-
-@interface CIRectangleFeature (ElCapitanSDK)
-@property(readonly) CGRect bounds;
-@end
-
-@class CIRectangleFeature;
-
-#endif  // MAC_OS_X_VERSION_10_11
-
-// Once Chrome no longer supports OSX 10.11, everything within this
-// preprocessor block can be removed.
-#if !defined(MAC_OS_X_VERSION_10_12) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_12
-
-@interface NSWindow (SierraSDK)
-@property(class) BOOL allowsAutomaticWindowTabbing;
-@end
-
-#endif  // MAC_OS_X_VERSION_10_12
-
 // Once Chrome no longer supports OSX 10.12, everything within this
 // preprocessor block can be removed.
 #if !defined(MAC_OS_X_VERSION_10_13) || \

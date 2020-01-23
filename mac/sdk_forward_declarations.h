@@ -70,86 +70,11 @@ typedef NSUInteger NSSpringLoadingHighlight;
 #endif  // MAC_OS_X_VERSION_10_12
 
 // ----------------------------------------------------------------------------
-// Define NSStrings only available in newer versions of the OSX SDK to force
-// them to be statically linked.
-// ----------------------------------------------------------------------------
-
-extern "C" {
-#if !defined(MAC_OS_X_VERSION_10_10) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
-BASE_EXPORT extern NSString* const CIDetectorTypeQRCode;
-BASE_EXPORT extern NSString* const NSUserActivityTypeBrowsingWeb;
-BASE_EXPORT extern NSString* const NSAppearanceNameVibrantDark;
-BASE_EXPORT extern NSString* const NSAppearanceNameVibrantLight;
-#endif  // MAC_OS_X_VERSION_10_10
-}  // extern "C"
-
-// ----------------------------------------------------------------------------
 // If compiling against an older version of the OSX SDK, declare classes and
 // functions that are available in newer versions of the OSX SDK. If compiling
 // against a newer version of the OSX SDK, redeclare those same classes and
 // functions to suppress -Wpartial-availability warnings.
 // ----------------------------------------------------------------------------
-
-// Once Chrome no longer supports OSX 10.9, everything within this preprocessor
-// block can be removed.
-#if !defined(MAC_OS_X_VERSION_10_10) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
-
-@interface NSUserActivity (YosemiteSDK)
-@property(readonly, copy) NSString* activityType;
-@property(copy) NSDictionary* userInfo;
-@property(copy) NSURL* webpageURL;
-@property(copy) NSString* title;
-- (instancetype)initWithActivityType:(NSString*)activityType;
-- (void)becomeCurrent;
-- (void)invalidate;
-@end
-
-@interface CBUUID (YosemiteSDK)
-- (NSString*)UUIDString;
-@end
-
-@interface NSViewController (YosemiteSDK)
-- (void)viewDidLoad;
-@end
-
-@interface NSWindow (YosemiteSDK)
-- (void)setTitlebarAppearsTransparent:(BOOL)flag;
-@end
-
-@interface NSProcessInfo (YosemiteSDK)
-@property(readonly) NSOperatingSystemVersion operatingSystemVersion;
-@end
-
-@interface NSLayoutConstraint (YosemiteSDK)
-@property(getter=isActive) BOOL active;
-+ (void)activateConstraints:(NSArray*)constraints;
-@end
-
-@interface NSVisualEffectView (YosemiteSDK)
-- (void)setState:(NSVisualEffectState)state;
-@end
-
-@class NSVisualEffectView;
-
-@interface CIQRCodeFeature (YosemiteSDK)
-@property(readonly) CGRect bounds;
-@property(readonly) CGPoint topLeft;
-@property(readonly) CGPoint topRight;
-@property(readonly) CGPoint bottomLeft;
-@property(readonly) CGPoint bottomRight;
-@property(readonly, copy) NSString* messageString;
-@end
-
-@class CIQRCodeFeature;
-
-@interface NSView (YosemiteSDK)
-- (BOOL)isAccessibilitySelectorAllowed:(SEL)selector;
-@property(copy) NSString* accessibilityLabel;
-@end
-
-#endif  // MAC_OS_X_VERSION_10_10
 
 // Once Chrome no longer supports OSX 10.10.2, everything within this
 // preprocessor block can be removed.

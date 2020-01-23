@@ -27,36 +27,6 @@
 // OSX SDK being compiled against.
 // ----------------------------------------------------------------------------
 
-#if !defined(MAC_OS_X_VERSION_10_12) || \
-    MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12
-
-// The protocol was formalized by the 10.12 SDK, but it was informally used
-// before.
-@protocol CAAnimationDelegate
-- (void)animationDidStart:(CAAnimation*)animation;
-- (void)animationDidStop:(CAAnimation*)animation finished:(BOOL)finished;
-@end
-
-#endif  // MAC_OS_X_VERSION_10_12
-
-// ----------------------------------------------------------------------------
-// If compiling against an older version of the OSX SDK, declare classes and
-// functions that are available in newer versions of the OSX SDK. If compiling
-// against a newer version of the OSX SDK, redeclare those same classes and
-// functions to suppress -Wpartial-availability warnings.
-// ----------------------------------------------------------------------------
-
-// Once Chrome no longer supports OSX 10.10.2, everything within this
-// preprocessor block can be removed.
-#if !defined(MAC_OS_X_VERSION_10_10_3) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10_3
-
-@interface NSEvent (Yosemite_3_SDK)
-@property(readonly) NSInteger stage;
-@end
-
-#endif  // MAC_OS_X_VERSION_10_10
-
 // ----------------------------------------------------------------------------
 // Define NSStrings only available in newer versions of the OSX SDK to force
 // them to be statically linked.

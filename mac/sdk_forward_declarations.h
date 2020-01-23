@@ -119,40 +119,6 @@ BASE_EXPORT extern NSString* const CIDetectorTypeText;
 
 #endif  // MAC_OS_X_VERSION_10_12
 
-// Once Chrome no longer supports OSX 10.12.0, everything within this
-// preprocessor block can be removed.
-#if !defined(MAC_OS_X_VERSION_10_12_1) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_12_1
-
-@interface NSButton (SierraPointOneSDK)
-@property(copy) NSColor* bezelColor;
-@property BOOL imageHugsTitle;
-+ (instancetype)buttonWithTitle:(NSString*)title
-                         target:(id)target
-                         action:(SEL)action;
-+ (instancetype)buttonWithImage:(NSImage*)image
-                         target:(id)target
-                         action:(SEL)action;
-+ (instancetype)buttonWithTitle:(NSString*)title
-                          image:(NSImage*)image
-                         target:(id)target
-                         action:(SEL)action;
-@end
-
-@interface NSSegmentedControl (SierraPointOneSDK)
-+ (instancetype)segmentedControlWithImages:(NSArray*)images
-                              trackingMode:(NSSegmentSwitchTracking)trackingMode
-                                    target:(id)target
-                                    action:(SEL)action;
-@end
-
-@interface NSTextField (SierraPointOneSDK)
-+ (instancetype)labelWithAttributedString:
-    (NSAttributedString*)attributedStringValue;
-@end
-
-#endif  // MAC_OS_X_VERSION_10_12_1
-
 // Once Chrome no longer supports OSX 10.12, everything within this
 // preprocessor block can be removed.
 #if !defined(MAC_OS_X_VERSION_10_13) || \

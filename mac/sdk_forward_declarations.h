@@ -37,9 +37,6 @@
 - (void)animationDidStop:(CAAnimation*)animation finished:(BOOL)finished;
 @end
 
-@protocol CALayerDelegate
-@end
-
 #endif  // MAC_OS_X_VERSION_10_12
 
 // ----------------------------------------------------------------------------

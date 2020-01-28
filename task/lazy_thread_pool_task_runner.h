@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef BASE_TASK_LAZY_TASK_RUNNER_H_
-#define BASE_TASK_LAZY_TASK_RUNNER_H_
+#ifndef BASE_TASK_LAZY_THREAD_POOL_TASK_RUNNER_H_
+#define BASE_TASK_LAZY_THREAD_POOL_TASK_RUNNER_H_
 
 #include <vector>
 
@@ -28,23 +28,17 @@
 // TaskRunners do not outlive the scope of the TaskEnvironment in unit tests
 // (otherwise the next test in the same process will die in use-after-frees).
 //
-// Note: This is only meant for base::ThreadPool bound task runners. Task
-// runners bound to other destination which share an existing sequence (like
-// BrowserThreads) should just use the appropriate getter each time (e.g.
-// base::Create*TaskRunner({BrowserThread::UI})).
-// TODO(1026641): Rename this API to LazyThreadPoolTaskRunner.
-//
 // IMPORTANT: Only use this API as a last resort. Prefer storing a
 // (Sequenced|SingleThread)TaskRunner returned by
-// base::Create(Sequenced|SingleThread|COMSTA)TaskRunner() as a member on an
-// object accessible by all PostTask() call sites.
+// base::ThreadPool::Create(Sequenced|SingleThread|COMSTA)TaskRunner() as a
+// member on an object accessible by all PostTask() call sites.
 //
 // Example usage 1:
 //
 // namespace {
-// base::LazySequencedTaskRunner g_sequenced_task_runner =
-//     LAZY_SEQUENCED_TASK_RUNNER_INITIALIZER(
-//         base::TaskTraits(base::ThreadPool(), base::MayBlock(),
+// base::LazyThreadPoolSequencedTaskRunner g_sequenced_task_runner =
+//     LAZY_THREAD_POOL_SEQUENCED_TASK_RUNNER_INITIALIZER(
+//         base::TaskTraits(base::MayBlock(),
 //                          base::TaskPriority::USER_VISIBLE));
 // }  // namespace
 //
@@ -57,9 +51,9 @@
 // Example usage 2:
 //
 // namespace {
-// base::LazySequencedTaskRunner g_sequenced_task_task_runner =
-//     LAZY_SEQUENCED_TASK_RUNNER_INITIALIZER(
-//         base::TaskTraits(base::ThreadPool(), base::MayBlock()));
+// base::LazyThreadPoolSequencedTaskRunner g_sequenced_task_task_runner =
+//     LAZY_THREAD_POOL_SEQUENCED_TASK_RUNNER_INITIALIZER(
+//         base::TaskTraits(base::MayBlock()));
 // }  // namespace
 //
 // // Code from different files can access the SequencedTaskRunner via this
@@ -72,21 +66,21 @@ namespace base {
 
 namespace internal {
 template <typename TaskRunnerType, bool com_sta>
-class BASE_EXPORT LazyTaskRunner;
+class BASE_EXPORT LazyThreadPoolTaskRunner;
 }  // namespace internal
 
 // Lazy SequencedTaskRunner.
-using LazySequencedTaskRunner =
-    internal::LazyTaskRunner<SequencedTaskRunner, false>;
+using LazyThreadPoolSequencedTaskRunner =
+    internal::LazyThreadPoolTaskRunner<SequencedTaskRunner, false>;
 
 // Lazy SingleThreadTaskRunner.
-using LazySingleThreadTaskRunner =
-    internal::LazyTaskRunner<SingleThreadTaskRunner, false>;
+using LazyThreadPoolSingleThreadTaskRunner =
+    internal::LazyThreadPoolTaskRunner<SingleThreadTaskRunner, false>;
 
 #if defined(OS_WIN)
 // Lazy COM-STA enabled SingleThreadTaskRunner.
-using LazyCOMSTATaskRunner =
-    internal::LazyTaskRunner<SingleThreadTaskRunner, true>;
+using LazyThreadPoolCOMSTATaskRunner =
+    internal::LazyThreadPoolTaskRunner<SingleThreadTaskRunner, true>;
 #endif
 
 // Helper macros to generate a variable name by concatenation.
@@ -94,14 +88,15 @@ using LazyCOMSTATaskRunner =
 #define LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(a, b) \
   LAZY_TASK_RUNNER_CONCATENATE_INTERNAL2(a, b)
 
-// Use the macros below to initialize a LazyTaskRunner. These macros verify that
-// their arguments are constexpr, which is important to prevent the generation
-// of a static initializer.
+// Use the macros below to initialize a LazyThreadPoolTaskRunner. These macros
+// verify that their arguments are constexpr, which is important to prevent the
+// generation of a static initializer.
 
 // |traits| are TaskTraits used when creating the SequencedTaskRunner.
-#define LAZY_SEQUENCED_TASK_RUNNER_INITIALIZER(traits)                 \
-  base::LazySequencedTaskRunner::CreateInternal(traits);               \
-  static_assert(traits.use_thread_pool(), "");                         \
+#define LAZY_THREAD_POOL_SEQUENCED_TASK_RUNNER_INITIALIZER(traits)     \
+  base::LazyThreadPoolSequencedTaskRunner::CreateInternal(traits);     \
+  /* ThreadPool() as a trait is deprecated and implicit here */        \
+  static_assert(!traits.use_thread_pool(), "");                        \
   ALLOW_UNUSED_TYPE constexpr base::TaskTraits                         \
       LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyTraitsAreConstexpr, \
                                             __LINE__) = traits
@@ -109,46 +104,50 @@ using LazyCOMSTATaskRunner =
 // |traits| are TaskTraits used when creating the SingleThreadTaskRunner.
 // |thread_mode| specifies whether the SingleThreadTaskRunner can share its
 // thread with other SingleThreadTaskRunners.
-#define LAZY_SINGLE_THREAD_TASK_RUNNER_INITIALIZER(traits, thread_mode)   \
-  base::LazySingleThreadTaskRunner::CreateInternal(traits, thread_mode);  \
-  static_assert(traits.use_thread_pool(), "");                            \
-  ALLOW_UNUSED_TYPE constexpr base::TaskTraits                            \
-      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyTraitsAreConstexpr,    \
-                                            __LINE__) = traits;           \
-  ALLOW_UNUSED_TYPE constexpr base::SingleThreadTaskRunnerThreadMode      \
-      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyThreadModeIsConstexpr, \
+#define LAZY_THREAD_POOL_SINGLE_THREAD_TASK_RUNNER_INITIALIZER(traits,      \
+                                                               thread_mode) \
+  base::LazyThreadPoolSingleThreadTaskRunner::CreateInternal(traits,        \
+                                                             thread_mode);  \
+  /* ThreadPool() as a trait is deprecated and implicit here */             \
+  static_assert(!traits.use_thread_pool(), "");                             \
+  ALLOW_UNUSED_TYPE constexpr base::TaskTraits                              \
+      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyTraitsAreConstexpr,      \
+                                            __LINE__) = traits;             \
+  ALLOW_UNUSED_TYPE constexpr base::SingleThreadTaskRunnerThreadMode        \
+      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyThreadModeIsConstexpr,   \
                                             __LINE__) = thread_mode
 
 // |traits| are TaskTraits used when creating the COM STA
 // SingleThreadTaskRunner. |thread_mode| specifies whether the COM STA
 // SingleThreadTaskRunner can share its thread with other
 // SingleThreadTaskRunners.
-#define LAZY_COM_STA_TASK_RUNNER_INITIALIZER(traits, thread_mode)         \
-  base::LazyCOMSTATaskRunner::CreateInternal(traits, thread_mode);        \
-  static_assert(traits.use_thread_pool(), "");                            \
-  ALLOW_UNUSED_TYPE constexpr base::TaskTraits                            \
-      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyTraitsAreConstexpr,    \
-                                            __LINE__) = traits;           \
-  ALLOW_UNUSED_TYPE constexpr base::SingleThreadTaskRunnerThreadMode      \
-      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyThreadModeIsConstexpr, \
+#define LAZY_COM_STA_TASK_RUNNER_INITIALIZER(traits, thread_mode)            \
+  base::LazyThreadPoolCOMSTATaskRunner::CreateInternal(traits, thread_mode); \
+  /* ThreadPool() as a trait is deprecated and implicit here */              \
+  static_assert(!traits.use_thread_pool(), "");                              \
+  ALLOW_UNUSED_TYPE constexpr base::TaskTraits                               \
+      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyTraitsAreConstexpr,       \
+                                            __LINE__) = traits;              \
+  ALLOW_UNUSED_TYPE constexpr base::SingleThreadTaskRunnerThreadMode         \
+      LAZY_TASK_RUNNER_CONCATENATE_INTERNAL(kVerifyThreadModeIsConstexpr,    \
                                             __LINE__) = thread_mode
 
 namespace internal {
 
 template <typename TaskRunnerType, bool com_sta>
-class BASE_EXPORT LazyTaskRunner {
+class BASE_EXPORT LazyThreadPoolTaskRunner {
  public:
   // Use the macros above rather than a direct call to this.
   //
   // |traits| are TaskTraits to use to create the TaskRunner. If this
-  // LazyTaskRunner is specialized to create a SingleThreadTaskRunner,
+  // LazyThreadPoolTaskRunner is specialized to create a SingleThreadTaskRunner,
   // |thread_mode| specifies whether the SingleThreadTaskRunner can share its
   // thread with other SingleThreadTaskRunner. Otherwise, it is unused.
-  static constexpr LazyTaskRunner CreateInternal(
+  static constexpr LazyThreadPoolTaskRunner CreateInternal(
       const TaskTraits& traits,
       SingleThreadTaskRunnerThreadMode thread_mode =
           SingleThreadTaskRunnerThreadMode::SHARED) {
-    return LazyTaskRunner(traits, thread_mode);
+    return LazyThreadPoolTaskRunner(traits, thread_mode);
   }
 
   // Returns the TaskRunner held by this instance. Creates it if it didn't
@@ -156,9 +155,10 @@ class BASE_EXPORT LazyTaskRunner {
   scoped_refptr<TaskRunnerType> Get();
 
  private:
-  constexpr LazyTaskRunner(const TaskTraits& traits,
-                           SingleThreadTaskRunnerThreadMode thread_mode =
-                               SingleThreadTaskRunnerThreadMode::SHARED)
+  constexpr LazyThreadPoolTaskRunner(
+      const TaskTraits& traits,
+      SingleThreadTaskRunnerThreadMode thread_mode =
+          SingleThreadTaskRunnerThreadMode::SHARED)
       : traits_(traits), thread_mode_(thread_mode) {}
 
   // Releases the TaskRunner held by this instance.
@@ -191,22 +191,22 @@ class BASE_EXPORT LazyTaskRunner {
   // (implementation limitation))'.
 };
 
-// When a LazyTaskRunner becomes active (invokes Get()), it adds a callback to
-// the current ScopedLazyTaskRunnerListForTesting, if any. Callbacks run when
-// the ScopedLazyTaskRunnerListForTesting is destroyed. In a test process, a
-// ScopedLazyTaskRunnerListForTesting must be instantiated before any
-// LazyTaskRunner becomes active.
+// When a LazyThreadPoolTaskRunner becomes active (invokes Get()), it adds a
+// callback to the current ScopedLazyTaskRunnerListForTesting, if any.
+// Callbacks run when the ScopedLazyTaskRunnerListForTesting is
+// destroyed. In a test process, a ScopedLazyTaskRunnerListForTesting
+// must be instantiated before any LazyThreadPoolTaskRunner becomes active.
 class BASE_EXPORT ScopedLazyTaskRunnerListForTesting {
  public:
   ScopedLazyTaskRunnerListForTesting();
   ~ScopedLazyTaskRunnerListForTesting();
 
  private:
-  friend class LazyTaskRunner<SequencedTaskRunner, false>;
-  friend class LazyTaskRunner<SingleThreadTaskRunner, false>;
+  friend class LazyThreadPoolTaskRunner<SequencedTaskRunner, false>;
+  friend class LazyThreadPoolTaskRunner<SingleThreadTaskRunner, false>;
 
 #if defined(OS_WIN)
-  friend class LazyTaskRunner<SingleThreadTaskRunner, true>;
+  friend class LazyThreadPoolTaskRunner<SingleThreadTaskRunner, true>;
 #endif
 
   // Add |callback| to the list of callbacks to run on destruction.
@@ -223,4 +223,4 @@ class BASE_EXPORT ScopedLazyTaskRunnerListForTesting {
 }  // namespace internal
 }  // namespace base
 
-#endif  // BASE_TASK_LAZY_TASK_RUNNER_H_
+#endif  // BASE_TASK_LAZY_THREAD_POOL_TASK_RUNNER_H_

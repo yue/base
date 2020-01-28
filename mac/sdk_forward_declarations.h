@@ -13,40 +13,78 @@
 
 #import <AppKit/AppKit.h>
 #include <AvailabilityMacros.h>
-#import <CoreBluetooth/CoreBluetooth.h>
-#import <CoreWLAN/CoreWLAN.h>
-#import <IOBluetooth/IOBluetooth.h>
-#import <ImageCaptureCore/ImageCaptureCore.h>
-#import <QuartzCore/QuartzCore.h>
-#include <stdint.h>
+#include <os/availability.h>
+
+// NOTE: If an #import is needed only for a newer SDK, it might be found below.
 
 #include "base/base_export.h"
 
 // ----------------------------------------------------------------------------
-// Define typedefs, enums, and protocols not available in the version of the
-// OSX SDK being compiled against.
+// Old symbols that used to be in the macOS SDK but are no longer.
 // ----------------------------------------------------------------------------
 
-// ----------------------------------------------------------------------------
-// Define NSStrings only available in newer versions of the OSX SDK to force
-// them to be statically linked.
-// ----------------------------------------------------------------------------
+// kCWSSIDDidChangeNotification is available in the CoreWLAN.framework for OSX
+// versions 10.6 through 10.10 but stopped being included starting with the 10.9
+// SDK. Remove when 10.10 is no longer supported by Chromium.
+BASE_EXPORT extern "C" NSString* const kCWSSIDDidChangeNotification;
 
-extern "C" {
-#if !defined(MAC_OS_X_VERSION_10_11) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_11
-BASE_EXPORT extern NSString* const CIDetectorTypeText;
-#endif  // MAC_OS_X_VERSION_10_11
-}  // extern "C"
+// ----------------------------------------------------------------------------
+// Definitions from SDKs newer than the one that Chromium compiles against.
+//
+// HOW TO DO THIS:
+//
+// 1. In this file:
+//   a. Use an #if !defined() guard
+//   b. Include all API_AVAILABLE/NS_CLASS_AVAILABLE_MAC annotations
+//   c. Optionally import frameworks
+// 2. In your source file:
+//   a. Correctly use @available to annotate availability
+//
+// This way, when the SDK is rolled, the section full of definitions
+// corresponding to it can be easily deleted.
+//
+// EXAMPLES OF HOW TO DO THIS:
+//
+// Suppose there's a simple extension of NSApplication in macOS 10.25. Then:
+//
+//   #if !defined(MAC_OS_X_VERSION_10_25) || \
+//       MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_25
+//
+//   @interface NSApplication (MacOSHouseCatSDK)
+//   @property(readonly) CGFloat purrRate API_AVAILABLE(macos(10.25));
+//   @end
+//
+//   #endif  // MAC_OS_X_VERSION_10_25
+//
+//
+// Suppose the CoreShoelace framework is introduced in macOS 10.77. Then:
+//
+//   #if !defined(MAC_OS_X_VERSION_10_77) || \
+//       MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_77
+//
+//   API_AVAILABLE(macos(10.77))
+//   @interface NSCoreShoelace : NSObject
+//   @property (readonly) NSUInteger stringLength;
+//   @end
+//
+//   #else
+//
+//   #import <CoreShoelace/CoreShoelace.h>
+//
+//   #endif  // MAC_OS_X_VERSION_10_77
+//
+// ----------------------------------------------------------------------------
 
 #if !defined(MAC_OS_X_VERSION_10_15) || \
-    MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_15
+    MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_15
 
 @interface NSScreen (ForwardDeclare)
 @property(readonly)
-    CGFloat maximumPotentialExtendedDynamicRangeColorComponentValue;
+    CGFloat maximumPotentialExtendedDynamicRangeColorComponentValue
+        API_AVAILABLE(macos(10.15));
 @end
 
+NS_CLASS_AVAILABLE_MAC(10_15)
 @interface SFUniversalLink : NSObject
 - (instancetype)initWithWebpageURL:(NSURL*)url;
 @property(readonly) NSURL* webpageURL;
@@ -54,14 +92,11 @@ BASE_EXPORT extern NSString* const CIDetectorTypeText;
 @property(getter=isEnabled) BOOL enabled;
 @end
 
+#else
+
+#import <SafariServices/SafariServices.h>
+
 #endif  // MAC_OS_X_VERSION_10_15
 
-// ----------------------------------------------------------------------------
-// The symbol for kCWSSIDDidChangeNotification is available in the
-// CoreWLAN.framework for OSX versions 10.6 through 10.10. The symbol is not
-// declared in the OSX 10.9+ SDK, so when compiling against an OSX 10.9+ SDK,
-// declare the symbol.
-// ----------------------------------------------------------------------------
-BASE_EXPORT extern "C" NSString* const kCWSSIDDidChangeNotification;
 
 #endif  // BASE_MAC_SDK_FORWARD_DECLARATIONS_H_

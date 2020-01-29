@@ -198,19 +198,6 @@ template <typename STRING_TYPE> class BasicStringPiece {
   constexpr size_type length() const noexcept { return length_; }
   bool empty() const { return length_ == 0; }
 
-  void clear() {
-    ptr_ = NULL;
-    length_ = 0;
-  }
-  void set(const value_type* data, size_type len) {
-    ptr_ = data;
-    length_ = len;
-  }
-  void set(const value_type* str) {
-    ptr_ = str;
-    length_ = str ? STRING_TYPE::traits_type::length(str) : 0;
-  }
-
   constexpr value_type operator[](size_type i) const {
     CHECK(i < length_);
     return ptr_[i];

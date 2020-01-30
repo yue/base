@@ -5,8 +5,9 @@
 #ifndef BASE_THREADING_HANG_WATCHER_H_
 #define BASE_THREADING_HANG_WATCHER_H_
 
-#include <exception>
+#include <atomic>
 #include <memory>
+#include <vector>
 
 #include "base/atomicops.h"
 #include "base/callback.h"

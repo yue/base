@@ -3,6 +3,10 @@
 // found in the LICENSE file.
 
 #include "base/threading/hang_watcher.h"
+
+#include <algorithm>
+#include <utility>
+
 #include "base/bind.h"
 #include "base/callback_helpers.h"
 #include "base/no_destructor.h"

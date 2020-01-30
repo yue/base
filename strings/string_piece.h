@@ -47,9 +47,6 @@ namespace base {
 // template internal to the .cc file.
 namespace internal {
 
-BASE_EXPORT void CopyToString(const StringPiece& self, std::string* target);
-BASE_EXPORT void CopyToString(const StringPiece16& self, string16* target);
-
 BASE_EXPORT void AppendToString(const StringPiece& self, std::string* target);
 BASE_EXPORT void AppendToString(const StringPiece16& self, string16* target);
 
@@ -253,12 +250,6 @@ template <typename STRING_TYPE> class BasicStringPiece {
 
   size_type max_size() const { return length_; }
   size_type capacity() const { return length_; }
-
-  // Sets the value of the given string target type to be the current string.
-  // This saves a temporary over doing |a = b.as_string()|
-  void CopyToString(STRING_TYPE* target) const {
-    internal::CopyToString(*this, target);
-  }
 
   void AppendToString(STRING_TYPE* target) const {
     internal::AppendToString(*this, target);

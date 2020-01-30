@@ -543,16 +543,6 @@ TEST(StringPieceTest, CheckCustom) {
   StringPiece e;
   std::string s2;
 
-  // CopyToString
-  a.CopyToString(&s2);
-  ASSERT_EQ(s2.size(), 6U);
-  ASSERT_EQ(s2, "foobar");
-  b.CopyToString(&s2);
-  ASSERT_EQ(s2.size(), 7U);
-  ASSERT_EQ(s1, s2);
-  e.CopyToString(&s2);
-  ASSERT_TRUE(s2.empty());
-
   // AppendToString
   s2.erase();
   a.AppendToString(&s2);

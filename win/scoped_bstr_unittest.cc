@@ -21,15 +21,15 @@ size_t test2_len = size(kTestString2) - 1;
 
 void DumbBstrTests() {
   ScopedBstr b;
-  EXPECT_TRUE(b == nullptr);
+  EXPECT_TRUE(b.Get() == nullptr);
   EXPECT_EQ(0u, b.Length());
   EXPECT_EQ(0u, b.ByteLength());
   b.Reset(nullptr);
-  EXPECT_TRUE(b == nullptr);
+  EXPECT_TRUE(b.Get() == nullptr);
   EXPECT_TRUE(b.Release() == nullptr);
   ScopedBstr b2;
   b.Swap(b2);
-  EXPECT_TRUE(b2 == nullptr);
+  EXPECT_TRUE(b.Get() == nullptr);
 }
 
 void GiveMeABstr(BSTR* ret) {
@@ -45,24 +45,24 @@ void BasicBstrTests() {
   b1.Swap(b2);
   EXPECT_EQ(test1_len, b2.Length());
   EXPECT_EQ(0u, b1.Length());
-  EXPECT_STREQ(b2, kTestString1);
+  EXPECT_STREQ(b2.Get(), kTestString1);
   BSTR tmp = b2.Release();
   EXPECT_TRUE(tmp != nullptr);
   EXPECT_STREQ(tmp, kTestString1);
-  EXPECT_TRUE(b2 == nullptr);
+  EXPECT_TRUE(b2.Get() == nullptr);
   SysFreeString(tmp);
 
   GiveMeABstr(b2.Receive());
-  EXPECT_TRUE(b2 != nullptr);
+  EXPECT_TRUE(b2.Get() != nullptr);
   b2.Reset();
   EXPECT_TRUE(b2.AllocateBytes(100) != nullptr);
   EXPECT_EQ(100u, b2.ByteLength());
   EXPECT_EQ(100 / sizeof(kTestString1[0]), b2.Length());
-  lstrcpy(static_cast<BSTR>(b2), kTestString1);
-  EXPECT_EQ(test1_len, static_cast<size_t>(lstrlen(b2)));
+  lstrcpy(b2.Get(), kTestString1);
+  EXPECT_EQ(test1_len, static_cast<size_t>(lstrlen(b2.Get())));
   EXPECT_EQ(100 / sizeof(kTestString1[0]), b2.Length());
-  b2.SetByteLen(lstrlen(b2) * sizeof(kTestString2[0]));
-  EXPECT_EQ(b2.Length(), static_cast<size_t>(lstrlen(b2)));
+  b2.SetByteLen(lstrlen(b2.Get()) * sizeof(kTestString2[0]));
+  EXPECT_EQ(b2.Length(), static_cast<size_t>(lstrlen(b2.Get())));
 
   EXPECT_TRUE(b1.Allocate(kTestString2) != nullptr);
   EXPECT_EQ(test2_len, b1.Length());

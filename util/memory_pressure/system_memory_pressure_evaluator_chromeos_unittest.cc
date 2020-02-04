@@ -19,6 +19,7 @@
 #include "base/test/test_timeouts.h"
 #include "base/threading/platform_thread.h"
 #include "base/threading/scoped_blocking_call.h"
+#include "base/threading/thread_task_runner_handle.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace util {
@@ -61,8 +62,8 @@ void OnMemoryPressure(
 
 void RunLoopRunWithTimeout(base::TimeDelta timeout) {
   base::RunLoop run_loop;
-  base::RunLoop::ScopedRunTimeoutForTest run_timeout(timeout,
-                                                     run_loop.QuitClosure());
+  base::ThreadTaskRunnerHandle::Get()->PostDelayedTask(
+      FROM_HERE, run_loop.QuitClosure(), timeout);
   run_loop.Run();
 }
 }  // namespace

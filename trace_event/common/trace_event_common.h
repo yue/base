@@ -61,28 +61,30 @@
 // current process id, thread id, and a timestamp in microseconds.
 //
 // To trace an asynchronous procedure such as an IPC send/receive, use
-// ASYNC_BEGIN and ASYNC_END:
+// NESTABLE_ASYNC_BEGIN and NESTABLE_ASYNC_END:
 //   [single threaded sender code]
 //     static int send_count = 0;
 //     ++send_count;
-//     TRACE_EVENT_ASYNC_BEGIN0("ipc", "message", send_count);
+//     TRACE_EVENT_NESTABLE_ASYNC_BEGIN0(
+//         "ipc", "message", TRACE_ID_LOCAL(send_count));
 //     Send(new MyMessage(send_count));
 //   [receive code]
 //     void OnMyMessage(send_count) {
-//       TRACE_EVENT_ASYNC_END0("ipc", "message", send_count);
+//       TRACE_NESTABLE_EVENT_ASYNC_END0(
+//           "ipc", "message", TRACE_ID_LOCAL(send_count));
 //     }
-// The third parameter is a unique ID to match ASYNC_BEGIN/ASYNC_END pairs.
-// ASYNC_BEGIN and ASYNC_END can occur on any thread of any traced process.
-// Pointers can be used for the ID parameter, and they will be annotated
-// internally so that the same pointer on two different processes will not
-// match. For example:
+// The third parameter is a unique ID to match NESTABLE_ASYNC_BEGIN/ASYNC_END
+// pairs. NESTABLE_ASYNC_BEGIN and ASYNC_END can occur on any thread of any
+// traced process. // Pointers can be used for the ID parameter, and they will
+// be annotated internally so that the same pointer on two different processes
+// will not match. For example:
 //   class MyTracedClass {
 //    public:
 //     MyTracedClass() {
-//       TRACE_EVENT_ASYNC_BEGIN0("category", "MyTracedClass", this);
+//       TRACE_EVENT_NESTABLE_ASYNC_BEGIN0("category", "MyTracedClass", this);
 //     }
 //     ~MyTracedClass() {
-//       TRACE_EVENT_ASYNC_END0("category", "MyTracedClass", this);
+//       TRACE_EVENT_NESTABLE_ASYNC_END0("category", "MyTracedClass", this);
 //     }
 //   }
 //
@@ -512,9 +514,11 @@
                                    name, id, TRACE_EVENT_FLAG_NONE, arg1_name, \
                                    arg1_val)
 
-// ASYNC_STEP_* APIs should be only used by legacy code. New code should
-// consider using NESTABLE_ASYNC_* APIs to describe substeps within an async
-// event.
+// -- TRACE_EVENT_ASYNC is DEPRECATED! --
+//
+// TRACE_EVENT_ASYNC_* APIs should be only used by legacy code. New code should
+// use TRACE_EVENT_NESTABLE_ASYNC_* APIs instead.
+//
 // Records a single ASYNC_BEGIN event called "name" immediately, with 0, 1 or 2
 // associated arguments. If the category is not enabled, then this
 // does nothing.

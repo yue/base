@@ -227,9 +227,10 @@ class span : public internal::ExtentStorage<Extent> {
   using pointer = T*;
   using reference = T&;
   using iterator = CheckedContiguousIterator<T>;
-  using const_iterator = CheckedContiguousConstIterator<T>;
+  // TODO(https://crbug.com/828324): Drop the const_iterator typedef once gMock
+  // supports containers without this nested type.
+  using const_iterator = iterator;
   using reverse_iterator = std::reverse_iterator<iterator>;
-  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
   static constexpr size_t extent = Extent;
 
   // [span.cons], span constructors, copy, assignment, and destructor
@@ -395,25 +396,17 @@ class span : public internal::ExtentStorage<Extent> {
   constexpr iterator begin() const noexcept {
     return iterator(data_, data_ + size());
   }
+
   constexpr iterator end() const noexcept {
     return iterator(data_, data_ + size(), data_ + size());
   }
 
-  constexpr const_iterator cbegin() const noexcept { return begin(); }
-  constexpr const_iterator cend() const noexcept { return end(); }
-
   constexpr reverse_iterator rbegin() const noexcept {
     return reverse_iterator(end());
   }
+
   constexpr reverse_iterator rend() const noexcept {
     return reverse_iterator(begin());
-  }
-
-  constexpr const_reverse_iterator crbegin() const noexcept {
-    return const_reverse_iterator(cend());
-  }
-  constexpr const_reverse_iterator crend() const noexcept {
-    return const_reverse_iterator(cbegin());
   }
 
  private:

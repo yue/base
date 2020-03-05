@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -965,7 +966,7 @@ TEST(SpanTest, ReverseIterator) {
   EXPECT_TRUE(std::equal(std::rbegin(kArray), std::rend(kArray), span.rbegin(),
                          span.rend()));
   EXPECT_TRUE(std::equal(std::crbegin(kArray), std::crend(kArray),
-                         span.crbegin(), span.crend()));
+                         std::crbegin(span), std::crend(span)));
 }
 
 TEST(SpanTest, AsBytes) {
@@ -1259,11 +1260,6 @@ TEST(SpanTest, IteratorIsRangeMoveSafe) {
         CheckedContiguousIterator<const int>(
             span.data() + dest_start_index,
             span.data() + dest_start_index + kNumElements)));
-    EXPECT_FALSE(CheckedContiguousConstIterator<const int>::IsRangeMoveSafe(
-        span.cbegin(), span.cend(),
-        CheckedContiguousConstIterator<const int>(
-            span.data() + dest_start_index,
-            span.data() + dest_start_index + kNumElements)));
   }
 
   // Non-overlapping ranges.
@@ -1273,28 +1269,17 @@ TEST(SpanTest, IteratorIsRangeMoveSafe) {
         CheckedContiguousIterator<const int>(
             span.data() + dest_start_index,
             span.data() + dest_start_index + kNumElements)));
-    EXPECT_TRUE(CheckedContiguousConstIterator<const int>::IsRangeMoveSafe(
-        span.cbegin(), span.cend(),
-        CheckedContiguousConstIterator<const int>(
-            span.data() + dest_start_index,
-            span.data() + dest_start_index + kNumElements)));
   }
 
   // IsRangeMoveSafe is true if the length to be moved is 0.
   EXPECT_TRUE(CheckedContiguousIterator<const int>::IsRangeMoveSafe(
       span.begin(), span.begin(),
       CheckedContiguousIterator<const int>(span.data(), span.data())));
-  EXPECT_TRUE(CheckedContiguousConstIterator<const int>::IsRangeMoveSafe(
-      span.cbegin(), span.cbegin(),
-      CheckedContiguousConstIterator<const int>(span.data(), span.data())));
 
   // IsRangeMoveSafe is false if end < begin.
   EXPECT_FALSE(CheckedContiguousIterator<const int>::IsRangeMoveSafe(
       span.end(), span.begin(),
       CheckedContiguousIterator<const int>(span.data(), span.data())));
-  EXPECT_FALSE(CheckedContiguousConstIterator<const int>::IsRangeMoveSafe(
-      span.cend(), span.cbegin(),
-      CheckedContiguousConstIterator<const int>(span.data(), span.data())));
 }
 
 TEST(SpanTest, Sort) {
@@ -1336,12 +1321,12 @@ TEST(SpanTest, SpanExtentConversions) {
 
 TEST(SpanTest, IteratorConversions) {
   static_assert(std::is_convertible<span<int>::iterator,
-                                    span<int>::const_iterator>::value,
-                "Error: iterator should be convertible to const_iterator");
+                                    span<const int>::iterator>::value,
+                "Error: iterator should be convertible to const iterator");
 
-  static_assert(!std::is_convertible<span<int>::const_iterator,
+  static_assert(!std::is_convertible<span<const int>::iterator,
                                      span<int>::iterator>::value,
-                "Error: const_iterator should not be convertible to iterator");
+                "Error: const iterator should not be convertible to iterator");
 }
 
 }  // namespace base

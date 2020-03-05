@@ -256,18 +256,18 @@ class span : public internal::ExtentStorage<Extent> {
   constexpr span(T (&array)[N]) noexcept : span(base::data(array), N) {}
 
   template <
+      typename U,
       size_t N,
-      typename = internal::
-          EnableIfSpanCompatibleArray<std::array<value_type, N>&, T, Extent>>
-  constexpr span(std::array<value_type, N>& array) noexcept
+      typename =
+          internal::EnableIfSpanCompatibleArray<std::array<U, N>&, T, Extent>>
+  constexpr span(std::array<U, N>& array) noexcept
       : span(base::data(array), N) {}
 
-  template <size_t N,
-            typename = internal::EnableIfSpanCompatibleArray<
-                const std::array<value_type, N>&,
-                T,
-                Extent>>
-  constexpr span(const std::array<value_type, N>& array) noexcept
+  template <typename U,
+            size_t N,
+            typename = internal::
+                EnableIfSpanCompatibleArray<const std::array<U, N>&, T, Extent>>
+  constexpr span(const std::array<U, N>& array) noexcept
       : span(base::data(array), N) {}
 
   // Conversion from a container that has compatible base::data() and integral

@@ -31,10 +31,12 @@ namespace {
 // the thread is suspended.
 class StackCopierDelegate : public StackCopier::Delegate {
  public:
-  StackCopierDelegate(Unwinder* native_unwinder,
+  StackCopierDelegate(ModuleCache* module_cache,
+                      Unwinder* native_unwinder,
                       Unwinder* aux_unwinder,
                       ProfileBuilder* profile_builder)
-      : native_unwinder_(native_unwinder),
+      : module_cache_(module_cache),
+        native_unwinder_(native_unwinder),
         aux_unwinder_(aux_unwinder),
         profile_builder_(profile_builder),
         metadata_provider_(
@@ -66,9 +68,14 @@ class StackCopierDelegate : public StackCopier::Delegate {
     // Reset this as soon as possible because it may hold a lock on the
     // metadata.
     metadata_provider_.reset();
+
+    native_unwinder_->UpdateModules(module_cache_);
+    if (aux_unwinder_)
+      aux_unwinder_->UpdateModules(module_cache_);
   }
 
  private:
+  ModuleCache* const module_cache_;
   Unwinder* const native_unwinder_;
   Unwinder* const aux_unwinder_;
   ProfileBuilder* const profile_builder_;
@@ -100,8 +107,8 @@ void StackSamplerImpl::RecordStackFrames(StackBuffer* stack_buffer,
   RegisterContext thread_context;
   uintptr_t stack_top;
   TimeTicks timestamp;
-  StackCopierDelegate delegate(native_unwinder_.get(), aux_unwinder_.get(),
-                               profile_builder);
+  StackCopierDelegate delegate(module_cache_, native_unwinder_.get(),
+                               aux_unwinder_.get(), profile_builder);
   bool success = stack_copier_->CopyStack(stack_buffer, &stack_top, &timestamp,
                                           &thread_context, &delegate);
   if (!success)

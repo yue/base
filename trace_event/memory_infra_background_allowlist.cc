@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "base/trace_event/memory_infra_background_whitelist.h"
+#include "base/trace_event/memory_infra_background_allowlist.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -15,12 +15,12 @@ namespace base {
 namespace trace_event {
 namespace {
 
-// The names of dump providers whitelisted for background tracing. Dump
+// The names of dump providers allowed to perform background tracing. Dump
 // providers can be added here only if the background mode dump has very
 // little processor and memory overhead.
 // TODO(ssid): Some dump providers do not create ownership edges on background
 // dump. So, the effective size will not be correct.
-const char* const kDumpProviderWhitelist[] = {
+const char* const kDumpProviderAllowlist[] = {
     "android::ResourceManagerImpl",
     "AutocompleteController",
     "BlinkGC",
@@ -70,7 +70,7 @@ const char* const kDumpProviderWhitelist[] = {
 
 // A list of string names that are allowed for the memory allocator dumps in
 // background mode.
-const char* const kAllocatorDumpNameWhitelist[] = {
+const char* const kAllocatorDumpNameAllowlist[] = {
     "blink_gc/main/heap",
     "blink_gc/workers/heap/worker_0x?",
     "blink_objects/AdSubframe",
@@ -387,9 +387,9 @@ const char* const kAllocatorDumpNameWhitelist[] = {
     nullptr  // End of list marker.
 };
 
-const char* const* g_dump_provider_whitelist = kDumpProviderWhitelist;
-const char* const* g_allocator_dump_name_whitelist =
-    kAllocatorDumpNameWhitelist;
+const char* const* g_dump_provider_allowlist = kDumpProviderAllowlist;
+const char* const* g_allocator_dump_name_allowlist =
+    kAllocatorDumpNameAllowlist;
 
 bool IsMemoryDumpProviderInList(const char* mdp_name, const char* const* list) {
   for (size_t i = 0; list[i] != nullptr; ++i) {
@@ -401,12 +401,12 @@ bool IsMemoryDumpProviderInList(const char* mdp_name, const char* const* list) {
 
 }  // namespace
 
-bool IsMemoryDumpProviderWhitelisted(const char* mdp_name) {
-  return IsMemoryDumpProviderInList(mdp_name, g_dump_provider_whitelist);
+bool IsMemoryDumpProviderInAllowlist(const char* mdp_name) {
+  return IsMemoryDumpProviderInList(mdp_name, g_dump_provider_allowlist);
 }
 
-bool IsMemoryAllocatorDumpNameWhitelisted(const std::string& name) {
-  // Global dumps are explicitly whitelisted for background use.
+bool IsMemoryAllocatorDumpNameInAllowlist(const std::string& name) {
+  // Global dumps that are of hex digits are all allowed for background use.
   if (base::StartsWith(name, "global/", CompareCase::SENSITIVE)) {
     for (size_t i = strlen("global/"); i < name.size(); i++)
       if (!base::IsHexDigit(name[i]))
@@ -440,20 +440,20 @@ bool IsMemoryAllocatorDumpNameWhitelisted(const std::string& name) {
     }
   }
 
-  for (size_t i = 0; g_allocator_dump_name_whitelist[i] != nullptr; ++i) {
-    if (stripped_str == g_allocator_dump_name_whitelist[i]) {
+  for (size_t i = 0; g_allocator_dump_name_allowlist[i] != nullptr; ++i) {
+    if (stripped_str == g_allocator_dump_name_allowlist[i]) {
       return true;
     }
   }
   return false;
 }
 
-void SetDumpProviderWhitelistForTesting(const char* const* list) {
-  g_dump_provider_whitelist = list;
+void SetDumpProviderAllowlistForTesting(const char* const* list) {
+  g_dump_provider_allowlist = list;
 }
 
-void SetAllocatorDumpNameWhitelistForTesting(const char* const* list) {
-  g_allocator_dump_name_whitelist = list;
+void SetAllocatorDumpNameAllowlistForTesting(const char* const* list) {
+  g_allocator_dump_name_allowlist = list;
 }
 
 }  // namespace trace_event

@@ -124,9 +124,6 @@ public class LibraryLoader {
     // Whether the configuration has been set.
     private boolean mConfigurationSet;
 
-    // Runs after all native libraries have been loaded.
-    private Runnable mPostLoadHook;
-
     @IntDef({LoadState.NOT_LOADED, LoadState.MAIN_DEX_LOADED, LoadState.LOADED})
     @Retention(RetentionPolicy.SOURCE)
     private @interface LoadState {
@@ -149,6 +146,10 @@ public class LibraryLoader {
     // The number of milliseconds it took to load all the native libraries, which
     // will be reported via UMA. Set once when the libraries are done loading.
     private long mLibraryLoadTimeMs;
+
+    // The suffix to add when loading the library. This is useful if a library with the same name is
+    // loaded in the same process, as can be the case with WebView/WebLayer.
+    private String mLibrarySuffix = "";
 
     /**
      * Call this method to determine if the chromium project must load the library
@@ -185,10 +186,13 @@ public class LibraryLoader {
         mLibraryProcessType = type;
     }
 
-    /** Sets a function to run after all native libraries have been loaded. */
-    public void setPostLoadHook(Runnable postLoadHook) {
+    /**
+     * Sets a suffix to use when loading the library. This will be appended to the library names
+     * for calls to System.loadLibrary().
+     */
+    public void setLibrarySuffix(String suffix) {
         assert mLoadState == LoadState.NOT_LOADED;
-        mPostLoadHook = postLoadHook;
+        mLibrarySuffix = suffix;
     }
 
     /**
@@ -488,7 +492,7 @@ public class LibraryLoader {
         // Load libraries using the system linker.
         for (String library : NativeLibraries.LIBRARIES) {
             if (!isInZipFile()) {
-                System.loadLibrary(library);
+                System.loadLibrary(library + mLibrarySuffix);
             } else {
                 // Load directly from the APK.
                 boolean is64Bit = ApiHelperForM.isProcess64Bit();
@@ -535,10 +539,6 @@ public class LibraryLoader {
             mLoadState = LoadState.MAIN_DEX_LOADED;
         } catch (UnsatisfiedLinkError e) {
             throw new ProcessInitException(LoaderErrors.NATIVE_LIBRARY_LOAD_FAILED, e);
-        }
-
-        if (mPostLoadHook != null) {
-            mPostLoadHook.run();
         }
     }
 

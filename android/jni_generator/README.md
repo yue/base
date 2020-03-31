@@ -150,11 +150,7 @@ void MyClass::NonStatic(JNIEnv* env) { ... }
 2. Call `JniMocker#mock` in a `setUp()` method for each interface you want to
    stub out.
 
-Note: Mocking native methods doesn't work in tests that are part of APKs that
-use an [`apk_under_test`](https://cs.chromium.org/search/?q=file:BUILD.gn+%22apk_under_test+%3D%22&type=cs).
-[This crbug](http://crbug.com/890452) tracks removing the `apk_under_test` variable.
-
-JniMocker will reset the stubs during `tearDown()`.
+`JniMocker` will reset the stubs during `tearDown()`.
 
 ```java
 /**

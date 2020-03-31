@@ -52,15 +52,6 @@ typedef CR_FORWARD_ENUM(unsigned int, NSSearchPathDirectory);
 typedef unsigned int NSSearchPathDomainMask;
 #endif
 
-typedef struct OpaqueSecTrustRef* SecACLRef;
-typedef struct OpaqueSecTrustedApplicationRef* SecTrustedApplicationRef;
-
-#if defined(OS_IOS)
-typedef struct CF_BRIDGED_TYPE(id) __SecPolicy* SecPolicyRef;
-#else
-typedef struct OpaqueSecPolicyRef* SecPolicyRef;
-#endif
-
 namespace base {
 
 class FilePath;

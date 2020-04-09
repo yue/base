@@ -41,24 +41,17 @@ class FilteredServiceDirectory;
 // test base-class:
 //
 //   TEST(MyFunkyTest, IsFunky) {
-//     TestComponentContextForProcess test_context;
+//     TestComponentContextForTest test_context;
 //     // Configure the |test_context|.
 //     // Run tests of code that uses ComponentContextForProcess().
 //   }
 //
-// By default created context doesn't expose any services. Services from the
-// original process-global ComponentContext (usually the environment in which
-// the test process is running), can be exposed through the |test_context| with
-// AddServices(), during test setup:
+// Services from the original process-global ComponentContext (usually the
+// environment in which the test process is running), can be exposed through the
+// |test_context| with AddServices(), during test setup:
 //
 //   test_context.AddServices({fuchsia::memorypressure::Provider::Name_, ...});
 //   // ... Execute tests which use fuchsia.memorypressure.Provider ...
-//
-// Alternatively InitialState::kEmpty can be passed to the constructor to expose
-// all services listed in /svc, e.g.:
-//
-//   TestComponentContextForProcess test_context(
-//       TestComponentContextForProcess::InitialState::kEmpty);
 //
 // Fake/mock implementations can be exposed via additional_services():
 //
@@ -75,13 +68,7 @@ class FilteredServiceDirectory;
 //
 class BASE_EXPORT TestComponentContextForProcess {
  public:
-  enum class InitialState {
-    kEmpty,
-    kCloneAll,
-  };
-
-  TestComponentContextForProcess(
-      InitialState initial_state = InitialState::kEmpty);
+  TestComponentContextForProcess();
   ~TestComponentContextForProcess();
 
   TestComponentContextForProcess(const TestComponentContextForProcess&) =
@@ -93,9 +80,8 @@ class BASE_EXPORT TestComponentContextForProcess {
   // published for use by the code-under test.
   sys::OutgoingDirectory* additional_services();
 
-  // Allows the specified service(s) from the original ComponentContext to be
+  // Allows the specified services from the original ComponentContext to be
   // exposed via the test default ComponentContext.
-  void AddService(const base::StringPiece service);
   void AddServices(base::span<const base::StringPiece> services);
 
   // Returns the directory of services that the code under test has published

@@ -87,10 +87,9 @@ TEST_F(CheckTest, Basics) {
   EXPECT_CHECK("Check failed: false. foo", CHECK(false) << "foo");
 
   double a = 2, b = 1;
-  EXPECT_CHECK("Check failed: a < b (2.000000 vs. 1.000000). ", CHECK_LT(a, b));
+  EXPECT_CHECK("Check failed: a < b (2 vs. 1)", CHECK_LT(a, b));
 
-  EXPECT_CHECK("Check failed: a < b (2.000000 vs. 1.000000). foo",
-               CHECK_LT(a, b) << "foo");
+  EXPECT_CHECK("Check failed: a < b (2 vs. 1)foo", CHECK_LT(a, b) << "foo");
 }
 
 TEST_F(CheckTest, PCheck) {
@@ -127,19 +126,19 @@ TEST_F(CheckTest, PCheck) {
 TEST_F(CheckTest, CheckOp) {
   int a = 1, b = 2;
   // clang-format off
-  EXPECT_CHECK("Check failed: a == b (1 vs. 2). ", CHECK_EQ(a, b));
-  EXPECT_CHECK("Check failed: a != a (1 vs. 1). ", CHECK_NE(a, a));
-  EXPECT_CHECK("Check failed: b <= a (2 vs. 1). ", CHECK_LE(b, a));
-  EXPECT_CHECK("Check failed: b < a (2 vs. 1). ",  CHECK_LT(b, a));
-  EXPECT_CHECK("Check failed: a >= b (1 vs. 2). ", CHECK_GE(a, b));
-  EXPECT_CHECK("Check failed: a > b (1 vs. 2). ",  CHECK_GT(a, b));
+  EXPECT_CHECK("Check failed: a == b (1 vs. 2)", CHECK_EQ(a, b));
+  EXPECT_CHECK("Check failed: a != a (1 vs. 1)", CHECK_NE(a, a));
+  EXPECT_CHECK("Check failed: b <= a (2 vs. 1)", CHECK_LE(b, a));
+  EXPECT_CHECK("Check failed: b < a (2 vs. 1)",  CHECK_LT(b, a));
+  EXPECT_CHECK("Check failed: a >= b (1 vs. 2)", CHECK_GE(a, b));
+  EXPECT_CHECK("Check failed: a > b (1 vs. 2)",  CHECK_GT(a, b));
 
-  EXPECT_DCHECK("Check failed: a == b (1 vs. 2). ", DCHECK_EQ(a, b));
-  EXPECT_DCHECK("Check failed: a != a (1 vs. 1). ", DCHECK_NE(a, a));
-  EXPECT_DCHECK("Check failed: b <= a (2 vs. 1). ", DCHECK_LE(b, a));
-  EXPECT_DCHECK("Check failed: b < a (2 vs. 1). ",  DCHECK_LT(b, a));
-  EXPECT_DCHECK("Check failed: a >= b (1 vs. 2). ", DCHECK_GE(a, b));
-  EXPECT_DCHECK("Check failed: a > b (1 vs. 2). ",  DCHECK_GT(a, b));
+  EXPECT_DCHECK("Check failed: a == b (1 vs. 2)", DCHECK_EQ(a, b));
+  EXPECT_DCHECK("Check failed: a != a (1 vs. 1)", DCHECK_NE(a, a));
+  EXPECT_DCHECK("Check failed: b <= a (2 vs. 1)", DCHECK_LE(b, a));
+  EXPECT_DCHECK("Check failed: b < a (2 vs. 1)",  DCHECK_LT(b, a));
+  EXPECT_DCHECK("Check failed: a >= b (1 vs. 2)", DCHECK_GE(a, b));
+  EXPECT_DCHECK("Check failed: a > b (1 vs. 2)",  DCHECK_GT(a, b));
   // clang-format on
 }
 
@@ -227,7 +226,7 @@ TEST_F(CheckTest, MAYBE_Dcheck) {
   std::string err =
       logging::SystemErrorCodeToString(logging::GetLastSystemErrorCode());
   EXPECT_DCHECK("Check failed: false. : " + err, DPCHECK(false));
-  EXPECT_DCHECK("Check failed: 0 == 1 (0 vs. 1). ", DCHECK_EQ(0, 1));
+  EXPECT_DCHECK("Check failed: 0 == 1 (0 vs. 1)", DCHECK_EQ(0, 1));
 
   // Test DCHECK on std::nullptr_t
   const void* p_null = nullptr;
@@ -240,7 +239,7 @@ TEST_F(CheckTest, MAYBE_Dcheck) {
   // Test DCHECK on a scoped enum.
   enum class Animal { DOG, CAT };
   DCHECK_EQ(Animal::DOG, Animal::DOG);
-  EXPECT_DCHECK("Check failed: Animal::DOG == Animal::CAT (0 vs. 1). ",
+  EXPECT_DCHECK("Check failed: Animal::DOG == Animal::CAT (0 vs. 1)",
                 DCHECK_EQ(Animal::DOG, Animal::CAT));
 
   // Test DCHECK on functions and function pointers.
@@ -259,10 +258,10 @@ TEST_F(CheckTest, MAYBE_Dcheck) {
   DCHECK_EQ(fp1, fp3);
   DCHECK_EQ(mp1, &MemberFunctions::MemberFunction1);
   DCHECK_EQ(mp2, &MemberFunctions::MemberFunction2);
-  EXPECT_DCHECK("=~Check failed: fp1 == fp2 \\(\\w+ vs. \\w+\\). ",
+  EXPECT_DCHECK("=~Check failed: fp1 == fp2 \\(\\w+ vs. \\w+\\)",
                 DCHECK_EQ(fp1, fp2));
   EXPECT_DCHECK(
-      "Check failed: mp2 == &MemberFunctions::MemberFunction1 (1 vs. 1). ",
+      "Check failed: mp2 == &MemberFunctions::MemberFunction1 (1 vs. 1)",
       DCHECK_EQ(mp2, &MemberFunctions::MemberFunction1));
 }
 
@@ -377,14 +376,13 @@ std::ostream& operator<<(std::ostream& out,
 
 TEST_F(CheckTest, OstreamVsToString) {
   StructWithOstream a, b;
-  EXPECT_CHECK("Check failed: a == b (ostream vs. ostream). ", CHECK_EQ(a, b));
+  EXPECT_CHECK("Check failed: a == b (ostream vs. ostream)", CHECK_EQ(a, b));
 
   StructWithToString c, d;
-  EXPECT_CHECK("Check failed: c == d (ToString vs. ToString). ",
-               CHECK_EQ(c, d));
+  EXPECT_CHECK("Check failed: c == d (ToString vs. ToString)", CHECK_EQ(c, d));
 
   StructWithToStringAndOstream e, f;
-  EXPECT_CHECK("Check failed: e == f (ostream vs. ostream). ", CHECK_EQ(e, f));
+  EXPECT_CHECK("Check failed: e == f (ostream vs. ostream)", CHECK_EQ(e, f));
 }
 
 }  // namespace

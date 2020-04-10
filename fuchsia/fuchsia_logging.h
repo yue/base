@@ -24,7 +24,7 @@ class BASE_EXPORT ZxLogMessage : public logging::LogMessage {
                int line,
                LogSeverity severity,
                zx_status_t zx_err);
-  ~ZxLogMessage() override;
+  ~ZxLogMessage();
 
  private:
   zx_status_t zx_err_;

@@ -3282,7 +3282,7 @@ if (is_android) {
       "//third_party/android_deps:androidx_collection_collection_java",
       "//third_party/android_deps:androidx_core_core_java",
       "//third_party/android_deps:androidx_multidex_multidex_java",
-      "//third_party/jsr-305:jsr_305_javalib",
+      "//third_party/android_deps:com_google_code_findbugs_jsr305_java",
     ]
 
     sources = [

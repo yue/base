@@ -31,7 +31,10 @@ namespace logging {
 // Caller takes ownership of the returned string.
 BASE_EXPORT char* CheckOpValueStr(int v);
 BASE_EXPORT char* CheckOpValueStr(unsigned v);
+BASE_EXPORT char* CheckOpValueStr(long v);
 BASE_EXPORT char* CheckOpValueStr(unsigned long v);
+BASE_EXPORT char* CheckOpValueStr(long long v);
+BASE_EXPORT char* CheckOpValueStr(unsigned long long v);
 BASE_EXPORT char* CheckOpValueStr(const void* v);
 BASE_EXPORT char* CheckOpValueStr(std::nullptr_t v);
 BASE_EXPORT char* CheckOpValueStr(double v);

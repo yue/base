@@ -28,9 +28,27 @@ char* CheckOpValueStr(unsigned v) {
   return strdup(buf);
 }
 
+char* CheckOpValueStr(long v) {
+  char buf[50];
+  snprintf(buf, sizeof(buf), "%ld", v);
+  return strdup(buf);
+}
+
 char* CheckOpValueStr(unsigned long v) {
   char buf[50];
   snprintf(buf, sizeof(buf), "%lu", v);
+  return strdup(buf);
+}
+
+char* CheckOpValueStr(long long v) {
+  char buf[50];
+  snprintf(buf, sizeof(buf), "%lld", v);
+  return strdup(buf);
+}
+
+char* CheckOpValueStr(unsigned long long v) {
+  char buf[50];
+  snprintf(buf, sizeof(buf), "%llu", v);
   return strdup(buf);
 }
 

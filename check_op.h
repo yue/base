@@ -5,8 +5,6 @@
 #ifndef BASE_CHECK_OP_H_
 #define BASE_CHECK_OP_H_
 
-#include <string.h>
-
 #include <cstddef>
 #include <type_traits>
 
@@ -73,7 +71,8 @@ inline typename std::enable_if<
         base::internal::SupportsToString<const T&>::value,
     char*>::type
 CheckOpValueStr(const T& v) {
-  return strdup(v.ToString().c_str());
+  // .ToString() may not return a std::string, e.g. blink::WTF::String.
+  return CheckOpValueStr(v.ToString());
 }
 
 // Provide an overload for functions and function pointers. Function pointers

@@ -385,20 +385,25 @@ void* PartitionReallocGenericFlags(PartitionRootGeneric* root,
   if (LIKELY(!overridden)) {
     internal::PartitionPage* page = internal::PartitionPage::FromPointer(
         internal::PartitionCookieFreePointerAdjust(ptr));
-    // TODO(palmer): See if we can afford to make this a CHECK.
-    DCHECK(root->IsValidPage(page));
+    bool success = false;
+    {
+      subtle::SpinLock::Guard guard{root->lock};
+      // TODO(palmer): See if we can afford to make this a CHECK.
+      DCHECK(root->IsValidPage(page));
 
-    if (UNLIKELY(page->bucket->is_direct_mapped())) {
-      // We may be able to perform the realloc in place by changing the
-      // accessibility of memory pages and, if reducing the size, decommitting
-      // them.
-      if (PartitionReallocDirectMappedInPlace(root, page, new_size)) {
-        if (UNLIKELY(hooks_enabled)) {
-          PartitionAllocHooks::ReallocObserverHookIfEnabled(ptr, ptr, new_size,
-                                                            type_name);
-        }
-        return ptr;
+      if (UNLIKELY(page->bucket->is_direct_mapped())) {
+        // We may be able to perform the realloc in place by changing the
+        // accessibility of memory pages and, if reducing the size, decommitting
+        // them.
+        success = PartitionReallocDirectMappedInPlace(root, page, new_size);
       }
+    }
+    if (success) {
+      if (UNLIKELY(hooks_enabled)) {
+        PartitionAllocHooks::ReallocObserverHookIfEnabled(ptr, ptr, new_size,
+                                                          type_name);
+      }
+      return ptr;
     }
 
     const size_t actual_new_size = root->ActualSize(new_size);

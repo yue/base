@@ -6,11 +6,6 @@
 #define BASE_TEST_TEST_WAITABLE_EVENT_H_
 
 #include "base/synchronization/waitable_event.h"
-#include "build/build_config.h"
-
-#if defined(OS_WIN)
-#include "base/win/scoped_handle.h"
-#endif
 
 namespace base {
 
@@ -25,10 +20,6 @@ class TestWaitableEvent : public WaitableEvent {
  public:
   TestWaitableEvent(ResetPolicy reset_policy = ResetPolicy::MANUAL,
                     InitialState initial_state = InitialState::NOT_SIGNALED);
-
-#if defined(OS_WIN)
-  explicit TestWaitableEvent(win::ScopedHandle event_handle);
-#endif
 };
 
 static_assert(sizeof(TestWaitableEvent) == sizeof(WaitableEvent),

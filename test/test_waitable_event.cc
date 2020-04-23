@@ -4,8 +4,6 @@
 
 #include "base/test/test_waitable_event.h"
 
-#include <utility>
-
 namespace base {
 
 TestWaitableEvent::TestWaitableEvent(ResetPolicy reset_policy,
@@ -17,12 +15,5 @@ TestWaitableEvent::TestWaitableEvent(ResetPolicy reset_policy,
   // logic).
   declare_only_used_while_idle();
 }
-
-#if defined(OS_WIN)
-TestWaitableEvent::TestWaitableEvent(win::ScopedHandle event_handle)
-    : WaitableEvent(std::move(event_handle)) {
-  declare_only_used_while_idle();
-}
-#endif
 
 }  // namespace base

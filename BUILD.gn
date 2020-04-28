@@ -2184,6 +2184,7 @@ buildflag_header("clang_profiling_buildflags") {
   flags = [
     "CLANG_PROFILING=$use_clang_profiling",
     "CLANG_PROFILING_INSIDE_SANDBOX=$use_clang_profiling_inside_sandbox",
+    "USE_CLANG_COVERAGE=$use_clang_coverage",
   ]
 }
 

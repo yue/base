@@ -100,6 +100,9 @@ if (is_win) {
 # test code (test support and anything in the test directory) which should use
 # source_set as is recommended for GN targets).
 jumbo_component("base") {
+  # Yue: Always do jumbo for base to save build time.
+  always_build_jumbo = true
+
   sources = [
     "allocator/allocator_check.cc",
     "allocator/allocator_check.h",

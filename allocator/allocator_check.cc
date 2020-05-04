@@ -7,7 +7,7 @@
 #include "base/allocator/features.h"
 #include "build/build_config.h"
 
-#if defined(OS_WIN)
+#if defined(OS_WIN) && BUILDFLAG(USE_ALLOCATOR_SHIM)
 #include "base/allocator/winheap_stubs_win.h"
 #endif
 

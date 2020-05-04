@@ -22,6 +22,12 @@
 #include "third_party/tcmalloc/chromium/src/gperftools/tcmalloc.h"
 #endif
 
+#if !BUILDFLAG(USE_ALLOCATOR_SHIM) && defined(LIBC_GLIBC) && !defined(USE_TCMALLOC)
+extern "C" {
+void* __libc_malloc(size_t size);
+}
+#endif
+
 namespace base {
 
 size_t g_oom_size = 0U;

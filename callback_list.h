@@ -5,16 +5,19 @@
 #ifndef BASE_CALLBACK_LIST_H_
 #define BASE_CALLBACK_LIST_H_
 
+#include <algorithm>
 #include <list>
 #include <memory>
 #include <utility>
 
+#include "base/auto_reset.h"
 #include "base/bind.h"
 #include "base/callback.h"
 #include "base/callback_helpers.h"
 #include "base/compiler_specific.h"
 #include "base/logging.h"
 #include "base/memory/weak_ptr.h"
+#include "base/stl_util.h"
 
 // OVERVIEW:
 //
@@ -136,82 +139,40 @@ class CallbackListBase {
     // Calling Notify() reentrantly is currently unsupported.
     DCHECK(!iterating_);
 
-    // Null callbacks should be removed from the list whenever notification
-    // isn't in progress, so right now all callbacks should be non-null.
-    DCHECK(std::all_of(callbacks_.cbegin(), callbacks_.cend(),
-                       [](const auto& cb) { return !cb.is_null(); }));
+    if (empty())
+      return;  // Nothing to do.
 
-    Iterator it(this);
-    CallbackType* cb;
-    while ((cb = it.GetNext()) != nullptr) {
-      // Run the current callback, which may cancel it or any other callbacks.
-      cb->Run(args...);
-    }
-  }
+    // Canceled callbacks should be removed from the list whenever notification
+    // isn't in progress, so right now all callbacks should be valid.
+    const auto callback_valid = [](const auto& cb) { return !cb.is_null(); };
+    DCHECK(std::all_of(callbacks_.cbegin(), callbacks_.cend(), callback_valid));
 
- private:
-  using Callbacks = std::list<CallbackType>;
-
-  // An iterator class that can be used to access the list of callbacks.
-  class Iterator {
-   public:
-    explicit Iterator(CallbackListBase<CallbackType>* list)
-        : list_(list),
-          list_iter_(list_->callbacks_.begin()) {
-      list_->iterating_ = true;
-    }
-
-    Iterator(const Iterator& iter) = delete;
-    Iterator& operator=(const Iterator& iter) = delete;
-
-    ~Iterator() {
-      list_->iterating_ = false;
-
-      // Any null callbacks remaining in the list were canceled due to
-      // Subscription destruction during iteration, and can safely be erased
-      // now.
-      list_->Compact();
-    }
-
-    CallbackType* GetNext() {
+    {
+      AutoReset<bool> iterating(&iterating_, true);
       // Skip any callbacks that are canceled during iteration.
-      while ((list_iter_ != list_->callbacks_.end()) && list_iter_->is_null())
-        ++list_iter_;
-
-      CallbackType* cb = nullptr;
-      if (list_iter_ != list_->callbacks_.end()) {
-        cb = &(*list_iter_);
-        ++list_iter_;
-      }
-      return cb;
-    }
-
-   private:
-    CallbackListBase<CallbackType>* list_;
-    typename CallbackListBase<CallbackType>::Callbacks::iterator list_iter_;
-  };
-
-  // Compact the list: remove any entries which were nulled out during
-  // iteration.
-  void Compact() {
-    auto it = callbacks_.begin();
-    bool updated = false;
-    while (it != callbacks_.end()) {
-      if ((*it).is_null()) {
-        updated = true;
-        it = callbacks_.erase(it);
-      } else {
-        ++it;
+      for (auto it = callbacks_.begin(); it != callbacks_.end();
+           it = std::find_if(it, callbacks_.end(), callback_valid)) {
+        // Run the current callback, which may cancel it or any other callbacks.
+        DCHECK(!it->is_null());
+        (it++)->Run(args...);
       }
     }
+
+    // Any null callbacks remaining in the list were canceled due to
+    // Subscription destruction during iteration, and can safely be erased now.
+    const size_t erased_callbacks =
+        EraseIf(callbacks_, [](const auto& cb) { return cb.is_null(); });
 
     // Run |removal_callback_| if any callbacks were canceled. Note that we
     // cannot simply compare list sizes before and after iterating, since
     // notification may result in Add()ing new callbacks as well as canceling
     // them.
-    if (updated && !removal_callback_.is_null())
+    if (removal_callback_ && erased_callbacks)
       removal_callback_.Run();  // May delete |this|!
   }
+
+ private:
+  using Callbacks = std::list<CallbackType>;
 
   // Cancels the callback pointed to by |it|, which is guaranteed to be valid.
   void CancelCallback(const typename Callbacks::iterator& it) {

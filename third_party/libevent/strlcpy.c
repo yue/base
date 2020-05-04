@@ -33,7 +33,7 @@ static char *rcsid = "$OpenBSD: strlcpy.c,v 1.5 2001/05/13 15:40:16 deraadt Exp 
 
 #include <sys/types.h>
 
-#ifdef HAVE_CONFIG_H
+#ifndef NO_CONFIG_H
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 

@@ -116,7 +116,7 @@ bool MemoryMappedFile::MapFileRegionToMemory(
       // available via fcntl.
       // See also: https://openradar.appspot.com/32720223
       fstore_t params = {F_ALLOCATEALL, F_PEOFPOSMODE, region.offset,
-                         region.size, 0};
+                         static_cast<off_t>(region.size), 0};
       if (fcntl(file_.GetPlatformFile(), F_PREALLOCATE, &params) != 0) {
         DPLOG(ERROR) << "F_PREALLOCATE";
         // This can fail because the filesystem doesn't support it so don't

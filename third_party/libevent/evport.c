@@ -50,7 +50,7 @@
  * As in the select(2) implementation, signals are handled by evsignal.
  */
 
-#ifdef HAVE_CONFIG_H
+#ifndef NO_CONFIG_H
 #include "config.h"
 #endif
 

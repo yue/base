@@ -42,7 +42,6 @@ typedef unsigned long NSSearchPathDomainMask;
 enum NSSearchPathDirectory : unsigned int;
 typedef unsigned int NSSearchPathDomainMask;
 #endif
-typedef enum NSSearchPathDirectory NSSearchPathDirectory;
 
 typedef struct CF_BRIDGED_TYPE(id) __SecCertificate* SecCertificateRef;
 typedef struct CF_BRIDGED_TYPE(id) __SecKey* SecKeyRef;

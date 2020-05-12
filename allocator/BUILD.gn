@@ -13,6 +13,9 @@ declare_args() {
   enable_debugallocation = is_debug
 }
 
+use_allocator_shim = false
+use_allocator = "none"
+
 # This "allocator" meta-target will forward to the default allocator according
 # to the build settings.
 group("allocator") {

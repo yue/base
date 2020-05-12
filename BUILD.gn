@@ -53,6 +53,8 @@ declare_args() {
   enable_mutex_priority_inheritance = false
 }
 
+use_allocator_shim = false
+
 config("base_flags") {
   if (is_clang) {
     cflags = [

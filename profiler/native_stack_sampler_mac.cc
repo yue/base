@@ -568,8 +568,7 @@ void NativeStackSamplerMac::SuspendThreadAndRecordStack(
   }
 
   WalkStack(thread_state, new_stack_top, current_modules, profile_module_index,
-            [sample, current_modules, profile_module_index](
-                uintptr_t frame_ip, size_t module_index) {
+            [sample](uintptr_t frame_ip, size_t module_index) {
               sample->frames.emplace_back(frame_ip, module_index);
             });
 }

@@ -95,17 +95,6 @@ class BASE_EXPORT ThreadControllerWithMessagePumpImpl
   void Quit() override;
   void EnsureWorkScheduled() override;
 
- private:
-  friend class DoWorkScope;
-  friend class RunScope;
-
-  // Returns the delay till the next task. If there's no delay TimeDelta::Max()
-  // will be returned.
-  TimeDelta DoWorkImpl(LazyNow* continuation_lazy_now);
-
-  void InitializeThreadTaskRunnerHandle()
-      EXCLUSIVE_LOCKS_REQUIRED(task_runner_lock_);
-
   struct MainThreadOnly {
     MainThreadOnly();
     ~MainThreadOnly();
@@ -134,6 +123,25 @@ class BASE_EXPORT ThreadControllerWithMessagePumpImpl
 
     bool task_execution_allowed = true;
   };
+
+  const MainThreadOnly& MainThreadOnlyForTesting() const {
+    return main_thread_only_;
+  }
+
+  ThreadControllerPowerMonitor* ThreadControllerPowerMonitorForTesting() {
+    return &power_monitor_;
+  }
+
+ private:
+  friend class DoWorkScope;
+  friend class RunScope;
+
+  // Returns the delay till the next task. If there's no delay TimeDelta::Max()
+  // will be returned.
+  TimeDelta DoWorkImpl(LazyNow* continuation_lazy_now);
+
+  void InitializeThreadTaskRunnerHandle()
+      EXCLUSIVE_LOCKS_REQUIRED(task_runner_lock_);
 
   MainThreadOnly& main_thread_only() {
     DCHECK_CALLED_ON_VALID_THREAD(associated_thread_->thread_checker);

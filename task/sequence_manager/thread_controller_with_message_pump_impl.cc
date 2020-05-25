@@ -4,6 +4,9 @@
 
 #include "base/task/sequence_manager/thread_controller_with_message_pump_impl.h"
 
+#include <algorithm>
+#include <utility>
+
 #include "base/auto_reset.h"
 #include "base/memory/ptr_util.h"
 #include "base/message_loop/message_pump.h"

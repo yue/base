@@ -431,10 +431,11 @@ void MessagePumpForUI::ScheduleNativeTimer(
     const UINT_PTR ret =
         ::SetTimer(message_window_.hwnd(), reinterpret_cast<UINT_PTR>(this),
                    delay_msec, nullptr);
-    installed_native_timer_ = next_work_info.delayed_run_time;
 
-    if (ret)
+    if (ret) {
+      installed_native_timer_ = next_work_info.delayed_run_time;
       return;
+    }
     // This error is likely similar to MESSAGE_POST_ERROR (i.e. native queue is
     // full). Since we only use ScheduleNativeTimer() in native nested loops
     // this likely means this pump will not be given a chance to run application

@@ -343,6 +343,7 @@ void MessagePumpForUI::HandleWorkMessage() {
   if (next_work_info.is_immediate()) {
     ScheduleWork();
   } else {
+    state_->delegate->BeforeWait();
     ScheduleNativeTimer(next_work_info);
   }
 }
@@ -374,6 +375,7 @@ void MessagePumpForUI::HandleTimerMessage() {
   if (next_work_info.is_immediate()) {
     ScheduleWork();
   } else {
+    state_->delegate->BeforeWait();
     ScheduleNativeTimer(next_work_info);
   }
 }

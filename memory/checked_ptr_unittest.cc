@@ -137,10 +137,33 @@ TEST_F(CheckedPtrTest, NullArrowDereference) {
 
 TEST_F(CheckedPtrTest, NullExtractNoDereference) {
   CountingCheckedPtr<int> ptr = nullptr;
+  // No dereference hence shouldn't crash.
   int* raw = ptr;
   std::ignore = raw;
   EXPECT_EQ(g_get_for_comparison_cnt, 0);
   EXPECT_EQ(g_get_for_extraction_cnt, 1);
+  EXPECT_EQ(g_get_for_dereference_cnt, 0);
+}
+
+TEST_F(CheckedPtrTest, NullCmpExplicit) {
+  CountingCheckedPtr<int> ptr = nullptr;
+  EXPECT_TRUE(ptr == nullptr);
+  EXPECT_TRUE(nullptr == ptr);
+  EXPECT_FALSE(ptr != nullptr);
+  EXPECT_FALSE(nullptr != ptr);
+  // No need to unwrap pointer, just compare against 0.
+  EXPECT_EQ(g_get_for_comparison_cnt, 0);
+  EXPECT_EQ(g_get_for_extraction_cnt, 0);
+  EXPECT_EQ(g_get_for_dereference_cnt, 0);
+}
+
+TEST_F(CheckedPtrTest, NullCmpBool) {
+  CountingCheckedPtr<int> ptr = nullptr;
+  EXPECT_FALSE(ptr);
+  EXPECT_TRUE(!ptr);
+  // No need to unwrap pointer, just compare against 0.
+  EXPECT_EQ(g_get_for_comparison_cnt, 0);
+  EXPECT_EQ(g_get_for_extraction_cnt, 0);
   EXPECT_EQ(g_get_for_dereference_cnt, 0);
 }
 

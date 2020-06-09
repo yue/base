@@ -2,28 +2,25 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.base.test;
+package org.chromium.base.process_launcher;
 
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.chromium.base.process_launcher.ChildProcessConnection;
-
 /** An implementation of ChildProcessConnection that does not connect to a real service. */
 public class TestChildProcessConnection extends ChildProcessConnection {
-    private static class MockChildServiceConnection
-            implements ChildProcessConnection.ChildServiceConnection {
+    private static class MockChildServiceConnection implements ChildServiceConnection {
         private boolean mBound;
 
         @Override
-        public boolean bind() {
+        public boolean bindServiceConnection() {
             mBound = true;
             return true;
         }
 
         @Override
-        public void unbind() {
+        public void unbindServiceConnection() {
             mBound = false;
         }
 

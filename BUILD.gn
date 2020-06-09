@@ -3129,6 +3129,7 @@ test("base_unittests") {
 
   if (use_partition_alloc) {
     sources += [
+      "allocator/partition_allocator/address_pool_manager_unittest.cc",
       "allocator/partition_allocator/address_space_randomization_unittest.cc",
       "allocator/partition_allocator/memory_reclaimer_unittest.cc",
       "allocator/partition_allocator/page_allocator_unittest.cc",

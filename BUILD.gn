@@ -2212,6 +2212,7 @@ buildflag_header("debugging_buildflags") {
     "UNSAFE_DEVELOPER_BUILD=$is_unsafe_developer_build",
     "CAN_UNWIND_WITH_CFI_TABLE=$can_unwind_with_cfi_table",
     "ENABLE_ARM_CFI_TABLE=$enable_arm_cfi_table",
+    "EXCLUDE_UNWIND_TABLES=$exclude_unwind_tables",
     "ENABLE_GDBINIT_WARNING=$enable_gdbinit_warning",
     "ENABLE_LLDBINIT_WARNING=$enable_lldbinit_warning",
   ]

@@ -2141,8 +2141,9 @@ jumbo_component("base") {
       sources += [
         "trace_event/trace_event_etw_export_win.cc",
         "trace_event/trace_event_etw_export_win.h",
+        "trace_event/trace_logging_minimal_win.cc",
+        "trace_event/trace_logging_minimal_win.h",
       ]
-      deps += [ "//base/trace_event/etw_manifest:chrome_events_win" ]
     }
 
     if (is_android) {

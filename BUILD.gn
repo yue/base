@@ -2816,7 +2816,6 @@ test("base_unittests") {
     "task/sequence_manager/work_deduplicator_unittest.cc",
     "task/sequence_manager/work_queue_sets_unittest.cc",
     "task/sequence_manager/work_queue_unittest.cc",
-    "task/single_thread_task_executor_unittest.cc",
     "task/task_traits_extension_unittest.cc",
     "task/task_traits_unittest.cc",
     "task/thread_pool/can_run_policy_test.h",

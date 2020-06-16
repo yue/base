@@ -2946,6 +2946,8 @@ test("base_unittests") {
       "win/com_init_check_hook_unittest.cc",
       "win/com_init_util_unittest.cc",
       "win/core_winrt_util_unittest.cc",
+      "win/dispatch_stub.cc",
+      "win/dispatch_stub.h",
       "win/dllmain.cc",
       "win/embedded_i18n/language_selector_unittest.cc",
       "win/enum_variant_unittest.cc",

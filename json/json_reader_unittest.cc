@@ -833,10 +833,18 @@ TEST(JSONReaderTest, DecodeNegativeEscapeSequence) {
 
 // Verifies invalid code points are replaced.
 TEST(JSONReaderTest, ReplaceInvalidCharacters) {
-  // U+D800 is a lone surrogate.
-  const std::string invalid = "\"\xED\xA0\x80\"";
+  // U+D800 is a lone high surrogate.
+  const std::string invalid_high = "\"\xED\xA0\x80\"";
   Optional<Value> value =
-      JSONReader::Read(invalid, JSON_REPLACE_INVALID_CHARACTERS);
+      JSONReader::Read(invalid_high, JSON_REPLACE_INVALID_CHARACTERS);
+  ASSERT_TRUE(value);
+  ASSERT_TRUE(value->is_string());
+  // Expect three U+FFFD (one for each UTF-8 byte in the invalid code point).
+  EXPECT_EQ("\xEF\xBF\xBD\xEF\xBF\xBD\xEF\xBF\xBD", value->GetString());
+
+  // U+DFFF is a lone low surrogate.
+  const std::string invalid_low = "\"\xED\xBF\xBF\"";
+  value = JSONReader::Read(invalid_low, JSON_REPLACE_INVALID_CHARACTERS);
   ASSERT_TRUE(value);
   ASSERT_TRUE(value->is_string());
   // Expect three U+FFFD (one for each UTF-8 byte in the invalid code point).
@@ -844,10 +852,17 @@ TEST(JSONReaderTest, ReplaceInvalidCharacters) {
 }
 
 TEST(JSONReaderTest, ReplaceInvalidUTF16EscapeSequence) {
-  // U+D800 is a lone surrogate.
-  const std::string invalid = "\"_\\uD800_\"";
+  // U+D800 is a lone high surrogate.
+  const std::string invalid_high = "\"_\\uD800_\"";
   Optional<Value> value =
-      JSONReader::Read(invalid, JSON_REPLACE_INVALID_CHARACTERS);
+      JSONReader::Read(invalid_high, JSON_REPLACE_INVALID_CHARACTERS);
+  ASSERT_TRUE(value);
+  ASSERT_TRUE(value->is_string());
+  EXPECT_EQ("_\xEF\xBF\xBD_", value->GetString());
+
+  // U+DFFF is a lone low surrogate.
+  const std::string invalid_low = "\"_\\uDFFF_\"";
+  value = JSONReader::Read(invalid_low, JSON_REPLACE_INVALID_CHARACTERS);
   ASSERT_TRUE(value);
   ASSERT_TRUE(value->is_string());
   EXPECT_EQ("_\xEF\xBF\xBD_", value->GetString());

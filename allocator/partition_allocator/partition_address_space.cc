@@ -16,7 +16,6 @@ namespace internal {
 
 #if defined(__LP64__)
 
-uintptr_t PartitionAddressSpace::reserved_address_start_ = 0;
 // Before PartitionAddressSpace::Init(), no allocation are allocated from a
 // reserved address space. So initially make reserved_base_address_ to
 // be kReservedAddressSpaceOffsetMask. So PartitionAddressSpace::Contains()
@@ -31,18 +30,11 @@ pool_handle PartitionAddressSpace::direct_map_pool_ = 0;
 pool_handle PartitionAddressSpace::normal_bucket_pool_ = 0;
 
 void PartitionAddressSpace::Init() {
-  PA_DCHECK(!reserved_address_start_);
-  reserved_address_start_ = reinterpret_cast<uintptr_t>(SystemAllocPages(
-      nullptr, kReservedAddressSpaceSize, base::PageInaccessible,
-      PageTag::kPartitionAlloc, false));
-  PA_CHECK(reserved_address_start_);
-
-  const uintptr_t reserved_address_end =
-      reserved_address_start_ + kReservedAddressSpaceSize;
-
-  reserved_base_address_ =
-      bits::Align(reserved_address_start_, kReservedAddressSpaceAlignment);
-  PA_DCHECK(reserved_base_address_ >= reserved_address_start_);
+  PA_DCHECK(kReservedAddressSpaceOffsetMask == reserved_base_address_);
+  reserved_base_address_ = reinterpret_cast<uintptr_t>(AllocPages(
+      nullptr, kDesiredAddressSpaceSize, kReservedAddressSpaceAlignment,
+      base::PageInaccessible, PageTag::kPartitionAlloc, false));
+  PA_CHECK(reserved_base_address_);
   PA_DCHECK(!(reserved_base_address_ & kReservedAddressSpaceOffsetMask));
 
   uintptr_t current = reserved_base_address_;
@@ -57,15 +49,13 @@ void PartitionAddressSpace::Init() {
       current, kNormalBucketPoolSize);
   PA_DCHECK(normal_bucket_pool_);
   current += kNormalBucketPoolSize;
-  PA_DCHECK(current <= reserved_address_end);
-  PA_DCHECK(current == reserved_base_address_ + kDesiredAddressSpaceSize);
+  PA_DCHECK(reserved_base_address_ + kDesiredAddressSpaceSize == current);
 }
 
 void PartitionAddressSpace::UninitForTesting() {
-  PA_DCHECK(reserved_address_start_);
-  FreePages(reinterpret_cast<void*>(reserved_address_start_),
-            kReservedAddressSpaceSize);
-  reserved_address_start_ = 0;
+  PA_DCHECK(kReservedAddressSpaceOffsetMask != reserved_base_address_);
+  FreePages(reinterpret_cast<void*>(reserved_base_address_),
+            kReservedAddressSpaceAlignment);
   reserved_base_address_ = kReservedAddressSpaceOffsetMask;
   direct_map_pool_ = 0;
   normal_bucket_pool_ = 0;

@@ -6,6 +6,7 @@
 #define BASE_ALLOCATOR_PARTITION_ALLOCATOR_PARTITION_ADDRESS_SPACE_H_
 
 #include "base/allocator/partition_allocator/address_pool_manager.h"
+#include "base/allocator/partition_allocator/partition_alloc_check.h"
 #include "base/allocator/partition_allocator/partition_alloc_constants.h"
 #include "base/allocator/partition_allocator/partition_alloc_features.h"
 #include "base/base_export.h"
@@ -133,12 +134,12 @@ class BASE_EXPORT PartitionAddressSpace {
 };
 
 ALWAYS_INLINE internal::pool_handle GetDirectMapPool() {
-  DCHECK(IsPartitionAllocGigaCageEnabled());
+  PA_DCHECK(IsPartitionAllocGigaCageEnabled());
   return PartitionAddressSpace::GetDirectMapPool();
 }
 
 ALWAYS_INLINE internal::pool_handle GetNormalBucketPool() {
-  DCHECK(IsPartitionAllocGigaCageEnabled());
+  PA_DCHECK(IsPartitionAllocGigaCageEnabled());
   return PartitionAddressSpace::GetNormalBucketPool();
 }
 

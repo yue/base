@@ -4,6 +4,8 @@
 
 package org.chromium.base.test.util;
 
+import android.os.Bundle;
+
 import org.junit.Assert;
 
 import org.chromium.base.PathUtils;
@@ -16,7 +18,19 @@ import org.chromium.base.annotations.MainDex;
  */
 @MainDex
 public class UrlUtils {
+    public static final String EXTRA_ROOT_DIRECTORY =
+            "org.chromium.base.test.util.UrlUtils.RootDirectory";
     private static final String DATA_DIR = "/chrome/test/data/";
+    private static String sRootDirectory = PathUtils.getExternalStorageDirectory();
+
+    /**
+     * Sets the root directory from state in the bundle.
+     * @param bundle Bundle containing the intent extras.
+     */
+    public static void setPathsFromBundle(Bundle bundle) {
+        String rootDirectory = bundle.getString(EXTRA_ROOT_DIRECTORY);
+        if (rootDirectory != null) sRootDirectory = rootDirectory;
+    }
 
     /**
      * Construct the full path of a test data file.
@@ -43,7 +57,7 @@ public class UrlUtils {
     @CalledByNative
     public static String getIsolatedTestRoot() {
         try (StrictModeContext ignored = StrictModeContext.allowDiskReads()) {
-            return PathUtils.getExternalStorageDirectory() + "/chromium_tests_root";
+            return sRootDirectory + "/chromium_tests_root";
         }
     }
 

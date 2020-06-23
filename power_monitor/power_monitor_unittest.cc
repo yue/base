@@ -102,7 +102,6 @@ TEST_F(PowerMonitorTest, ThermalThrottling) {
 
   for (const auto state : kThermalStates) {
     source()->GenerateThermalThrottlingEvent(state);
-    EXPECT_EQ(state, source()->GetCurrentThermalState());
     EXPECT_EQ(observer.last_thermal_state(), state);
   }
 

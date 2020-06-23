@@ -613,7 +613,7 @@ namespace {
 
 struct CheckedPtr2ImplPartitionAllocSupportEnabled
     : base::internal::CheckedPtr2ImplPartitionAllocSupport {
-  static bool EnableForPtr(void* ptr) { return true; }
+  static bool EnabledForPtr(void* ptr) { return true; }
 };
 
 using CheckedPtr2ImplEnabled = base::internal::CheckedPtr2Impl<

@@ -9,7 +9,6 @@
 
 #include "base/base_export.h"
 #include "base/compiler_specific.h"
-#include "base/dcheck_is_on.h"
 #include "base/immediate_crash.h"
 
 // This header defines the CHECK, DCHECK, and DPCHECK macros.
@@ -125,6 +124,12 @@ class BASE_EXPORT CheckError {
       ::logging::CheckError::PCheck(__FILE__, __LINE__, #condition).stream(), \
       !ANALYZER_ASSUME_TRUE(condition))
 
+#endif
+
+#if defined(NDEBUG) && !defined(DCHECK_ALWAYS_ON)
+#define DCHECK_IS_ON() false
+#else
+#define DCHECK_IS_ON() true
 #endif
 
 #if DCHECK_IS_ON()

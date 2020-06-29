@@ -473,17 +473,10 @@ TEST(NativeUnwinderAndroidTest, MAYBE_ModuleState_SystemLibrary) {
   const uintptr_t c_library_function_address =
       reinterpret_cast<uintptr_t>(&printf);
 
-  std::vector<const ModuleCache::Module*> unwinder_modules =
-      unwinder_module_cache.GetModules();
-  const auto unwinder_module_loc = std::find_if(
-      unwinder_modules.begin(), unwinder_modules.end(),
-      [c_library_function_address](const ModuleCache::Module* module) {
-        return c_library_function_address >= module->GetBaseAddress() &&
-               c_library_function_address <
-                   module->GetBaseAddress() + module->GetSize();
-      });
-  ASSERT_NE(unwinder_modules.end(), unwinder_module_loc);
-  const ModuleCache::Module* unwinder_module = *unwinder_module_loc;
+  const ModuleCache::Module* unwinder_module =
+      unwinder_module_cache.GetExistingModuleForAddress(
+          c_library_function_address);
+  ASSERT_NE(nullptr, unwinder_module);
 
   ModuleCache reference_module_cache;
   const ModuleCache::Module* reference_module =
@@ -516,17 +509,10 @@ TEST(NativeUnwinderAndroidTest, MAYBE_ModuleState_ChromeLibrary) {
   const uintptr_t chrome_function_address =
       reinterpret_cast<uintptr_t>(&CaptureScenario);
 
-  std::vector<const ModuleCache::Module*> unwinder_modules =
-      unwinder_module_cache.GetModules();
-  const auto unwinder_module_loc = std::find_if(
-      unwinder_modules.begin(), unwinder_modules.end(),
-      [chrome_function_address](const ModuleCache::Module* module) {
-        return chrome_function_address >= module->GetBaseAddress() &&
-               chrome_function_address <
-                   module->GetBaseAddress() + module->GetSize();
-      });
-  ASSERT_NE(unwinder_modules.end(), unwinder_module_loc);
-  const ModuleCache::Module* unwinder_module = *unwinder_module_loc;
+  const ModuleCache::Module* unwinder_module =
+      unwinder_module_cache.GetExistingModuleForAddress(
+          chrome_function_address);
+  ASSERT_NE(nullptr, unwinder_module);
 
   ModuleCache reference_module_cache;
   const ModuleCache::Module* reference_module =

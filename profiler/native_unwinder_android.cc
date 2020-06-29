@@ -202,7 +202,9 @@ UnwindResult NativeUnwinderAndroid::TryUnwind(RegisterContext* thread_context,
       regs->set_dex_pc(0);
     }
 
-    // Add the frame to |stack|.
+    // Add the frame to |stack|. Must use GetModuleForAddress rather than
+    // GetExistingModuleForAddress because the unwound-to address may be in a
+    // module associated with a different unwinder.
     const ModuleCache::Module* module =
         module_cache->GetModuleForAddress(regs->pc());
     stack->emplace_back(regs->pc(), module);
@@ -246,12 +248,13 @@ void NativeUnwinderAndroid::AddInitialModulesFromMaps(
 void NativeUnwinderAndroid::EmitDexFrame(uintptr_t dex_pc,
                                          ModuleCache* module_cache,
                                          std::vector<Frame>* stack) const {
-  const ModuleCache::Module* module = module_cache->GetModuleForAddress(dex_pc);
+  const ModuleCache::Module* module =
+      module_cache->GetExistingModuleForAddress(dex_pc);
   if (!module) {
     // The region containing |dex_pc| may not be in |module_cache| since it's
     // usually not executable (.dex file). Since non-executable regions
     // are used much less commonly, it's lazily added here instead of from
-    // AddInitialModules().
+    // AddInitialModulesFromMaps().
     unwindstack::MapInfo* map_info = memory_regions_map_->Find(dex_pc);
     if (map_info) {
       auto new_module = std::make_unique<NonElfModule>(map_info);

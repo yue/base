@@ -33,32 +33,7 @@ void* PartitionMemalign(const AllocatorDispatch*,
                         size_t alignment,
                         size_t size,
                         void* context) {
-  // This is mandated by |posix_memalign()|, so should never fire.
-  //
-  // Note: CHECK() is fine here since we are not called from malloc(), but from
-  // posix_memalign(), so there is no recursion. It is also fine to make aligned
-  // allocations slower, as they are rare.
-  CHECK(base::bits::IsPowerOfTwo(alignment));
-
-  void* ptr;
-  // Handle cases such as size = 16, alignment = 64.
-  // Wastes memory when a large alignment is requested with a small size, but
-  // this is hard to avoid, and should not be too common.
-  if (size < alignment) {
-    ptr = Allocator().Alloc(alignment, "");
-  } else {
-    // PartitionAlloc only guarantees alignment for power-of-two sized
-    // allocations. To make sure this applies here, round up the allocation
-    // size.
-    size_t size_rounded_up =
-        static_cast<size_t>(1)
-        << (sizeof(size_t) * 8 - base::bits::CountLeadingZeroBits(size - 1));
-    ptr = Allocator().Alloc(size_rounded_up, "");
-  }
-
-  CHECK_EQ(reinterpret_cast<uintptr_t>(ptr) % alignment, 0ull);
-
-  return ptr;
+  return Allocator().AlignedAlloc(alignment, size);
 }
 
 void* PartitionRealloc(const AllocatorDispatch*,

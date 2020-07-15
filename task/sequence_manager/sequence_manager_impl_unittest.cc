@@ -4917,23 +4917,6 @@ TEST_P(SequenceManagerTest,
             queue->GetEnqueueOrderAtWhichWeBecameUnblocked());
 }
 
-TEST_P(SequenceManagerTest, OnTaskReady) {
-  auto queue = CreateTaskQueue();
-  int task_ready_count = 0;
-
-  queue->GetTaskQueueImpl()->SetOnTaskReadyHandler(
-      BindLambdaForTesting([&](const Task&, LazyNow*) { ++task_ready_count; }));
-
-  EXPECT_EQ(0, task_ready_count);
-  queue->task_runner()->PostTask(FROM_HERE, DoNothing());
-  EXPECT_EQ(1, task_ready_count);
-  queue->task_runner()->PostDelayedTask(FROM_HERE, DoNothing(),
-                                        base::TimeDelta::FromHours(1));
-  EXPECT_EQ(1, task_ready_count);
-  FastForwardBy(base::TimeDelta::FromHours(1));
-  EXPECT_EQ(2, task_ready_count);
-}
-
 namespace {
 
 class TaskObserverExpectingNoDelayedRunTime : public TaskObserver {

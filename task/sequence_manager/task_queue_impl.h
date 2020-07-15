@@ -122,7 +122,6 @@ class BASE_EXPORT TaskQueueImpl {
   void RemoveFence();
   bool HasActiveFence();
   bool BlockedByFence() const;
-  EnqueueOrder GetEnqueueOrderAtWhichWeBecameUnblocked() const;
 
   // Implementation of TaskQueue::SetObserver.
   void SetObserver(TaskQueue::Observer* observer);

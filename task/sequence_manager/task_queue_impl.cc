@@ -880,10 +880,6 @@ bool TaskQueueImpl::HasActiveFence() {
   return !!main_thread_only().current_fence;
 }
 
-EnqueueOrder TaskQueueImpl::GetEnqueueOrderAtWhichWeBecameUnblocked() const {
-  return main_thread_only().enqueue_order_at_which_we_became_unblocked;
-}
-
 bool TaskQueueImpl::CouldTaskRun(EnqueueOrder enqueue_order) const {
   if (!IsQueueEnabled())
     return false;

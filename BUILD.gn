@@ -91,11 +91,6 @@ dep_libevent =
 # Determines whether message_pump_libevent should be used.
 use_libevent = dep_libevent && !is_ios
 
-# Whether or not cfi table should be enabled on arm.
-# TODO(crbug.com/1090409): Replace can_unwind_with_cfi_table once sampling
-# profiler is enabled on android.
-enable_arm_cfi_table = is_android && !is_component_build && current_cpu == "arm"
-
 if (is_android) {
   import("//build/config/android/rules.gni")
 }

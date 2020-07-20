@@ -8,9 +8,11 @@
 
 #include <memory>
 
+#include "base/allocator/partition_allocator/checked_ptr_support.h"
 #include "base/allocator/partition_allocator/memory_reclaimer.h"
 #include "base/allocator/partition_allocator/oom.h"
 #include "base/allocator/partition_allocator/page_allocator_internal.h"
+#include "base/allocator/partition_allocator/partition_address_space.h"
 #include "base/allocator/partition_allocator/partition_alloc_features.h"
 #include "base/allocator/partition_allocator/partition_direct_map_extent.h"
 #include "base/allocator/partition_allocator/partition_oom.h"
@@ -837,6 +839,12 @@ template void PartitionAllocator<internal::ThreadSafe>::init(
 template PartitionAllocator<internal::NotThreadSafe>::~PartitionAllocator();
 template void PartitionAllocator<internal::NotThreadSafe>::init(
     PartitionAllocatorAlignment alignment);
+
+#if DCHECK_IS_ON()
+void DCheckIfManagedByPartitionAllocNormalBuckets(const void* ptr) {
+  PA_DCHECK(IsManagedByPartitionAllocNormalBuckets(ptr));
+}
+#endif
 
 }  // namespace internal
 

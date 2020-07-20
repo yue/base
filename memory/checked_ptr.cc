@@ -4,12 +4,18 @@
 
 #include "base/memory/checked_ptr.h"
 
+#include "base/allocator/partition_allocator/checked_ptr_support.h"
+#include "base/allocator/partition_allocator/partition_address_space.h"
 #include "base/allocator/partition_allocator/partition_alloc.h"
+#include "base/partition_alloc_buildflags.h"
+#include "build/build_config.h"
+#include "build/buildflag.h"
 
 namespace base {
 namespace internal {
 
-#if defined(ARCH_CPU_64_BITS) && !defined(OS_NACL)
+#if defined(ARCH_CPU_64_BITS) && !defined(OS_NACL) && \
+    BUILDFLAG(USE_PARTITION_ALLOC) && ENABLE_CHECKED_PTR2_OR_MTE_IMPL
 
 BASE_EXPORT bool CheckedPtr2OrMTEImplPartitionAllocSupport::EnabledForPtr(
     void* ptr) {

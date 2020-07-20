@@ -20,7 +20,8 @@
 
 #define ENABLE_CHECKED_PTR2_OR_MTE_IMPL 0
 #if ENABLE_CHECKED_PTR2_OR_MTE_IMPL
-static_assert(ENABLE_TAG_FOR_CHECKED_PTR2 || ENABLE_TAG_FOR_MTE_CHECKED_PTR,
+static_assert(ENABLE_TAG_FOR_CHECKED_PTR2 || ENABLE_TAG_FOR_MTE_CHECKED_PTR ||
+                  ENABLE_TAG_FOR_SINGLE_TAG_CHECKED_PTR,
               "CheckedPtr2OrMTEImpl can only by used if tags are enabled");
 #endif
 
@@ -185,10 +186,10 @@ struct CheckedPtr2OrMTEImpl {
   static ALWAYS_INLINE void* SafelyUnwrapPtrForDereference(
       uintptr_t wrapped_ptr) {
 #if CHECKED_PTR2_AVOID_BRANCH_WHEN_CHECKING_ENABLED
-    // This variant cannot be used with MTECheckedPtr algorithm, because it
+    // This variant can only be used with CheckedPtr2 algorithm, because it
     // relies on the generation to exist at a constant offset before the
     // allocation.
-    static_assert(!ENABLE_TAG_FOR_MTE_CHECKED_PTR, "");
+    static_assert(ENABLE_TAG_FOR_CHECKED_PTR2, "");
 
     // Top bit tells if the protection is enabled. Use it to decide whether to
     // read the word before the allocation, which exists only if the protection

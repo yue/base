@@ -823,9 +823,7 @@ ALWAYS_INLINE void* PartitionRoot<thread_safe>::AllocFlags(
   }
   size_t requested_size = size;
   size = internal::PartitionSizeAdjustAdd(allow_extras, size);
-#if ENABLE_TAG_FOR_CHECKED_PTR2
-  PA_CHECK(size >= requested_size);
-#endif
+  PA_CHECK(size >= requested_size);  // check for overflows
   auto* bucket = SizeToBucket(size);
   PA_DCHECK(bucket);
   {

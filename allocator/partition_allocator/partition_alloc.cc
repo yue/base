@@ -73,16 +73,24 @@ static_assert(kGenericMaxDirectMapped <=
                   (1UL << 31) + kPageAllocationGranularity,
               "maximum direct mapped allocation");
 // Check that some of our zanier calculations worked out as expected.
-#if !ENABLE_TAG_FOR_MTE_CHECKED_PTR
-static_assert(kGenericSmallestBucket == alignof(std::max_align_t),
+#if ENABLE_TAG_FOR_MTE_CHECKED_PTR
+static_assert(kGenericSmallestBucket >= alignof(std::max_align_t),
               "generic smallest bucket");
 #else
-static_assert(kGenericSmallestBucket >= alignof(std::max_align_t),
+static_assert(kGenericSmallestBucket == alignof(std::max_align_t),
               "generic smallest bucket");
 #endif
 static_assert(kGenericMaxBucketed == 983040, "generic max bucketed");
 static_assert(kMaxSystemPagesPerSlotSpan < (1 << 8),
               "System pages per slot span must be less than 128.");
+
+#if ENABLE_TAG_FOR_SINGLE_TAG_CHECKED_PTR
+namespace internal {
+BASE_EXPORT PartitionTagWrapper g_checked_ptr_single_tag = {{},
+                                                            kFixedTagValue,
+                                                            {}};
+}
+#endif
 
 Lock& GetHooksLock() {
   static NoDestructor<Lock> lock;

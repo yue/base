@@ -35,7 +35,10 @@ BASE_EXPORT bool CheckedPtr2OrMTEImplPartitionAllocSupport::EnabledForPtr(
   // the same result regardless, anyway.
   // TODO(bartekn): Figure out the thread-safety mismatch.
   return IsManagedByPartitionAllocNormalBuckets(ptr)
-#if ENABLE_TAG_FOR_CHECKED_PTR2
+  // Checking offset is not needed for ENABLE_TAG_FOR_SINGLE_TAG_CHECKED_PTR,
+  // but call it anyway for apples-to-apples comparison with
+  // ENABLE_TAG_FOR_CHECKED_PTR2.
+#if ENABLE_TAG_FOR_CHECKED_PTR2 || ENABLE_TAG_FOR_SINGLE_TAG_CHECKED_PTR
          && PartitionAllocGetSlotOffset<ThreadSafe>(ptr) == 0
 #endif
       ;

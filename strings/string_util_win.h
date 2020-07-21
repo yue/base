@@ -147,7 +147,7 @@ BASE_EXPORT bool ReplaceChars(WStringPiece input,
 
 BASE_EXPORT bool TrimString(WStringPiece input,
                             WStringPiece trim_chars,
-                            std::wstring* output);
+                            std::string* output);
 
 BASE_EXPORT WStringPiece TrimString(WStringPiece input,
                                     WStringPiece trim_chars,

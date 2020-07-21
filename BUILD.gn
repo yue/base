@@ -2291,7 +2291,10 @@ buildflag_header("sanitizer_buildflags") {
 buildflag_header("tracing_buildflags") {
   header = "tracing_buildflags.h"
 
-  flags = [ "ENABLE_BASE_TRACING=$enable_base_tracing" ]
+  flags = [
+    "ENABLE_BASE_TRACING=$enable_base_tracing",
+    "USE_PERFETTO_CLIENT_LIBRARY=$use_perfetto_client_library",
+  ]
 }
 
 # This is the subset of files from base that should not be used with a dynamic

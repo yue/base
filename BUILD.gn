@@ -3612,6 +3612,7 @@ if (is_android) {
       "*/NativeLibraries.class",
       "*/NativeLibraries##*.class",
     ]
+    resources_package = "org.chromium.base"
   }
 
   android_aidl("base_java_aidl") {

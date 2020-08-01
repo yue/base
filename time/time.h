@@ -297,7 +297,8 @@ class BASE_EXPORT TimeDelta {
     return *this = (*this / a);
   }
 
-  constexpr int64_t operator/(TimeDelta a) const {
+  constexpr int64_t operator/(TimeDelta a) const = delete;
+  constexpr int64_t IntDiv(TimeDelta a) const {
     if (!is_inf() && !a.is_zero())
       return delta_ / a.delta_;
     return ((delta_ < 0) == (a.delta_ < 0))

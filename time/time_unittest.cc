@@ -1779,6 +1779,8 @@ TEST(TimeDelta, TimeDeltaOperators) {
                 "");
   static_assert(3 == kElevenSeconds.IntDiv(kThreeSeconds), "");
   static_assert(0 == kThreeSeconds.IntDiv(kElevenSeconds), "");
+  static_assert(11.0 / 3.0 == kElevenSeconds.FltDiv(kThreeSeconds), "");
+  static_assert(3.0 / 11.0 == kThreeSeconds.FltDiv(kElevenSeconds), "");
   static_assert(TimeDelta::FromSeconds(2) == kElevenSeconds % kThreeSeconds,
                 "");
 }
@@ -1826,6 +1828,18 @@ TEST(TimeDelta, Overflows) {
   static_assert(TimeDelta::Min().IntDiv(TimeDelta::FromSeconds(-10)) ==
                     std::numeric_limits<int64_t>::max(),
                 "");
+  static_assert(TimeDelta::Max().FltDiv(TimeDelta::FromSeconds(10)) ==
+                    std::numeric_limits<double>::infinity(),
+                "");
+  static_assert(TimeDelta::Max().FltDiv(TimeDelta::FromSeconds(-10)) ==
+                    -std::numeric_limits<double>::infinity(),
+                "");
+  static_assert(TimeDelta::Min().FltDiv(TimeDelta::FromSeconds(10)) ==
+                    -std::numeric_limits<double>::infinity(),
+                "");
+  static_assert(TimeDelta::Min().FltDiv(TimeDelta::FromSeconds(-10)) ==
+                    std::numeric_limits<double>::infinity(),
+                "");
 
   // Division by zero.
   static_assert((TimeDelta::FromSeconds(1) / 0).is_max(), "");
@@ -1848,6 +1862,14 @@ TEST(TimeDelta, Overflows) {
   static_assert(TimeDelta::Min().IntDiv(TimeDelta()) ==
                     std::numeric_limits<int64_t>::min(),
                 "");
+  EXPECT_EQ(std::numeric_limits<double>::infinity(),
+            TimeDelta::FromSeconds(1).FltDiv(TimeDelta()));
+  EXPECT_EQ(-std::numeric_limits<double>::infinity(),
+            TimeDelta::FromSeconds(-1).FltDiv(TimeDelta()));
+  EXPECT_EQ(std::numeric_limits<double>::infinity(),
+            TimeDelta::Max().FltDiv(TimeDelta()));
+  EXPECT_EQ(-std::numeric_limits<double>::infinity(),
+            TimeDelta::Min().FltDiv(TimeDelta()));
 
   // Division by infinity.
   static_assert(kLargeDelta.IntDiv(TimeDelta::Min()) == 0, "");
@@ -1866,6 +1888,10 @@ TEST(TimeDelta, Overflows) {
   static_assert(TimeDelta::Max().IntDiv(TimeDelta::Max()) ==
                     std::numeric_limits<int64_t>::max(),
                 "");
+  static_assert(kLargeDelta.FltDiv(TimeDelta::Min()) == 0, "");
+  static_assert(kLargeDelta.FltDiv(TimeDelta::Max()) == 0, "");
+  static_assert(kLargeNegative.FltDiv(TimeDelta::Min()) == 0, "");
+  static_assert(kLargeNegative.FltDiv(TimeDelta::Max()) == 0, "");
 
   static_assert(TimeDelta::FromSeconds(10) % TimeDelta::Min() ==
                     TimeDelta::FromSeconds(10),

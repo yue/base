@@ -105,7 +105,6 @@ TEST(MemoryTest, AllocatorShimWorking) {
 
 // OpenBSD does not support these tests. Don't test these on ASan/TSan/MSan
 // configurations: only test the real allocator.
-// Windows only supports these tests with the allocator shim in place.
 #if !defined(OS_OPENBSD) && BUILDFLAG(USE_ALLOCATOR_SHIM) && \
     !defined(MEMORY_TOOL_REPLACES_ALLOCATOR)
 
@@ -559,8 +558,34 @@ TEST_F(OutOfMemoryHandledTest, NewReleasesReservation) {
 }
 #endif  // defined(ARCH_CPU_32_BITS) && (defined(OS_WIN) || defined(OS_LINUX))
 
-// TODO(b.kelemen): make UncheckedMalloc and UncheckedCalloc work
-// on Windows as well.
+// See the comment in |UncheckedMalloc()|, it behaves as malloc() in these
+// cases.
+#if BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) || defined(OS_ANDROID)
+
+TEST_F(OutOfMemoryDeathTest, UncheckedMallocDies) {
+  ASSERT_DEATH(
+      {
+        SetUpInDeathAssert();
+        void* data;
+        bool ok = base::UncheckedMalloc(test_size_, &data);
+        EXPECT_TRUE(!data || ok);
+      },
+      kOomRegex);
+}
+
+TEST_F(OutOfMemoryDeathTest, UncheckedCallocDies) {
+  ASSERT_DEATH(
+      {
+        SetUpInDeathAssert();
+        void* data;
+        bool ok = base::UncheckedCalloc(1, test_size_, &data);
+        EXPECT_TRUE(!data || ok);
+      },
+      kOomRegex);
+}
+
+#else
+
 TEST_F(OutOfMemoryHandledTest, UncheckedMalloc) {
   EXPECT_TRUE(base::UncheckedMalloc(kSafeMallocSize, &value_));
   EXPECT_TRUE(value_ != nullptr);
@@ -589,5 +614,8 @@ TEST_F(OutOfMemoryHandledTest, UncheckedCalloc) {
   EXPECT_FALSE(base::UncheckedCalloc(1, test_size_, &value_));
   EXPECT_TRUE(value_ == nullptr);
 }
-#endif  // !defined(OS_OPENBSD) && BUILDFLAG(ENABLE_WIN_ALLOCATOR_SHIM_TESTS) &&
+
+#endif  // BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC) || defined(OS_ANDROID)
+
+#endif  // !defined(OS_OPENBSD) && BUILDFLAG(USE_ALLOCATOR_SHIM) &&
         // !defined(MEMORY_TOOL_REPLACES_ALLOCATOR)

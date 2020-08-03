@@ -1263,6 +1263,7 @@ jumbo_component("base") {
     "//base/third_party/double_conversion",
     "//base/third_party/dynamic_annotations",
     "//build:branding_buildflags",
+    "//build:lacros_buildflags",
     "//third_party/modp_b64",
   ]
 
@@ -1520,6 +1521,11 @@ jumbo_component("base") {
       "power_monitor/power_monitor_device_source_chromeos.cc",
       "system/sys_info_chromeos.cc",
     ]
+  }
+
+  # Lacros.
+  if (chromeos_is_browser_only) {
+    sources += [ "system/sys_info_chromeos.cc" ]
   }
 
   # Fuchsia.
@@ -2928,6 +2934,7 @@ test("base_unittests") {
     "//base/test:run_all_base_unittests",
     "//base/test:test_support",
     "//base/third_party/dynamic_annotations",
+    "//build:lacros_buildflags",
     "//testing/gmock",
     "//testing/gtest",
     "//third_party/icu",

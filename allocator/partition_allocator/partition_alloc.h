@@ -956,6 +956,7 @@ ALWAYS_INLINE void* PartitionRoot<thread_safe>::AlignedAlloc(size_t alignment,
     size_t size_rounded_up =
         static_cast<size_t>(1)
         << (sizeof(size_t) * 8 - base::bits::CountLeadingZeroBits(size - 1));
+    PA_CHECK(size_rounded_up >= size);  // Overflow check.
     ptr = Alloc(size_rounded_up, "");
   }
 

@@ -45,6 +45,11 @@ ReadElfLibraryName(const void* elf_mapped_base);
 // |elf_mapped_base|, or an empty span if the header couldn't be read.
 span<const Phdr> BASE_EXPORT GetElfProgramHeaders(const void* elf_mapped_base);
 
+// Returns the offset to add to virtual addresses in the image to compute the
+// mapped virtual address. This value must be added to the p_vaddr field in the
+// Phdrs to obtain the mapped virtual address.
+size_t BASE_EXPORT GetRelocationOffset(const void* elf_mapped_base);
+
 }  // namespace debug
 }  // namespace base
 

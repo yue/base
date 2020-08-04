@@ -11,6 +11,7 @@
 #include "base/debug/test_elf_image_builder.h"
 #include "base/files/memory_mapped_file.h"
 #include "base/native_library.h"
+#include "base/notreached.h"
 #include "base/strings/string_util.h"
 #include "build/build_config.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -139,6 +140,33 @@ TEST_P(ElfReaderTest, ReadElfLibraryNameNoSoName) {
 
   Optional<StringPiece> library_name = ReadElfLibraryName(image.elf_start());
   EXPECT_EQ(nullopt, library_name);
+}
+
+TEST_P(ElfReaderTest, GetRelocationOffset) {
+  TestElfImage image = TestElfImageBuilder(GetParam())
+                           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
+                           .Build();
+
+  switch (GetParam()) {
+    case TestElfImageBuilder::RELOCATABLE:
+      EXPECT_EQ(reinterpret_cast<size_t>(image.elf_start()),
+                GetRelocationOffset(image.elf_start()));
+      break;
+
+    case TestElfImageBuilder::RELOCATABLE_WITH_BIAS:
+      EXPECT_EQ(reinterpret_cast<size_t>(image.elf_start()) -
+                    TestElfImageBuilder::kLoadBias,
+                GetRelocationOffset(image.elf_start()));
+      break;
+
+    case TestElfImageBuilder::NON_RELOCATABLE:
+      EXPECT_EQ(0u, GetRelocationOffset(image.elf_start()));
+      break;
+
+    default:
+      NOTREACHED();
+      break;
+  }
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -62,6 +62,10 @@ class TestElfImageBuilder {
     NON_RELOCATABLE,        // Virtual address == mapped address.
   };
 
+  // The load bias to use for RELOCATABLE_WITH_BIAS. 0xc000 is a commonly used
+  // load bias for Android system ELF images.
+  static constexpr size_t kLoadBias = 0xc000;
+
   explicit TestElfImageBuilder(MappingType mapping_type);
   ~TestElfImageBuilder();
 
@@ -112,10 +116,6 @@ class TestElfImageBuilder {
                   Off offset,
                   Addr vaddr,
                   size_t size);
-
-  // The load bias to use for RELOCATABLE_WITH_BIAS. 0xc000 is a commonly used
-  // load bias for Android system ELF images.
-  static constexpr size_t kLoadBias = 0xc000;
 
   const MappingType mapping_type_;
   std::vector<std::vector<uint8_t>> note_contents_;

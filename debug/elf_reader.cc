@@ -51,41 +51,7 @@ const Ehdr* GetElfHeader(const void* elf_mapped_base) {
   return reinterpret_cast<const Ehdr*>(elf_mapped_base);
 }
 
-// Returns the offset to add to virtual addresses in the image to compute the
-// mapped virtual address.
-size_t GetRelocationOffset(const void* elf_mapped_base) {
-  span<const Phdr> headers = GetElfProgramHeaders(elf_mapped_base);
-  for (const Phdr& header : headers) {
-    if (header.p_type == PT_LOAD) {
-      // |elf_mapped_base| + |header.p_offset| is the mapped address of this
-      // segment. |header.p_vaddr| is the specified virtual address within the
-      // ELF image.
-      const char* const mapped_address =
-          reinterpret_cast<const char*>(elf_mapped_base) + header.p_offset;
-      return reinterpret_cast<uintptr_t>(mapped_address) - header.p_vaddr;
-    }
-  }
-
-  // Assume the virtual addresses in the image start at 0, so the offset is
-  // from 0 to the actual mapped base address.
-  return static_cast<size_t>(reinterpret_cast<const char*>(elf_mapped_base) -
-                             reinterpret_cast<const char*>(0));
-}
-
 }  // namespace
-
-span<const Phdr> GetElfProgramHeaders(const void* elf_mapped_base) {
-  // NOTE: Function should use async signal safe calls only.
-
-  const Ehdr* elf_header = GetElfHeader(elf_mapped_base);
-  if (!elf_header)
-    return {};
-
-  const char* phdr_start =
-      reinterpret_cast<const char*>(elf_header) + elf_header->e_phoff;
-  return span<const Phdr>(reinterpret_cast<const Phdr*>(phdr_start),
-                          elf_header->e_phnum);
-}
 
 size_t ReadElfBuildId(const void* elf_mapped_base,
                       bool uppercase,
@@ -193,6 +159,40 @@ Optional<StringPiece> ReadElfLibraryName(const void* elf_mapped_base) {
   }
 
   return nullopt;
+}
+
+span<const Phdr> GetElfProgramHeaders(const void* elf_mapped_base) {
+  // NOTE: Function should use async signal safe calls only.
+
+  const Ehdr* elf_header = GetElfHeader(elf_mapped_base);
+  if (!elf_header)
+    return {};
+
+  const char* phdr_start =
+      reinterpret_cast<const char*>(elf_header) + elf_header->e_phoff;
+  return span<const Phdr>(reinterpret_cast<const Phdr*>(phdr_start),
+                          elf_header->e_phnum);
+}
+
+// Returns the offset to add to virtual addresses in the image to compute the
+// mapped virtual address.
+size_t GetRelocationOffset(const void* elf_mapped_base) {
+  span<const Phdr> headers = GetElfProgramHeaders(elf_mapped_base);
+  for (const Phdr& header : headers) {
+    if (header.p_type == PT_LOAD) {
+      // |elf_mapped_base| + |header.p_offset| is the mapped address of this
+      // segment. |header.p_vaddr| is the specified virtual address within the
+      // ELF image.
+      const char* const mapped_address =
+          reinterpret_cast<const char*>(elf_mapped_base) + header.p_offset;
+      return reinterpret_cast<uintptr_t>(mapped_address) - header.p_vaddr;
+    }
+  }
+
+  // Assume the virtual addresses in the image start at 0, so the offset is
+  // from 0 to the actual mapped base address.
+  return static_cast<size_t>(reinterpret_cast<const char*>(elf_mapped_base) -
+                             reinterpret_cast<const char*>(0));
 }
 
 }  // namespace debug

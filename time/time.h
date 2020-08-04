@@ -301,6 +301,12 @@ class BASE_EXPORT TimeDelta {
   constexpr int64_t IntDiv(TimeDelta a) const {
     if (!is_inf() && !a.is_zero())
       return delta_ / a.delta_;
+
+    // 0/0 and inf/inf (any combination of positive and negative) are invalid
+    // (they are almost certainly not intentional, and result in NaN, which
+    // turns into 0 if clamped to an integer; this makes introducing subtle bugs
+    // too easy).
+    CHECK((!is_zero() || !a.is_zero()) && (!is_inf() || !a.is_inf()));
     return ((delta_ < 0) == (a.delta_ < 0))
                ? std::numeric_limits<int64_t>::max()
                : std::numeric_limits<int64_t>::min();

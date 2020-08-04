@@ -92,7 +92,7 @@ class BASE_EXPORT IOJankMonitoringWindow
   static constexpr TimeDelta kMonitoringWindow = TimeDelta::FromMinutes(1);
   static constexpr TimeDelta kTimeDiscrepancyTimeout = kIOJankInterval * 10;
   static constexpr int kNumIntervals =
-      kMonitoringWindow.IntDiv(kIOJankInterval);
+      kMonitoringWindow.FltDiv(kIOJankInterval);
 
  private:
   friend class base::RefCountedThreadSafe<IOJankMonitoringWindow>;

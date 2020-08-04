@@ -24,11 +24,26 @@ namespace {
 constexpr uint8_t kBuildIdBytes[] = {0xab, 0xcd, 0x12, 0x34};
 constexpr const char kBuildIdHexString[] = "ABCD1234";
 constexpr const char kBuildIdHexStringLower[] = "ABCD1234";
+
+std::string ParamInfoToString(
+    const ::testing::TestParamInfo<base::TestElfImageBuilder::MappingType>&
+        param_info) {
+  switch (param_info.param) {
+    case TestElfImageBuilder::RELOCATABLE:
+      return "Relocatable";
+
+    case TestElfImageBuilder::RELOCATABLE_WITH_BIAS:
+      return "RelocatableWithBias";
+  }
+}
 }  // namespace
 
-TEST(ElfReaderTest, ReadElfBuildIdUppercase) {
+using ElfReaderTest =
+    ::testing::TestWithParam<TestElfImageBuilder::MappingType>;
+
+TEST_P(ElfReaderTest, ReadElfBuildIdUppercase) {
   TestElfImage image =
-      TestElfImageBuilder()
+      TestElfImageBuilder(GetParam())
           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
           .AddNoteSegment(NT_GNU_BUILD_ID, "GNU", kBuildIdBytes)
           .Build();
@@ -39,9 +54,9 @@ TEST(ElfReaderTest, ReadElfBuildIdUppercase) {
   EXPECT_EQ(kBuildIdHexString, StringPiece(&build_id[0], build_id_size));
 }
 
-TEST(ElfReaderTest, ReadElfBuildIdLowercase) {
+TEST_P(ElfReaderTest, ReadElfBuildIdLowercase) {
   TestElfImage image =
-      TestElfImageBuilder()
+      TestElfImageBuilder(GetParam())
           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
           .AddNoteSegment(NT_GNU_BUILD_ID, "GNU", kBuildIdBytes)
           .Build();
@@ -53,11 +68,11 @@ TEST(ElfReaderTest, ReadElfBuildIdLowercase) {
             StringPiece(&build_id[0], build_id_size));
 }
 
-TEST(ElfReaderTest, ReadElfBuildIdMultipleNotes) {
+TEST_P(ElfReaderTest, ReadElfBuildIdMultipleNotes) {
   constexpr uint8_t kOtherNoteBytes[] = {0xef, 0x56};
 
   TestElfImage image =
-      TestElfImageBuilder()
+      TestElfImageBuilder(GetParam())
           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
           .AddNoteSegment(NT_GNU_BUILD_ID + 1, "ABC", kOtherNoteBytes)
           .AddNoteSegment(NT_GNU_BUILD_ID, "GNU", kBuildIdBytes)
@@ -69,9 +84,9 @@ TEST(ElfReaderTest, ReadElfBuildIdMultipleNotes) {
   EXPECT_EQ(kBuildIdHexString, StringPiece(&build_id[0], build_id_size));
 }
 
-TEST(ElfReaderTest, ReadElfBuildIdWrongName) {
+TEST_P(ElfReaderTest, ReadElfBuildIdWrongName) {
   TestElfImage image =
-      TestElfImageBuilder()
+      TestElfImageBuilder(GetParam())
           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
           .AddNoteSegment(NT_GNU_BUILD_ID, "ABC", kBuildIdBytes)
           .Build();
@@ -81,9 +96,9 @@ TEST(ElfReaderTest, ReadElfBuildIdWrongName) {
   EXPECT_EQ(0u, build_id_size);
 }
 
-TEST(ElfReaderTest, ReadElfBuildIdWrongType) {
+TEST_P(ElfReaderTest, ReadElfBuildIdWrongType) {
   TestElfImage image =
-      TestElfImageBuilder()
+      TestElfImageBuilder(GetParam())
           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
           .AddNoteSegment(NT_GNU_BUILD_ID + 1, "GNU", kBuildIdBytes)
           .Build();
@@ -93,8 +108,8 @@ TEST(ElfReaderTest, ReadElfBuildIdWrongType) {
   EXPECT_EQ(0u, build_id_size);
 }
 
-TEST(ElfReaderTest, ReadElfBuildIdNoBuildId) {
-  TestElfImage image = TestElfImageBuilder()
+TEST_P(ElfReaderTest, ReadElfBuildIdNoBuildId) {
+  TestElfImage image = TestElfImageBuilder(GetParam())
                            .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
                            .Build();
 
@@ -103,7 +118,34 @@ TEST(ElfReaderTest, ReadElfBuildIdNoBuildId) {
   EXPECT_EQ(0u, build_id_size);
 }
 
-TEST(ElfReaderTest, ReadElfBuildIdForCurrentElfImage) {
+TEST_P(ElfReaderTest, ReadElfLibraryName) {
+  TestElfImage image = TestElfImageBuilder(GetParam())
+                           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
+                           .AddSoName("mysoname")
+                           .Build();
+
+  Optional<StringPiece> library_name = ReadElfLibraryName(image.elf_start());
+  ASSERT_NE(nullopt, library_name);
+  EXPECT_EQ("mysoname", *library_name);
+}
+
+TEST_P(ElfReaderTest, ReadElfLibraryNameNoSoName) {
+  TestElfImage image = TestElfImageBuilder(GetParam())
+                           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
+                           .Build();
+
+  Optional<StringPiece> library_name = ReadElfLibraryName(image.elf_start());
+  EXPECT_EQ(nullopt, library_name);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    MappingTypes,
+    ElfReaderTest,
+    ::testing::Values(TestElfImageBuilder::RELOCATABLE,
+                      TestElfImageBuilder::RELOCATABLE_WITH_BIAS),
+    &ParamInfoToString);
+
+TEST(ElfReaderTestWithCurrentElfImage, ReadElfBuildId) {
   ElfBuildIdBuffer build_id;
   size_t build_id_size = ReadElfBuildId(&__executable_start, true, build_id);
   ASSERT_NE(build_id_size, 0u);
@@ -122,27 +164,7 @@ TEST(ElfReaderTest, ReadElfBuildIdForCurrentElfImage) {
   }
 }
 
-TEST(ElfReaderTest, ReadElfLibraryName) {
-  TestElfImage image = TestElfImageBuilder()
-                           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
-                           .AddSoName("mysoname")
-                           .Build();
-
-  Optional<StringPiece> library_name = ReadElfLibraryName(image.elf_start());
-  ASSERT_NE(nullopt, library_name);
-  EXPECT_EQ("mysoname", *library_name);
-}
-
-TEST(ElfReaderTest, ReadElfLibraryNameNoSoName) {
-  TestElfImage image = TestElfImageBuilder()
-                           .AddLoadSegment(PF_R | PF_X, /* size = */ 2000)
-                           .Build();
-
-  Optional<StringPiece> library_name = ReadElfLibraryName(image.elf_start());
-  EXPECT_EQ(nullopt, library_name);
-}
-
-TEST(ElfReaderTest, ReadElfLibraryNameForCurrentElfImage) {
+TEST(ElfReaderTestWithCurrentImage, ReadElfBuildId) {
 #if defined(OS_ANDROID)
   // On Android the library loader memory maps the full so file.
   const char kLibraryName[] = "libbase_unittests__library";

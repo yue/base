@@ -146,7 +146,7 @@ size_t ReadElfBuildId(const void* elf_mapped_base,
 Optional<StringPiece> ReadElfLibraryName(const void* elf_mapped_base) {
   // NOTE: Function should use async signal safe calls only.
 
-  const char* elf_base = reinterpret_cast<const char*>(elf_mapped_base);
+  const char* elf_virtual_base = GetElfBaseVirtualAddress(elf_mapped_base);
   const Ehdr* elf_header = GetElfHeader(elf_mapped_base);
   if (!elf_header)
     return {};
@@ -159,9 +159,9 @@ Optional<StringPiece> ReadElfLibraryName(const void* elf_mapped_base) {
     // SONAME offsets, which are used to compute the offset of the library
     // name string.
     const Dyn* dynamic_start =
-        reinterpret_cast<const Dyn*>(elf_base + header.p_vaddr);
+        reinterpret_cast<const Dyn*>(elf_virtual_base + header.p_vaddr);
     const Dyn* dynamic_end = reinterpret_cast<const Dyn*>(
-        elf_base + header.p_vaddr + header.p_memsz);
+        elf_virtual_base + header.p_vaddr + header.p_memsz);
     Word soname_strtab_offset = 0;
     const char* strtab_addr = 0;
     for (const Dyn* dynamic_iter = dynamic_start; dynamic_iter < dynamic_end;
@@ -169,7 +169,8 @@ Optional<StringPiece> ReadElfLibraryName(const void* elf_mapped_base) {
       if (dynamic_iter->d_tag == DT_STRTAB) {
 #if defined(OS_FUCHSIA) || defined(OS_ANDROID)
         // Fuchsia and Android do not relocate the symtab pointer on ELF load.
-        strtab_addr = (size_t)dynamic_iter->d_un.d_ptr + (const char*)elf_base;
+        strtab_addr =
+            (size_t)dynamic_iter->d_un.d_ptr + (const char*)elf_virtual_base;
 #else
         strtab_addr = (const char*)dynamic_iter->d_un.d_ptr;
 #endif

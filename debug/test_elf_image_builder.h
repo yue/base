@@ -16,12 +16,14 @@
 #include "base/strings/string_piece.h"
 
 #if __SIZEOF_POINTER__ == 4
+using Addr = Elf32_Addr;
 using Ehdr = Elf32_Ehdr;
 using Half = Elf32_Half;
 using Off = Elf32_Off;
 using Phdr = Elf32_Phdr;
 using Word = Elf32_Word;
 #else
+using Addr = Elf64_Addr;
 using Ehdr = Elf64_Ehdr;
 using Half = Elf64_Half;
 using Off = Elf64_Off;
@@ -53,7 +55,13 @@ class TestElfImage {
 // Builds an in-memory image of an ELF file for testing.
 class TestElfImageBuilder {
  public:
-  TestElfImageBuilder();
+  // The type of mapping to use for virtual addresses in the ELF file.
+  enum MappingType {
+    RELOCATABLE,           // Virtual address == file offset.
+    RELOCATABLE_WITH_BIAS  // Virtual address == file offset + load bias.
+  };
+
+  explicit TestElfImageBuilder(MappingType mapping_type);
   ~TestElfImageBuilder();
 
   TestElfImageBuilder(const TestElfImageBuilder&) = delete;
@@ -81,6 +89,13 @@ class TestElfImageBuilder {
   // Computed sizing state for parts of the ELF image.
   struct ImageMeasures;
 
+  // Gets the 'virtual address' corresponding to |offset| to write into the
+  // image, according to |mapping_type_|. Relocatable ELF images have virtual
+  // addresses equal to the offset with a possible constant load bias.
+  // Non-relocatable ELF images have virtual addresses equal to the actual
+  // memory address.
+  Addr GetVirtualAddressForOffset(Off offset) const;
+
   // Measures sizes/start offset of segments in the image.
   ImageMeasures MeasureSizesAndOffsets() const;
 
@@ -92,6 +107,11 @@ class TestElfImageBuilder {
   Ehdr CreateEhdr(Half phnum);
   Phdr CreatePhdr(Word type, Word flags, size_t align, Off offset, size_t size);
 
+  // The load bias to use for RELOCATABLE_WITH_BIAS. 0xc000 is a commonly used
+  // load bias for Android system ELF images.
+  static constexpr size_t kLoadBias = 0xc000;
+
+  const MappingType mapping_type_;
   std::vector<std::vector<uint8_t>> note_contents_;
   std::vector<LoadSegment> load_segments_;
   Optional<std::string> soname_;

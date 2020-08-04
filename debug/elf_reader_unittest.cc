@@ -34,6 +34,9 @@ std::string ParamInfoToString(
 
     case TestElfImageBuilder::RELOCATABLE_WITH_BIAS:
       return "RelocatableWithBias";
+
+    case TestElfImageBuilder::NON_RELOCATABLE:
+      return "NonRelocatable";
   }
 }
 }  // namespace
@@ -142,7 +145,8 @@ INSTANTIATE_TEST_SUITE_P(
     MappingTypes,
     ElfReaderTest,
     ::testing::Values(TestElfImageBuilder::RELOCATABLE,
-                      TestElfImageBuilder::RELOCATABLE_WITH_BIAS),
+                      TestElfImageBuilder::RELOCATABLE_WITH_BIAS,
+                      TestElfImageBuilder::NON_RELOCATABLE),
     &ParamInfoToString);
 
 TEST(ElfReaderTestWithCurrentElfImage, ReadElfBuildId) {

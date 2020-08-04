@@ -57,8 +57,9 @@ class TestElfImageBuilder {
  public:
   // The type of mapping to use for virtual addresses in the ELF file.
   enum MappingType {
-    RELOCATABLE,           // Virtual address == file offset.
-    RELOCATABLE_WITH_BIAS  // Virtual address == file offset + load bias.
+    RELOCATABLE,            // Virtual address == file offset.
+    RELOCATABLE_WITH_BIAS,  // Virtual address == file offset + load bias.
+    NON_RELOCATABLE,        // Virtual address == mapped address.
   };
 
   explicit TestElfImageBuilder(MappingType mapping_type);
@@ -94,7 +95,7 @@ class TestElfImageBuilder {
   // addresses equal to the offset with a possible constant load bias.
   // Non-relocatable ELF images have virtual addresses equal to the actual
   // memory address.
-  Addr GetVirtualAddressForOffset(Off offset) const;
+  Addr GetVirtualAddressForOffset(Off offset, const uint8_t* elf_start) const;
 
   // Measures sizes/start offset of segments in the image.
   ImageMeasures MeasureSizesAndOffsets() const;
@@ -105,7 +106,12 @@ class TestElfImageBuilder {
   static uint8_t* AppendHdr(const T& hdr, uint8_t* loc);
 
   Ehdr CreateEhdr(Half phnum);
-  Phdr CreatePhdr(Word type, Word flags, size_t align, Off offset, size_t size);
+  Phdr CreatePhdr(Word type,
+                  Word flags,
+                  size_t align,
+                  Off offset,
+                  Addr vaddr,
+                  size_t size);
 
   // The load bias to use for RELOCATABLE_WITH_BIAS. 0xc000 is a commonly used
   // load bias for Android system ELF images.

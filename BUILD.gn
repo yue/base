@@ -3556,6 +3556,7 @@ if (is_android) {
       "android/java/src/org/chromium/base/annotations/VerifiesOnOMR1.java",
       "android/java/src/org/chromium/base/annotations/VerifiesOnP.java",
       "android/java/src/org/chromium/base/annotations/VerifiesOnQ.java",
+      "android/java/src/org/chromium/base/annotations/VerifiesOnR.java",
       "android/java/src/org/chromium/base/compat/ApiHelperForM.java",
       "android/java/src/org/chromium/base/compat/ApiHelperForN.java",
       "android/java/src/org/chromium/base/compat/ApiHelperForO.java",

@@ -2147,7 +2147,10 @@ jumbo_component("base") {
 
     public_deps += [ "//third_party/perfetto:libperfetto" ]
 
-    deps += [ "//third_party/perfetto/include/perfetto/protozero" ]
+    deps += [
+      "//base/tracing/protos:chrome_track_event",
+      "//third_party/perfetto/include/perfetto/protozero",
+    ]
 
     all_dependent_configs += [ "//third_party/perfetto/gn:public_config" ]
 

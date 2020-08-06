@@ -2308,6 +2308,8 @@ static_library("base_static") {
     "base_switches.h",
   ]
 
+  deps = [ "//build:lacros_buildflags" ]
+
   if (is_win) {
     sources += [
       "win/static_constants.cc",

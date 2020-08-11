@@ -8,7 +8,6 @@
 #ifndef BASE_MAC_SDK_FORWARD_DECLARATIONS_H_
 #define BASE_MAC_SDK_FORWARD_DECLARATIONS_H_
 
-#import <AppKit/AppKit.h>
 #include <AvailabilityMacros.h>
 #include <os/availability.h>
 
@@ -64,7 +63,12 @@
 //
 // ----------------------------------------------------------------------------
 
-// Chromium currently is building with the most recent SDK. WWDC is not far
-// away, though....
+#if !defined(MAC_OS_X_VERSION_10_16) || \
+    MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_16
+#include <CoreMedia/CoreMedia.h>
+enum : CMVideoCodecType {
+  kCMVideoCodecType_VP9 = 'vp09'
+};
+#endif  // MAC_OS_X_VERSION_MAX_ALLOWED
 
 #endif  // BASE_MAC_SDK_FORWARD_DECLARATIONS_H_

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <initializer_list>
 #include <iterator>
 #include <random>
 #include <utility>
@@ -1566,6 +1567,101 @@ TEST(RangesTest, Clamp) {
       &ranges::clamp(k4, k5, k4, ranges::greater(), &Int::value) == &k4, "");
   static_assert(
       &ranges::clamp(k4, k4, k4, ranges::greater(), &Int::value) == &k4, "");
+}
+
+TEST(RangesTest, LexicographicalCompare) {
+  constexpr int inputs1[] = {0, 1, 2, 3, 4, 5};
+  constexpr int inputs2[] = {0, 1, 2, 3, 5, 4};
+  static_assert(!ranges::lexicographical_compare(inputs1, inputs1 + 6, inputs1,
+                                                 inputs1 + 6),
+                "");
+  static_assert(ranges::lexicographical_compare(inputs1, inputs1 + 6, inputs2,
+                                                inputs2 + 6),
+                "");
+  static_assert(!ranges::lexicographical_compare(inputs2, inputs2 + 6, inputs1,
+                                                 inputs1 + 6),
+                "");
+  static_assert(!ranges::lexicographical_compare(inputs2, inputs2 + 6, inputs2,
+                                                 inputs2 + 6),
+                "");
+
+  constexpr Int ints1[] = {0, 1, 2, 3, 4, 5};
+  constexpr Int ints2[] = {5, 4, 3, 2, 1, 0};
+  static_assert(
+      !ranges::lexicographical_compare(inputs1, ints1, {}, {}, &Int::value),
+      "");
+  static_assert(
+      !ranges::lexicographical_compare(ints1, inputs1, {}, &Int::value), "");
+
+  static_assert(
+      !ranges::lexicographical_compare(inputs2, ints1, {}, {}, &Int::value),
+      "");
+  static_assert(
+      ranges::lexicographical_compare(ints1, inputs2, {}, &Int::value), "");
+
+  static_assert(ranges::lexicographical_compare(ints1, ints2, {}, &Int::value,
+                                                &Int::value),
+                "");
+  static_assert(!ranges::lexicographical_compare(ints2, ints1, {}, &Int::value,
+                                                 &Int::value),
+                "");
+
+  static_assert(!ranges::lexicographical_compare(
+                    ints1, ints2, ranges::greater(), &Int::value, &Int::value),
+                "");
+  static_assert(ranges::lexicographical_compare(ints2, ints1, ranges::greater(),
+                                                &Int::value, &Int::value),
+                "");
+
+  using List = std::initializer_list<int>;
+  static_assert(
+      ranges::lexicographical_compare(List{0, 1, 2}, List{0, 1, 2, 3}), "");
+  static_assert(
+      !ranges::lexicographical_compare(List{0, 1, 2, 3}, List{0, 1, 2}), "");
+  static_assert(
+      ranges::lexicographical_compare(List{0, 1, 2, 3}, List{0, 1, 2, 4}), "");
+  static_assert(
+      !ranges::lexicographical_compare(List{0, 1, 2, 4}, List{0, 1, 2, 3}), "");
+}
+
+TEST(RangesTest, NextPermutation) {
+  int input[] = {5, 4, 3, 2, 0, 1};
+  EXPECT_TRUE(ranges::next_permutation(input, input + 6));
+  EXPECT_THAT(input, ElementsAre(5, 4, 3, 2, 1, 0));
+
+  EXPECT_FALSE(ranges::next_permutation(input, input + 6));
+  EXPECT_THAT(input, ElementsAre(0, 1, 2, 3, 4, 5));
+
+  Int ints[] = {0, 1, 2, 3, 5, 4};
+  EXPECT_TRUE(ranges::next_permutation(ints, ranges::greater(), &Int::value));
+  EXPECT_THAT(ints, ElementsAre(0, 1, 2, 3, 4, 5));
+
+  EXPECT_FALSE(ranges::next_permutation(ints, ranges::greater(), &Int::value));
+  EXPECT_THAT(ints, ElementsAre(5, 4, 3, 2, 1, 0));
+
+  int bits[] = {0, 0, 1, 0, 0};
+  EXPECT_TRUE(ranges::next_permutation(bits));
+  EXPECT_THAT(bits, ElementsAre(0, 1, 0, 0, 0));
+}
+
+TEST(RangesTest, PrevPermutation) {
+  int input[] = {0, 1, 2, 3, 5, 4};
+  EXPECT_TRUE(ranges::prev_permutation(input, input + 6));
+  EXPECT_THAT(input, ElementsAre(0, 1, 2, 3, 4, 5));
+
+  EXPECT_FALSE(ranges::prev_permutation(input, input + 6));
+  EXPECT_THAT(input, ElementsAre(5, 4, 3, 2, 1, 0));
+
+  Int ints[] = {5, 4, 3, 2, 0, 1};
+  EXPECT_TRUE(ranges::prev_permutation(ints, ranges::greater(), &Int::value));
+  EXPECT_THAT(ints, ElementsAre(5, 4, 3, 2, 1, 0));
+
+  EXPECT_FALSE(ranges::prev_permutation(ints, ranges::greater(), &Int::value));
+  EXPECT_THAT(ints, ElementsAre(0, 1, 2, 3, 4, 5));
+
+  int bits[] = {0, 0, 1, 0, 0};
+  EXPECT_TRUE(ranges::prev_permutation(bits));
+  EXPECT_THAT(bits, ElementsAre(0, 0, 0, 1, 0));
 }
 
 }  // namespace util

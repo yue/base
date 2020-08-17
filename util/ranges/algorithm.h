@@ -4756,12 +4756,200 @@ constexpr const T& clamp(const T& v,
 // [alg.lex.comparison] Lexicographical comparison
 // Reference: https://wg21.link/alg.lex.comparison
 
-// TODO(crbug.com/1071094): Implement.
+// Returns: `true` if and only if the sequence of elements defined by the range
+// `[first1, last1)` is lexicographically less than the sequence of elements
+// defined by the range `[first2, last2)`.
+//
+// Complexity: At most `2 min(last1 - first1, last2 - first2)` applications of
+// the corresponding comparison and each projection, if any.
+//
+// Remarks: If two sequences have the same number of elements and their
+// corresponding elements (if any) are equivalent, then neither sequence is
+// lexicographically less than the other. If one sequence is a proper prefix of
+// the other, then the shorter sequence is lexicographically less than the
+// longer sequence. Otherwise, the lexicographical comparison of the sequences
+// yields the same result as the comparison of the first corresponding pair of
+// elements that are not equivalent.
+//
+// Reference:
+// https://wg21.link/alg.lex.comparison#:~:text=lexicographical_compare(I1
+template <typename ForwardIterator1,
+          typename ForwardIterator2,
+          typename Comp = ranges::less,
+          typename Proj1 = identity,
+          typename Proj2 = identity,
+          typename = internal::iterator_category_t<ForwardIterator1>,
+          typename = internal::iterator_category_t<ForwardIterator2>,
+          typename = indirect_result_t<Comp&,
+                                       projected<ForwardIterator1, Proj1>,
+                                       projected<ForwardIterator2, Proj2>>,
+          typename = indirect_result_t<Comp&,
+                                       projected<ForwardIterator2, Proj2>,
+                                       projected<ForwardIterator1, Proj1>>>
+constexpr bool lexicographical_compare(ForwardIterator1 first1,
+                                       ForwardIterator1 last1,
+                                       ForwardIterator2 first2,
+                                       ForwardIterator2 last2,
+                                       Comp comp = {},
+                                       Proj1 proj1 = {},
+                                       Proj2 proj2 = {}) {
+  for (; first1 != last1 && first2 != last2; ++first1, ++first2) {
+    auto&& projected_first1 = invoke(proj1, *first1);
+    auto&& projected_first2 = invoke(proj2, *first2);
+    if (invoke(comp, projected_first1, projected_first2))
+      return true;
+    if (invoke(comp, projected_first2, projected_first1))
+      return false;
+  }
+
+  // `first2 != last2` is equivalent to `first1 == last1 && first2 != last2`
+  // here, since we broke out of the loop above.
+  return first2 != last2;
+}
+
+// Returns: `true` if and only if the sequence of elements defined by `range1`
+//  is lexicographically less than the sequence of elements defined by `range2`.
+//
+// Complexity: At most `2 min(size(range1), size(range2))` applications of the
+// corresponding comparison and each projection, if any.
+//
+// Remarks: If two sequences have the same number of elements and their
+// corresponding elements (if any) are equivalent, then neither sequence is
+// lexicographically less than the other. If one sequence is a proper prefix of
+// the other, then the shorter sequence is lexicographically less than the
+// longer sequence. Otherwise, the lexicographical comparison of the sequences
+// yields the same result as the comparison of the first corresponding pair of
+// elements that are not equivalent.
+//
+// Reference:
+// https://wg21.link/alg.lex.comparison#:~:text=lexicographical_compare(R1
+template <typename Range1,
+          typename Range2,
+          typename Comp = ranges::less,
+          typename Proj1 = identity,
+          typename Proj2 = identity,
+          typename = internal::range_category_t<Range1>,
+          typename = internal::range_category_t<Range2>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range1>, Proj1>,
+                                       projected<iterator_t<Range2>, Proj2>>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range2>, Proj2>,
+                                       projected<iterator_t<Range1>, Proj1>>>
+constexpr bool lexicographical_compare(Range1&& range1,
+                                       Range2&& range2,
+                                       Comp comp = {},
+                                       Proj1 proj1 = {},
+                                       Proj2 proj2 = {}) {
+  return ranges::lexicographical_compare(
+      ranges::begin(range1), ranges::end(range1), ranges::begin(range2),
+      ranges::end(range2), std::move(comp), std::move(proj1), std::move(proj2));
+}
 
 // [alg.permutation.generators] Permutation generators
 // Reference: https://wg21.link/alg.permutation.generators
 
-// TODO(crbug.com/1071094): Implement.
+// Effects: Takes a sequence defined by the range `[first, last)` and transforms
+// it into the next permutation. The next permutation is found by assuming that
+// the set of all permutations is lexicographically sorted with respect to
+// `comp` and `proj`. If no such permutation exists, transforms the sequence
+// into the first permutation; that is, the ascendingly-sorted one.
+//
+// Returns: `true` if a next permutation was found and otherwise `false`.
+//
+// Complexity: At most `(last - first) / 2` swaps.
+//
+// Reference:
+// https://wg21.link/alg.permutation.generators#:~:text=next_permutation(I
+template <typename BidirectionalIterator,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::iterator_category_t<BidirectionalIterator>,
+          typename = indirect_result_t<Comp&,
+                                       projected<BidirectionalIterator, Proj>,
+                                       projected<BidirectionalIterator, Proj>>>
+constexpr auto next_permutation(BidirectionalIterator first,
+                                BidirectionalIterator last,
+                                Comp comp = {},
+                                Proj proj = {}) {
+  return std::next_permutation(
+      first, last, internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Effects: Takes a sequence defined by `range` and transforms it into the next
+// permutation. The next permutation is found by assuming that the set of all
+// permutations is lexicographically sorted with respect to `comp` and `proj`.
+// If no such permutation exists, transforms the sequence into the first
+// permutation; that is, the ascendingly-sorted one.
+//
+// Returns: `true` if a next permutation was found and otherwise `false`.
+//
+// Complexity: At most `size(range) / 2` swaps.
+//
+// Reference:
+// https://wg21.link/alg.permutation.generators#:~:text=next_permutation(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range>, Proj>,
+                                       projected<iterator_t<Range>, Proj>>>
+constexpr auto next_permutation(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return ranges::next_permutation(ranges::begin(range), ranges::end(range),
+                                  std::move(comp), std::move(proj));
+}
+
+// Effects: Takes a sequence defined by the range `[first, last)` and transforms
+// it into the previous permutation. The previous permutation is found by
+// assuming that the set of all permutations is lexicographically sorted with
+// respect to `comp` and `proj`. If no such permutation exists, transforms the
+// sequence into the last permutation; that is, the decreasingly-sorted one.
+//
+// Returns: `true` if a next permutation was found and otherwise `false`.
+//
+// Complexity: At most `(last - first) / 2` swaps.
+//
+// Reference:
+// https://wg21.link/alg.permutation.generators#:~:text=prev_permutation(I
+template <typename BidirectionalIterator,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::iterator_category_t<BidirectionalIterator>,
+          typename = indirect_result_t<Comp&,
+                                       projected<BidirectionalIterator, Proj>,
+                                       projected<BidirectionalIterator, Proj>>>
+constexpr auto prev_permutation(BidirectionalIterator first,
+                                BidirectionalIterator last,
+                                Comp comp = {},
+                                Proj proj = {}) {
+  return std::prev_permutation(
+      first, last, internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Effects: Takes a sequence defined by `range` and transforms it into the
+// previous permutation. The previous permutation is found by assuming that the
+// set of all permutations is lexicographically sorted with respect to `comp`
+// and `proj`. If no such permutation exists, transforms the sequence into the
+// last permutation; that is, the decreasingly-sorted one.
+//
+// Returns: `true` if a previous permutation was found and otherwise `false`.
+//
+// Complexity: At most `size(range) / 2` swaps.
+//
+// Reference:
+// https://wg21.link/alg.permutation.generators#:~:text=prev_permutation(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range>, Proj>,
+                                       projected<iterator_t<Range>, Proj>>>
+constexpr auto prev_permutation(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return ranges::prev_permutation(ranges::begin(range), ranges::end(range),
+                                  std::move(comp), std::move(proj));
+}
 
 }  // namespace ranges
 

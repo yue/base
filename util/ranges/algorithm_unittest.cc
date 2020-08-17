@@ -33,23 +33,23 @@ struct Int {
   int value = 0;
 };
 
-bool operator==(Int lhs, Int rhs) {
+constexpr bool operator==(Int lhs, Int rhs) {
   return lhs.value == rhs.value;
 }
 
-bool operator<(Int lhs, Int rhs) {
+constexpr bool operator<(Int lhs, Int rhs) {
   return lhs.value < rhs.value;
 }
 
-bool operator>(Int lhs, Int rhs) {
+constexpr bool operator>(Int lhs, Int rhs) {
   return lhs.value > rhs.value;
 }
 
-bool operator<=(Int lhs, Int rhs) {
+constexpr bool operator<=(Int lhs, Int rhs) {
   return lhs.value <= rhs.value;
 }
 
-bool operator>=(Int lhs, Int rhs) {
+constexpr bool operator>=(Int lhs, Int rhs) {
   return lhs.value >= rhs.value;
 }
 
@@ -1369,6 +1369,203 @@ TEST(RangesTest, IsHeapUntil) {
   EXPECT_EQ(heap_int + 7,
             ranges::is_heap_until(heap_int, ranges::greater(), &Int::value));
   EXPECT_EQ(heap_int + 1, ranges::is_heap_until(heap_int, {}, &Int::value));
+}
+
+TEST(RangesTest, Min) {
+  constexpr int k1 = 1;
+  constexpr int k2 = 2;
+  static_assert(&ranges::min(k1, k1) == &k1, "");
+  static_assert(&ranges::min(k1, k2) == &k1, "");
+  static_assert(&ranges::min(k2, k1) == &k1, "");
+  static_assert(&ranges::min(k2, k2) == &k2, "");
+
+  constexpr Int k3 = 3;
+  constexpr Int k4 = 4;
+  static_assert(&ranges::min(k3, k3, ranges::greater(), &Int::value) == &k3,
+                "");
+  static_assert(&ranges::min(k3, k4, ranges::greater(), &Int::value) == &k4,
+                "");
+  static_assert(&ranges::min(k4, k3, ranges::greater(), &Int::value) == &k4,
+                "");
+  static_assert(&ranges::min(k4, k4, ranges::greater(), &Int::value) == &k4,
+                "");
+
+  constexpr Int array[] = {2, 6, 4, 3, 5, 1};
+  static_assert(ranges::min({5, 3, 4, 2, 1, 6}) == 1, "");
+  static_assert(ranges::min(array, ranges::greater(), &Int::value) == 6, "");
+}
+
+TEST(RangesTest, Max) {
+  constexpr int k1 = 1;
+  constexpr int k2 = 2;
+  static_assert(&ranges::max(k1, k2) == &k2, "");
+  static_assert(&ranges::max(k1, k2) == &k2, "");
+  static_assert(&ranges::max(k2, k1) == &k2, "");
+  static_assert(&ranges::max(k2, k1) == &k2, "");
+
+  constexpr Int k3 = 3;
+  constexpr Int k4 = 4;
+  static_assert(&ranges::max(k3, k3, ranges::greater(), &Int::value) == &k3,
+                "");
+  static_assert(&ranges::max(k3, k4, ranges::greater(), &Int::value) == &k3,
+                "");
+  static_assert(&ranges::max(k4, k3, ranges::greater(), &Int::value) == &k3,
+                "");
+  static_assert(&ranges::max(k4, k4, ranges::greater(), &Int::value) == &k4,
+                "");
+
+  constexpr Int array[] = {2, 6, 4, 3, 5, 1};
+  static_assert(ranges::max({5, 3, 4, 2, 1, 6}) == 6, "");
+  static_assert(ranges::max(array, ranges::greater(), &Int::value) == 1, "");
+}
+
+TEST(RangesTest, Minmax) {
+  constexpr int k1 = 1;
+  constexpr int k2 = 2;
+  static_assert(&ranges::minmax(k1, k1).first == &k1, "");
+  static_assert(&ranges::minmax(k1, k1).second == &k1, "");
+  static_assert(&ranges::minmax(k1, k2).first == &k1, "");
+  static_assert(&ranges::minmax(k1, k2).second == &k2, "");
+  static_assert(&ranges::minmax(k2, k1).first == &k1, "");
+  static_assert(&ranges::minmax(k2, k1).second == &k2, "");
+  static_assert(&ranges::minmax(k2, k2).first == &k2, "");
+  static_assert(&ranges::minmax(k2, k2).second == &k2, "");
+
+  static constexpr Int k3 = 3;
+  static constexpr Int k4 = 4;
+  {
+    constexpr auto kResult =
+        ranges::minmax(k3, k3, ranges::greater(), &Int::value);
+    static_assert(&kResult.first == &k3, "");
+    static_assert(&kResult.second == &k3, "");
+  }
+  {
+    constexpr auto kResult =
+        ranges::minmax(k3, k4, ranges::greater(), &Int::value);
+    static_assert(&kResult.first == &k4, "");
+    static_assert(&kResult.second == &k3, "");
+  }
+  {
+    constexpr auto kResult =
+        ranges::minmax(k4, k3, ranges::greater(), &Int::value);
+    static_assert(&kResult.first == &k4, "");
+    static_assert(&kResult.second == &k3, "");
+  }
+  {
+    constexpr auto kResult =
+        ranges::minmax(k4, k4, ranges::greater(), &Int::value);
+    static_assert(&kResult.first == &k4, "");
+    static_assert(&kResult.second == &k4, "");
+  }
+
+  static_assert(ranges::minmax({5, 3, 4, 2, 1, 6}).first == 1, "");
+  static_assert(ranges::minmax({5, 3, 4, 2, 1, 6}).second == 6, "");
+
+  constexpr Int array[] = {2, 6, 4, 3, 5, 1};
+  static_assert(
+      ranges::minmax(array, ranges::greater(), &Int::value).first == 6, "");
+  static_assert(
+      ranges::minmax(array, ranges::greater(), &Int::value).second == 1, "");
+}
+
+TEST(RangesTest, MinElement) {
+  constexpr int array[] = {2, 6, 4, 3, 5, 1};
+  constexpr Int ints[] = {2, 6, 4, 3, 5, 1};
+  static_assert(*ranges::min_element(array, array + 6) == 1, "");
+  static_assert(*ranges::min_element(ints, ranges::greater(), &Int::value) == 6,
+                "");
+}
+
+TEST(RangesTest, MaxElement) {
+  constexpr int array[] = {2, 6, 4, 3, 5, 1};
+  constexpr Int ints[] = {2, 6, 4, 3, 5, 1};
+  static_assert(*ranges::max_element(array, array + 6) == 6, "");
+  static_assert(*ranges::max_element(ints, ranges::greater(), &Int::value) == 1,
+                "");
+}
+
+TEST(RangesTest, MinmaxElement) {
+  constexpr int array[] = {2, 6, 4, 3, 5, 1};
+  static_assert(*ranges::minmax_element(array, array + 6).first == 1, "");
+  static_assert(*ranges::minmax_element(array, array + 6).second == 6, "");
+
+  constexpr Int ints[] = {2, 6, 4, 3, 5, 1};
+  static_assert(
+      *ranges::minmax_element(ints, ranges::greater(), &Int::value).first == 6,
+      "");
+  static_assert(
+      *ranges::minmax_element(ints, ranges::greater(), &Int::value).second == 1,
+      "");
+}
+
+TEST(RangesTest, Clamp) {
+  constexpr int k1 = 1;
+  constexpr int k2 = 2;
+  constexpr int k3 = 3;
+
+  static_assert(&ranges::clamp(k1, k1, k1) == &k1, "");
+  static_assert(&ranges::clamp(k1, k1, k2) == &k1, "");
+  static_assert(&ranges::clamp(k1, k1, k3) == &k1, "");
+  static_assert(&ranges::clamp(k1, k2, k2) == &k2, "");
+  static_assert(&ranges::clamp(k1, k2, k3) == &k2, "");
+  static_assert(&ranges::clamp(k1, k3, k3) == &k3, "");
+
+  static_assert(&ranges::clamp(k2, k1, k1) == &k1, "");
+  static_assert(&ranges::clamp(k2, k1, k2) == &k2, "");
+  static_assert(&ranges::clamp(k2, k1, k3) == &k2, "");
+  static_assert(&ranges::clamp(k2, k2, k2) == &k2, "");
+  static_assert(&ranges::clamp(k2, k2, k3) == &k2, "");
+  static_assert(&ranges::clamp(k2, k3, k3) == &k3, "");
+
+  static_assert(&ranges::clamp(k3, k1, k1) == &k1, "");
+  static_assert(&ranges::clamp(k3, k1, k2) == &k2, "");
+  static_assert(&ranges::clamp(k3, k1, k3) == &k3, "");
+  static_assert(&ranges::clamp(k3, k2, k2) == &k2, "");
+  static_assert(&ranges::clamp(k3, k2, k3) == &k3, "");
+  static_assert(&ranges::clamp(k3, k3, k3) == &k3, "");
+
+  constexpr Int k4 = 4;
+  constexpr Int k5 = 5;
+  constexpr Int k6 = 6;
+
+  static_assert(
+      &ranges::clamp(k6, k6, k6, ranges::greater(), &Int::value) == &k6, "");
+  static_assert(
+      &ranges::clamp(k6, k6, k5, ranges::greater(), &Int::value) == &k6, "");
+  static_assert(
+      &ranges::clamp(k6, k6, k4, ranges::greater(), &Int::value) == &k6, "");
+  static_assert(
+      &ranges::clamp(k6, k5, k5, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k6, k5, k4, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k6, k4, k4, ranges::greater(), &Int::value) == &k4, "");
+
+  static_assert(
+      &ranges::clamp(k5, k6, k6, ranges::greater(), &Int::value) == &k6, "");
+  static_assert(
+      &ranges::clamp(k5, k6, k5, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k5, k6, k4, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k5, k5, k5, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k5, k5, k4, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k5, k4, k4, ranges::greater(), &Int::value) == &k4, "");
+
+  static_assert(
+      &ranges::clamp(k4, k6, k6, ranges::greater(), &Int::value) == &k6, "");
+  static_assert(
+      &ranges::clamp(k4, k6, k5, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k4, k6, k4, ranges::greater(), &Int::value) == &k4, "");
+  static_assert(
+      &ranges::clamp(k4, k5, k5, ranges::greater(), &Int::value) == &k5, "");
+  static_assert(
+      &ranges::clamp(k4, k5, k4, ranges::greater(), &Int::value) == &k4, "");
+  static_assert(
+      &ranges::clamp(k4, k4, k4, ranges::greater(), &Int::value) == &k4, "");
 }
 
 }  // namespace util

@@ -6,6 +6,7 @@
 #define BASE_UTIL_RANGES_ALGORITHM_H_
 
 #include <algorithm>
+#include <initializer_list>
 #include <iterator>
 #include <type_traits>
 #include <utility>
@@ -4436,7 +4437,321 @@ constexpr auto is_heap_until(Range&& range, Comp comp = {}, Proj proj = {}) {
 // [alg.min.max] Minimum and maximum
 // Reference: https://wg21.link/alg.min.max
 
-// TODO(crbug.com/1071094): Implement.
+// Returns: The smaller value. Returns the first argument when the arguments are
+// equivalent.
+//
+// Complexity: Exactly one comparison and two applications of the projection, if
+// any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::min
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr const T& min(const T& a, const T& b, Comp comp = {}, Proj proj = {}) {
+  return invoke(comp, invoke(proj, b), invoke(proj, a)) ? b : a;
+}
+
+// Preconditions: `!empty(ilist)`.
+//
+// Returns: The smallest value in the input range. Returns a copy of the
+// leftmost element when several elements are equivalent to the smallest.
+//
+// Complexity: Exactly `size(ilist) - 1` comparisons and twice as many
+// applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::min(initializer_list
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr T min(std::initializer_list<T> ilist,
+                Comp comp = {},
+                Proj proj = {}) {
+  return *std::min_element(
+      ilist.begin(), ilist.end(),
+      internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Preconditions: `!empty(range)`.
+//
+// Returns: The smallest value in the input range. Returns a copy of the
+// leftmost element when several elements are equivalent to the smallest.
+//
+// Complexity: Exactly `size(range) - 1` comparisons and twice as many
+// applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::min(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>>
+constexpr auto min(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return *std::min_element(
+      ranges::begin(range), ranges::end(range),
+      internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Returns: The larger value. Returns the first argument when the arguments are
+// equivalent.
+//
+// Complexity: Exactly one comparison and two applications of the projection, if
+// any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::max
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr const T& max(const T& a, const T& b, Comp comp = {}, Proj proj = {}) {
+  return invoke(comp, invoke(proj, a), invoke(proj, b)) ? b : a;
+}
+
+// Preconditions: `!empty(ilist)`.
+//
+// Returns: The largest value in the input range. Returns a copy of the leftmost
+// element when several elements are equivalent to the largest.
+//
+// Complexity: Exactly `size(ilist) - 1` comparisons and twice as many
+// applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::max(initializer_list
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr T max(std::initializer_list<T> ilist,
+                Comp comp = {},
+                Proj proj = {}) {
+  return *std::max_element(
+      ilist.begin(), ilist.end(),
+      internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Preconditions: `!empty(range)`.
+//
+// Returns: The largest value in the input range. Returns a copy of the leftmost
+// element when several elements are equivalent to the smallest.
+//
+// Complexity: Exactly `size(range) - 1` comparisons and twice as many
+// applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::max(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>>
+constexpr auto max(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return *std::max_element(
+      ranges::begin(range), ranges::end(range),
+      internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Returns: `{b, a}` if `b` is smaller than `a`, and `{a, b}` otherwise.
+//
+// Complexity: Exactly one comparison and two applications of the projection, if
+// any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::minmax
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr auto minmax(const T& a, const T& b, Comp comp = {}, Proj proj = {}) {
+  return std::minmax(a, b,
+                     internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Preconditions: `!empty(ilist)`.
+//
+// Returns: Let `X` be the return type. Returns `X{x, y}`, where `x` is a copy
+// of the leftmost element with the smallest value and `y` a copy of the
+// rightmost element with the largest value in the input range.
+//
+// Complexity: At most `(3/2) size(ilist)` applications of the corresponding
+// predicate and twice as many applications of the projection, if any.
+//
+// Reference:
+// https://wg21.link/alg.min.max#:~:text=ranges::minmax(initializer_list
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr auto minmax(std::initializer_list<T> ilist,
+                      Comp comp = {},
+                      Proj proj = {}) {
+  auto it =
+      std::minmax_element(ranges::begin(ilist), ranges::end(ilist),
+                          internal::ProjectedBinaryPredicate(comp, proj, proj));
+  return std::pair<T, T>{*it.first, *it.second};
+}
+
+// Preconditions: `!empty(range)`.
+//
+// Returns: Let `X` be the return type. Returns `X{x, y}`, where `x` is a copy
+// of the leftmost element with the smallest value and `y` a copy of the
+// rightmost element with the largest value in the input range.
+//
+// Complexity: At most `(3/2) size(range)` applications of the corresponding
+// predicate and twice as many applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::minmax(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>>
+constexpr auto minmax(Range&& range, Comp comp = {}, Proj proj = {}) {
+  using T = range_value_t<Range>;
+  auto it =
+      std::minmax_element(ranges::begin(range), ranges::end(range),
+                          internal::ProjectedBinaryPredicate(comp, proj, proj));
+  return std::pair<T, T>{*it.first, *it.second};
+}
+
+// Returns: The first iterator i in the range `[first, last)` such that for
+// every iterator `j` in the range `[first, last)`,
+// `bool(invoke(comp, invoke(proj, *j), invoke(proj, *i)))` is `false`. Returns
+// `last` if `first == last`.
+//
+// Complexity: Exactly `max(last - first - 1, 0)` comparisons and twice as
+// many projections.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::min_element(I
+template <typename ForwardIterator,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::iterator_category_t<ForwardIterator>,
+          typename = indirect_result_t<Comp&,
+                                       projected<ForwardIterator, Proj>,
+                                       projected<ForwardIterator, Proj>>>
+constexpr auto min_element(ForwardIterator first,
+                           ForwardIterator last,
+                           Comp comp = {},
+                           Proj proj = {}) {
+  return std::min_element(first, last,
+                          internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Returns: The first iterator i in `range` such that for every iterator `j` in
+// `range`, `bool(invoke(comp, invoke(proj, *j), invoke(proj, *i)))` is `false`.
+// Returns `end(range)` if `empty(range)`.
+//
+// Complexity: Exactly `max(size(range) - 1, 0)` comparisons and twice as many
+// projections.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::min_element(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range>, Proj>,
+                                       projected<iterator_t<Range>, Proj>>>
+constexpr auto min_element(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return ranges::min_element(ranges::begin(range), ranges::end(range),
+                             std::move(comp), std::move(proj));
+}
+
+// Returns: The first iterator i in the range `[first, last)` such that for
+// every iterator `j` in the range `[first, last)`,
+// `bool(invoke(comp, invoke(proj, *i), invoke(proj, *j)))` is `false`.
+// Returns `last` if `first == last`.
+//
+// Complexity: Exactly `max(last - first - 1, 0)` comparisons and twice as
+// many projections.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::max_element(I
+template <typename ForwardIterator,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::iterator_category_t<ForwardIterator>,
+          typename = indirect_result_t<Comp&,
+                                       projected<ForwardIterator, Proj>,
+                                       projected<ForwardIterator, Proj>>>
+constexpr auto max_element(ForwardIterator first,
+                           ForwardIterator last,
+                           Comp comp = {},
+                           Proj proj = {}) {
+  return std::max_element(first, last,
+                          internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Returns: The first iterator i in `range` such that for every iterator `j`
+// in `range`, `bool(invoke(comp, invoke(proj, *j), invoke(proj, *j)))` is
+// `false`. Returns `end(range)` if `empty(range)`.
+//
+// Complexity: Exactly `max(size(range) - 1, 0)` comparisons and twice as many
+// projections.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::max_element(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range>, Proj>,
+                                       projected<iterator_t<Range>, Proj>>>
+constexpr auto max_element(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return ranges::max_element(ranges::begin(range), ranges::end(range),
+                             std::move(comp), std::move(proj));
+}
+
+// Returns: `{first, first}` if `[first, last)` is empty, otherwise `{m, M}`,
+// where `m` is the first iterator in `[first, last)` such that no iterator in
+// the range refers to a smaller element, and where `M` is the last iterator
+// in
+// `[first, last)` such that no iterator in the range refers to a larger
+// element.
+//
+// Complexity: Let `N` be `last - first`. At most `max(3/2 (N − 1), 0)`
+// comparisons and twice as many applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::minmax_element(I
+template <typename ForwardIterator,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::iterator_category_t<ForwardIterator>,
+          typename = indirect_result_t<Comp&,
+                                       projected<ForwardIterator, Proj>,
+                                       projected<ForwardIterator, Proj>>>
+constexpr auto minmax_element(ForwardIterator first,
+                              ForwardIterator last,
+                              Comp comp = {},
+                              Proj proj = {}) {
+  return std::minmax_element(
+      first, last, internal::ProjectedBinaryPredicate(comp, proj, proj));
+}
+
+// Returns: `{begin(range), begin(range)}` if `range` is empty, otherwise
+// `{m, M}`, where `m` is the first iterator in `range` such that no iterator
+// in the range refers to a smaller element, and where `M` is the last
+// iterator in `range` such that no iterator in the range refers to a larger
+// element.
+//
+// Complexity: Let `N` be `size(range)`. At most `max(3/2 (N − 1), 0)`
+// comparisons and twice as many applications of the projection, if any.
+//
+// Reference: https://wg21.link/alg.min.max#:~:text=ranges::minmax_element(R
+template <typename Range,
+          typename Comp = ranges::less,
+          typename Proj = identity,
+          typename = internal::range_category_t<Range>,
+          typename = indirect_result_t<Comp&,
+                                       projected<iterator_t<Range>, Proj>,
+                                       projected<iterator_t<Range>, Proj>>>
+constexpr auto minmax_element(Range&& range, Comp comp = {}, Proj proj = {}) {
+  return ranges::minmax_element(ranges::begin(range), ranges::end(range),
+                                std::move(comp), std::move(proj));
+}
+
+// [alg.clamp] Bounded value
+// Reference: https://wg21.link/alg.clamp
+
+// Preconditions: `bool(invoke(comp, invoke(proj, hi), invoke(proj, lo)))` is
+// `false`.
+//
+// Returns: `lo` if `bool(invoke(comp, invoke(proj, v), invoke(proj, lo)))` is
+// `true`, `hi` if `bool(invoke(comp, invoke(proj, hi), invoke(proj, v)))` is
+// `true`, otherwise `v`.
+//
+// Complexity: At most two comparisons and three applications of the
+// projection.
+//
+// Reference: https://wg21.link/alg.clamp#:~:text=ranges::clamp
+template <typename T, typename Comp = ranges::less, typename Proj = identity>
+constexpr const T& clamp(const T& v,
+                         const T& lo,
+                         const T& hi,
+                         Comp comp = {},
+                         Proj proj = {}) {
+  auto&& projected_v = invoke(proj, v);
+  if (invoke(comp, projected_v, invoke(proj, lo)))
+    return lo;
+
+  return invoke(comp, invoke(proj, hi), projected_v) ? hi : v;
+}
 
 // [alg.lex.comparison] Lexicographical comparison
 // Reference: https://wg21.link/alg.lex.comparison

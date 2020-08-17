@@ -769,6 +769,14 @@ TEST(StringPieceTest, ConstexprSize) {
   }
 }
 
+TEST(StringPieceTest, ConstexprFront) {
+  static_assert(StringPiece("abc").front() == 'a', "");
+}
+
+TEST(StringPieceTest, ConstexprBack) {
+  static_assert(StringPiece("abc").back() == 'c', "");
+}
+
 TEST(StringPieceTest, Compare) {
   constexpr StringPiece piece = "def";
 
@@ -809,6 +817,21 @@ TEST(StringPieceTest, EndsWith) {
   static_assert(!piece.ends_with("ab"), "");
 
   static_assert(!piece.ends_with("abcd"), "");
+}
+
+TEST(StringPieceTest, Substr) {
+  constexpr StringPiece piece = "abcdefghijklmnopqrstuvwxyz";
+
+  static_assert(piece.substr(0, 2) == "ab", "");
+  static_assert(piece.substr(0, 3) == "abc", "");
+  static_assert(piece.substr(0, 4) == "abcd", "");
+  static_assert(piece.substr(3, 2) == "de", "");
+  static_assert(piece.substr(3, 3) == "def", "");
+  static_assert(piece.substr(23) == "xyz", "");
+  static_assert(piece.substr(23, 3) == "xyz", "");
+  static_assert(piece.substr(23, 99) == "xyz", "");
+  static_assert(piece.substr(0) == piece, "");
+  static_assert(piece.substr(0, 99) == piece, "");
 }
 
 }  // namespace base

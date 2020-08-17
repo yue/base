@@ -129,13 +129,6 @@ BASE_EXPORT size_t find_last_not_of(const StringPiece& self,
                                     char c,
                                     size_t pos);
 
-BASE_EXPORT StringPiece substr(const StringPiece& self,
-                               size_t pos,
-                               size_t n);
-BASE_EXPORT StringPiece16 substr(const StringPiece16& self,
-                                 size_t pos,
-                                 size_t n);
-
 }  // namespace internal
 
 // BasicStringPiece ------------------------------------------------------------
@@ -212,12 +205,12 @@ template <typename STRING_TYPE> class BasicStringPiece {
     return ptr_[i];
   }
 
-  value_type front() const {
+  constexpr value_type front() const {
     CHECK_NE(0UL, length_);
     return ptr_[0];
   }
 
-  value_type back() const {
+  constexpr value_type back() const {
     CHECK_NE(0UL, length_);
     return ptr_[length_ - 1];
   }
@@ -339,9 +332,12 @@ template <typename STRING_TYPE> class BasicStringPiece {
   }
 
   // substr.
-  BasicStringPiece substr(size_type pos,
-                          size_type n = BasicStringPiece::npos) const {
-    return internal::substr(*this, pos, n);
+  constexpr BasicStringPiece substr(
+      size_type pos,
+      size_type n = BasicStringPiece::npos) const {
+    // TODO(crbug.com/1049498): Be less lenient here and CHECK(pos <= size()).
+    pos = std::min(pos, size());
+    return {data() + pos, std::min(n, size() - pos)};
   }
 
  protected:

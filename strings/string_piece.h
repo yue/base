@@ -267,14 +267,6 @@ template <typename STRING_TYPE> class BasicStringPiece {
         (CharTraits<value_type>::compare(this->ptr_, x.ptr_, x.length_) == 0));
   }
 
-  // Does "this" end with "x"
-  constexpr bool ends_with(BasicStringPiece x) const noexcept {
-    return ((this->length_ >= x.length_) &&
-            (CharTraits<value_type>::compare(
-                 this->ptr_ + (this->length_ - x.length_), x.ptr_, x.length_) ==
-             0));
-  }
-
   // find: Search for a character or substring at a given offset.
   size_type find(const BasicStringPiece<STRING_TYPE>& s,
                  size_type pos = 0) const {

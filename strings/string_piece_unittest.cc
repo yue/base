@@ -555,18 +555,6 @@ TEST(StringPieceTest, CheckCustom) {
   ASSERT_TRUE(!b.starts_with(a));
   ASSERT_TRUE(!e.starts_with(a));
 
-  // ends with
-  ASSERT_TRUE(a.ends_with(a));
-  ASSERT_TRUE(a.ends_with("bar"));
-  ASSERT_TRUE(a.ends_with(e));
-  ASSERT_TRUE(b.ends_with(s1));
-  ASSERT_TRUE(b.ends_with(b));
-  ASSERT_TRUE(b.ends_with(e));
-  ASSERT_TRUE(e.ends_with(""));
-  ASSERT_TRUE(!a.ends_with(b));
-  ASSERT_TRUE(!b.ends_with(a));
-  ASSERT_TRUE(!e.ends_with(a));
-
   StringPiece c;
   c = {"foobar", 6};
   ASSERT_EQ(c, a);
@@ -615,11 +603,6 @@ TEST(StringPieceTest, CheckComparisons2) {
   ASSERT_TRUE(abc.starts_with(abc));
   ASSERT_TRUE(abc.starts_with("abcdefghijklm"));
   ASSERT_TRUE(!abc.starts_with("abcdefguvwxyz"));
-
-  // ends_with
-  ASSERT_TRUE(abc.ends_with(abc));
-  ASSERT_TRUE(!abc.ends_with("abcdefguvwxyz"));
-  ASSERT_TRUE(abc.ends_with("nopqrstuvwxyz"));
 }
 
 TYPED_TEST(CommonStringPieceTest, StringCompareNotAmbiguous) {
@@ -803,20 +786,6 @@ TEST(StringPieceTest, StartsWith) {
   static_assert(!piece.starts_with("bc"), "");
 
   static_assert(!piece.starts_with("abcd"), "");
-}
-
-TEST(StringPieceTest, EndsWith) {
-  constexpr StringPiece piece("abc");
-
-  static_assert(piece.ends_with(""), "");
-  static_assert(piece.ends_with("c"), "");
-  static_assert(piece.ends_with("bc"), "");
-  static_assert(piece.ends_with("abc"), "");
-
-  static_assert(!piece.ends_with("a"), "");
-  static_assert(!piece.ends_with("ab"), "");
-
-  static_assert(!piece.ends_with("abcd"), "");
 }
 
 TEST(StringPieceTest, Substr) {

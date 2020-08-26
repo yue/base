@@ -1500,9 +1500,8 @@ component("base") {
       ]
     }
 
-    if (current_cpu != "arm") {
-      # The reached code profiler is only supported on Android with 32-bit arm
-      # arch.
+    if (current_cpu != "arm" && current_cpu != "arm64") {
+      # The reached code profiler is only supported on Android arm arch.
       sources -= [ "android/reached_code_profiler.cc" ]
       sources += [ "android/reached_code_profiler_stub.cc" ]
     }

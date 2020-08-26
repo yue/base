@@ -45,9 +45,11 @@ assert(use_allocator == "none" || use_allocator == "tcmalloc" ||
 # Don't ship this configuration, not ready yet.
 assert(!(use_allocator == "partition" && is_official_build))
 
-assert(!is_win || use_allocator == "none", "Tcmalloc doesn't work on Windows.")
-assert(!is_mac || use_allocator == "none", "Tcmalloc doesn't work on macOS.")
-assert(!is_ios || use_allocator == "none", "Tcmalloc doesn't work on iOS.")
+assert(!is_win || use_allocator != "tcmalloc",
+       "Tcmalloc doesn't work on Windows.")
+assert(!is_mac || use_allocator != "tcmalloc",
+       "Tcmalloc doesn't work on macOS.")
+assert(!is_ios || use_allocator != "tcmalloc", "Tcmalloc doesn't work on iOS.")
 
 assert(
     !use_allocator_shim || is_linux || is_chromeos || is_android || is_win ||

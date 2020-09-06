@@ -195,9 +195,6 @@ class BASE_EXPORT StackSamplingProfiler {
                                          Optional<int64_t> key,
                                          int64_t value);
 
-  // The thread whose stack will be sampled.
-  SamplingProfilerThreadToken thread_token_;
-
   const SamplingParams params_;
 
   // Receives the sampling data and builds a profile. The ownership of this

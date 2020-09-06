@@ -8,7 +8,6 @@
 
 #include <new>
 
-#include "base/allocator/allocator_shim.h"
 #include "base/allocator/buildflags.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -18,9 +17,19 @@
 #include "base/threading/thread_restrictions.h"
 #include "build/build_config.h"
 
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
+#include "base/allocator/allocator_shim.h"
+#endif
+
 #if BUILDFLAG(USE_TCMALLOC)
 #include "third_party/tcmalloc/chromium/src/config.h"
 #include "third_party/tcmalloc/chromium/src/gperftools/tcmalloc.h"
+#endif
+
+#if !BUILDFLAG(USE_ALLOCATOR_SHIM) && defined(LIBC_GLIBC) && !defined(USE_TCMALLOC)
+extern "C" {
+void* __libc_malloc(size_t size);
+}
 #endif
 
 namespace base {

@@ -83,7 +83,7 @@ JobTaskSource::State::TryIncrementWorkerCountFromWorkerRelease(
              value_before_add, value_before_add + kWorkerCountIncrement,
              std::memory_order_release, std::memory_order_relaxed)) {
   }
-  return {value_before_add};
+  return {static_cast<uint32_t>(value_before_add)};
 }
 
 JobTaskSource::State::Value
@@ -91,14 +91,14 @@ JobTaskSource::State::DecrementWorkerCountFromWorkerAcquire() {
   const size_t value_before_sub =
       value_.fetch_sub(kWorkerCountIncrement, std::memory_order_acquire);
   DCHECK((value_before_sub >> kWorkerCountBitOffset) > 0);
-  return {value_before_sub};
+  return {static_cast<uint32_t>(value_before_sub)};
 }
 
 JobTaskSource::State::Value
 JobTaskSource::State::IncrementWorkerCountFromJoiningThread() {
   size_t value_before_add =
       value_.fetch_add(kWorkerCountIncrement, std::memory_order_relaxed);
-  return {value_before_add};
+  return {static_cast<uint32_t>(value_before_add)};
 }
 
 JobTaskSource::State::Value
@@ -106,7 +106,7 @@ JobTaskSource::State::DecrementWorkerCountFromJoiningThread() {
   const size_t value_before_sub =
       value_.fetch_sub(kWorkerCountIncrement, std::memory_order_relaxed);
   DCHECK((value_before_sub >> kWorkerCountBitOffset) > 0);
-  return {value_before_sub};
+  return {static_cast<uint32_t>(value_before_sub)};
 }
 
 JobTaskSource::State::Value JobTaskSource::State::Load() const {

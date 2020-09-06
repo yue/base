@@ -31,7 +31,7 @@ enum class MachOArchitectures : uint32_t {
   kInvalidFormat = 1 << 30,
 
   // Not a file at all. This bit may only appear alone.
-  kFileError = 1 << 31,
+  kFileError = static_cast<uint32_t>(1 << 31),
 };
 
 // MachOArchitectures is an enum class for better namespacing, but it’s treated

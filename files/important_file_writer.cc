@@ -19,7 +19,6 @@
 #include "base/files/file.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
-#include "base/files/important_file_writer_cleaner.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
@@ -35,6 +34,10 @@
 #include "base/threading/thread.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
+
+#if defined(OS_WIN)
+#include "base/files/important_file_writer_cleaner.h"
+#endif
 
 namespace base {
 

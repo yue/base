@@ -5,9 +5,12 @@
 #include "base/memory/discardable_memory.h"
 #include "base/feature_list.h"
 #include "base/memory/discardable_memory_internal.h"
-#include "base/memory/madv_free_discardable_memory_posix.h"
 #include "base/metrics/field_trial_params.h"
 #include "build/build_config.h"
+
+#if defined(OS_POSIX)
+#include "base/memory/madv_free_discardable_memory_posix.h"
+#endif
 
 #if defined(OS_ANDROID)
 #include <third_party/ashmem/ashmem.h>

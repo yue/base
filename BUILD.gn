@@ -293,6 +293,10 @@ component("base") {
     "hash/hash.h",
     "hash/legacy_hash.cc",
     "hash/legacy_hash.h",
+    "hash/md5.cc",
+    "hash/md5.h",
+    "hash/sha1.cc",
+    "hash/sha1.h",
     "immediate_crash.h",
     "json/json_common.h",
     "json/json_file_value_serializer.cc",
@@ -1662,32 +1666,6 @@ component("base") {
       "//third_party/fuchsia-sdk/sdk/pkg/syslog",
       "//third_party/icu",
     ]
-  }
-
-  # Use the base implementation of hash functions when building for
-  # NaCl. Otherwise, use boringssl. Building boringssl for NaCl opens
-  # a can of worms surrounding the nacl_io library.
-  #
-  # TODO(crbug.com/702997) Use only boringssl when NaCl is removed.
-  sources += [
-    "hash/md5.h",
-    "hash/md5_constexpr.h",
-    "hash/md5_constexpr_internal.h",
-    "hash/sha1.h",
-  ]
-  if (is_nacl) {
-    sources += [
-      "hash/md5_nacl.cc",
-      "hash/md5_nacl.h",
-      "hash/sha1.cc",
-    ]
-  } else {
-    sources += [
-      "hash/md5_boringssl.cc",
-      "hash/md5_boringssl.h",
-      "hash/sha1_boringssl.cc",
-    ]
-    public_deps += [ "//third_party/boringssl" ]
   }
 
   # NaCl.

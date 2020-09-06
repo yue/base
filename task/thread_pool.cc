@@ -15,10 +15,10 @@ namespace base {
 
 namespace {
 
-class PostTaskAndReplyWithTraitsTaskRunner
+class PostTaskAndReplyWithTraitsTaskRunnerTP
     : public internal::PostTaskAndReplyImpl {
  public:
-  explicit PostTaskAndReplyWithTraitsTaskRunner(const TaskTraits& traits)
+  explicit PostTaskAndReplyWithTraitsTaskRunnerTP(const TaskTraits& traits)
       : traits_(traits) {}
 
  private:
@@ -85,7 +85,7 @@ bool ThreadPool::PostTaskAndReply(const Location& from_here,
                                   const TaskTraits& traits,
                                   OnceClosure task,
                                   OnceClosure reply) {
-  return PostTaskAndReplyWithTraitsTaskRunner(traits).PostTaskAndReply(
+  return PostTaskAndReplyWithTraitsTaskRunnerTP(traits).PostTaskAndReply(
       from_here, std::move(task), std::move(reply));
 }
 

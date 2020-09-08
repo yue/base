@@ -89,7 +89,7 @@ base::StringPiece GetModule(base::StringPiece file) {
   module = module.substr(0, extension_start);
 
   // Chop off the -inl suffix.
-  static constexpr base::StringPiece kInlSuffix("-inl");
+  static base::StringPiece kInlSuffix("-inl");
   if (base::EndsWith(module, kInlSuffix))
     module.remove_suffix(kInlSuffix.size());
 

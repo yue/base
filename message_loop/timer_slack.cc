@@ -13,8 +13,8 @@
 namespace base {
 namespace features {
 
-constexpr base::Feature kLudicrousTimerSlack{"LudicrousTimerSlack",
-                                             base::FEATURE_DISABLED_BY_DEFAULT};
+const base::Feature kLudicrousTimerSlack{"LudicrousTimerSlack",
+                                         base::FEATURE_DISABLED_BY_DEFAULT};
 
 namespace {
 

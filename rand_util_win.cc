@@ -8,6 +8,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// error C2371: 'UNICODE_STRING': redefinition; different basic types
+#define _NTDEF_
+
 // #define needed to link in RtlGenRandom(), a.k.a. SystemFunction036.  See the
 // "Community Additions" comment on MSDN here:
 // http://msdn.microsoft.com/en-us/library/windows/desktop/aa387694.aspx

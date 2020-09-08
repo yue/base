@@ -76,14 +76,6 @@ struct ParameterPack {
     }
     return pack_npos;
   }
-
-  // Helper for extracting the Nth type from a parameter pack.
-  template <size_t N>
-  using NthType = std::tuple_element_t<N, std::tuple<Ts...>>;
-
-  // Checks if every type in the parameter pack is the same.
-  using IsAllSameType =
-      bool_constant<all_of({std::is_same<NthType<0>, Ts>::value...})>;
 };
 
 }  // namespace base

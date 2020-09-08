@@ -15,6 +15,10 @@
 
 #include "base/check.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#include <intrin.h>
+#endif
+
 namespace base::bits {
 
 // Bit functions in <bit> are restricted to a specific set of types of unsigned
@@ -117,7 +121,7 @@ inline T* AlignUp(T* ptr, uintptr_t alignment) {
 //
 // A common use for this function is to take its result and use it to left-shift
 // a bit; instead of doing so, use std::bit_floor().
-constexpr int Log2Floor(uint32_t n) {
+inline int Log2Floor(uint32_t n) {
   return 31 - std::countl_zero(n);
 }
 
@@ -128,7 +132,7 @@ constexpr int Log2Floor(uint32_t n) {
 //
 // A common use for this function is to take its result and use it to left-shift
 // a bit; instead of doing so, use std::bit_ceil().
-constexpr int Log2Ceiling(uint32_t n) {
+inline int Log2Ceiling(uint32_t n) {
   // When n == 0, we want the function to return -1.
   // When n == 0, (n - 1) will underflow to 0xFFFFFFFF, which is
   // why the statement below starts with (n ? 32 : -1).

@@ -104,8 +104,10 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wzero-length-array"
 #endif
+#if !defined(COMPILER_MSVC) || defined(__clang__)
   char pad_[PA_THREAD_ISOLATED_ARRAY_PAD_SZ(_ReservationOffsetTable,
                                             kNumPools)] = {};
+#endif
 #if defined(__clang__)
 #pragma clang diagnostic pop
 #endif

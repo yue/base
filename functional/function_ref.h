@@ -64,7 +64,7 @@ class FunctionRef;
 template <typename R, typename... Args>
 class FunctionRef<R(Args...)> {
   template <typename Functor,
-            typename RunType = internal::FunctorTraits<Functor>::RunType>
+            typename RunType = typename internal::FunctorTraits<Functor>::RunType>
   static constexpr bool kCompatibleFunctor =
       std::convertible_to<internal::ExtractReturnType<RunType>, R> &&
       std::same_as<internal::ExtractArgs<RunType>, internal::TypeList<Args...>>;
@@ -73,6 +73,7 @@ class FunctionRef<R(Args...)> {
   // `ABSL_ATTRIBUTE_LIFETIME_BOUND` is important; since `FunctionRef` retains
   // only a reference to `functor`, `functor` must outlive `this`.
   template <typename Functor>
+#if 0
     requires kCompatibleFunctor<Functor> &&
              // Prevent this constructor from participating in overload
              // resolution if the callable is itself an instantiation of the
@@ -96,6 +97,7 @@ class FunctionRef<R(Args...)> {
              // construction from `absl::FunctionRef`.
              (!internal::is_instantiation_v<absl::FunctionRef,
                                             std::decay_t<Functor>>)
+#endif
   // NOLINTNEXTLINE(google-explicit-constructor)
   FunctionRef(const Functor& functor ABSL_ATTRIBUTE_LIFETIME_BOUND)
       : wrapped_func_ref_(functor) {}

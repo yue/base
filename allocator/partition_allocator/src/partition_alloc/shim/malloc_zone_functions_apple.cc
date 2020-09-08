@@ -46,9 +46,11 @@ void StoreZoneFunctions(const ChromeMallocZone* zone,
   if (zone->version >= 10) {
     functions->claimed_address = zone->claimed_address;
   }
+#if PA_TRY_FREE_DEFAULT_IS_AVAILABLE
   if (zone->version >= 13) {
     functions->try_free_default = zone->try_free_default;
   }
+#endif
 
   // Note that zone version 8 introduced a pressure relief callback, and version
   // 10 introduced a claimed address callback, but neither are allocation or

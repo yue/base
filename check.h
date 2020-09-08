@@ -18,6 +18,10 @@
 #include "base/memory/raw_ptr.h"
 #include "base/not_fatal_until.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4003 4722)
+#endif
+
 // This header defines the CHECK, DCHECK, and DPCHECK macros.
 //
 // CHECK dies with a fatal error if its condition is not true. It is not
@@ -221,12 +225,8 @@ class BASE_EXPORT NotReachedNoreturnError : public CheckError {
 // compiler optimizations. Unlike the other check macros, this one does not use
 // LOGGING_CHECK_FUNCTION_IMPL(), since it is incompatible with
 // EAT_CHECK_STREAM_PARAMETERS().
-#define CHECK(condition, ...)                                 \
-  BASE_IF(BASE_IS_EMPTY(__VA_ARGS__),                         \
-          UNLIKELY(!(condition)) ? logging::CheckFailure()    \
-                                 : EAT_CHECK_STREAM_PARAMS(), \
-          LOGGING_CHECK_FUNCTION_IMPL(                        \
-              logging::CheckError::Check(#condition, __VA_ARGS__), condition))
+#define CHECK(condition, ...) \
+   UNLIKELY(!(condition)) ? logging::CheckFailure() : EAT_CHECK_STREAM_PARAMS()
 
 #define CHECK_WILL_STREAM() false
 
@@ -238,10 +238,9 @@ class BASE_EXPORT NotReachedNoreturnError : public CheckError {
 
 #define CHECK_WILL_STREAM() true
 
-#define CHECK(condition, ...)                                              \
-  LOGGING_CHECK_FUNCTION_IMPL(                                             \
-      ::logging::CheckError::Check(#condition __VA_OPT__(, ) __VA_ARGS__), \
-      condition)
+#define CHECK(condition, ...)                                           \
+  LOGGING_CHECK_FUNCTION_IMPL(::logging::CheckError::Check(#condition), \
+                              condition)
 
 #define PCHECK(condition)                                                \
   LOGGING_CHECK_FUNCTION_IMPL(::logging::CheckError::PCheck(#condition), \
@@ -287,10 +286,10 @@ class BASE_EXPORT NotReachedNoreturnError : public CheckError {
 // invocations as it communicates intent to eventually end up as a CHECK. It
 // also preserves the log message so setting crash keys to get additional debug
 // info isn't required as often.
-#define DUMP_WILL_BE_CHECK(condition, ...)                                \
-  LOGGING_CHECK_FUNCTION_IMPL(::logging::CheckError::DumpWillBeCheck(     \
-                                  #condition __VA_OPT__(, ) __VA_ARGS__), \
-                              condition)
+#define DUMP_WILL_BE_CHECK(condition) \
+  LOGGING_CHECK_FUNCTION_IMPL(        \
+      ::logging::CheckError::DumpWillBeCheck(#condition), condition)
+
 
 // Async signal safe checking mechanism.
 [[noreturn]] BASE_EXPORT void RawCheckFailure(const char* message);

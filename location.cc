@@ -38,12 +38,19 @@ constexpr size_t StrippedFilePathPrefixLength() {
 #endif
   constexpr size_t path_len = StrLen(path);
   constexpr size_t stripped_len = StrLen(stripped);
+#if defined(OFFICIAL_BUILD)
   static_assert(path_len >= stripped_len,
                 "Invalid file path for base/location.cc.");
   return path_len - stripped_len;
+#else
+  return std::max(path_len - stripped_len, static_cast<size_t>(0));
+#endif  // defined(OFFICIAL_BUILD)
 }
 
+
 constexpr size_t kStrippedPrefixLength = StrippedFilePathPrefixLength();
+
+#if defined(OFFICIAL_BUILD)
 
 // Returns true if the |name| string has |prefix_len| characters in the prefix
 // and the suffix matches the |expected| string.
@@ -70,6 +77,8 @@ static_assert(StrEndsWith(__FILE__, kStrippedPrefixLength, "base\\location.cc"),
 static_assert(StrEndsWith(__FILE__, kStrippedPrefixLength, "base/location.cc"),
               "The file name does not match the expected prefix format.");
 #endif
+
+#endif  // defined(OFFICIAL_BUILD)
 
 }  // namespace
 

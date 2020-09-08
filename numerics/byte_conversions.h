@@ -71,6 +71,7 @@ inline constexpr uint64_t U64FromNativeEndian(
     std::span<const uint8_t, 8u> bytes) {
   return internal::FromLittleEndian<uint64_t>(bytes);
 }
+#if 0
 // Returns a float with the value in `bytes` interpreted as the native endian
 // encoding of the number for the machine.
 //
@@ -93,6 +94,7 @@ inline constexpr double DoubleFromNativeEndian(
     std::span<const uint8_t, 8u> bytes) {
   return std::bit_cast<double>(U64FromNativeEndian(bytes));
 }
+#endif
 
 // Returns a uint8_t with the value in `bytes` interpreted as a little-endian
 // encoding of the integer.
@@ -146,6 +148,7 @@ inline constexpr uint64_t U64FromLittleEndian(
     std::span<const uint8_t, 8u> bytes) {
   return internal::FromLittleEndian<uint64_t>(bytes);
 }
+#if 0
 // Returns a float with the value in `bytes` interpreted as a little-endian
 // encoding of the integer.
 //
@@ -170,6 +173,7 @@ inline constexpr double DoubleFromLittleEndian(
     std::span<const uint8_t, 8u> bytes) {
   return std::bit_cast<double>(U64FromLittleEndian(bytes));
 }
+#endif
 
 // Returns a uint8_t with the value in `bytes` interpreted as a big-endian
 // encoding of the integer.
@@ -215,6 +219,7 @@ inline constexpr uint32_t U32FromBigEndian(std::span<const uint8_t, 4u> bytes) {
 inline constexpr uint64_t U64FromBigEndian(std::span<const uint8_t, 8u> bytes) {
   return ByteSwap(internal::FromLittleEndian<uint64_t>(bytes));
 }
+#if 0
 // Returns a float with the value in `bytes` interpreted as a big-endian
 // encoding of the integer.
 //
@@ -236,6 +241,7 @@ inline constexpr double DoubleFromBigEndian(
     std::span<const uint8_t, 8u> bytes) {
   return std::bit_cast<double>(U64FromBigEndian(bytes));
 }
+#endif
 
 // Returns a byte array holding the value of a uint8_t encoded as the native
 // endian encoding of the integer for the machine.
@@ -277,6 +283,7 @@ inline constexpr std::array<uint8_t, 4u> U32ToNativeEndian(uint32_t val) {
 inline constexpr std::array<uint8_t, 8u> U64ToNativeEndian(uint64_t val) {
   return internal::ToLittleEndian(val);
 }
+#if 0
 // Returns a byte array holding the value of a float encoded as the native
 // endian encoding of the number for the machine.
 //
@@ -297,6 +304,7 @@ inline constexpr std::array<uint8_t, 4u> FloatToNativeEndian(float val) {
 inline constexpr std::array<uint8_t, 8u> DoubleToNativeEndian(double val) {
   return U64ToNativeEndian(std::bit_cast<uint64_t>(val));
 }
+#endif
 
 // Returns a byte array holding the value of a uint8_t encoded as the
 // little-endian encoding of the integer.
@@ -342,6 +350,7 @@ inline constexpr std::array<uint8_t, 4u> U32ToLittleEndian(uint32_t val) {
 inline constexpr std::array<uint8_t, 8u> U64ToLittleEndian(uint64_t val) {
   return internal::ToLittleEndian(val);
 }
+#if 0
 // Returns a byte array holding the value of a float encoded as the
 // little-endian encoding of the number.
 //
@@ -364,6 +373,7 @@ inline constexpr std::array<uint8_t, 4u> FloatToLittleEndian(float val) {
 inline constexpr std::array<uint8_t, 8u> DoubleToLittleEndian(double val) {
   return internal::ToLittleEndian(std::bit_cast<uint64_t>(val));
 }
+#endif
 
 // Returns a byte array holding the value of a uint8_t encoded as the big-endian
 // encoding of the integer.
@@ -409,6 +419,7 @@ inline constexpr std::array<uint8_t, 4u> U32ToBigEndian(uint32_t val) {
 inline constexpr std::array<uint8_t, 8u> U64ToBigEndian(uint64_t val) {
   return internal::ToLittleEndian(ByteSwap(val));
 }
+#if 0
 // Returns a byte array holding the value of a float encoded as the big-endian
 // encoding of the number.
 //
@@ -431,6 +442,7 @@ inline constexpr std::array<uint8_t, 4u> FloatToBigEndian(float val) {
 inline constexpr std::array<uint8_t, 8u> DoubleToBigEndian(double val) {
   return internal::ToLittleEndian(ByteSwap(std::bit_cast<uint64_t>(val)));
 }
+#endif
 
 }  // namespace base::numerics
 

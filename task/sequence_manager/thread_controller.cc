@@ -329,8 +329,13 @@ ThreadController::RunLevelTracker::RunLevel::~RunLevel() {
   }
 }
 
+#if defined(COMPILER_MSVC)
+ThreadController::RunLevelTracker::RunLevel::RunLevel(const RunLevel& other) =
+    default;
+#else
 ThreadController::RunLevelTracker::RunLevel::RunLevel(RunLevel&& other) =
     default;
+#endif
 
 void ThreadController::RunLevelTracker::RunLevel::LogPercentageMetric(
     const char* name,

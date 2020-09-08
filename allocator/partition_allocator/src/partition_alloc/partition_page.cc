@@ -319,6 +319,7 @@ void UnmapNow(uintptr_t reservation_start,
 
   } else
 #endif  // BUILDFLAG(ENABLE_BACKUP_REF_PTR_SUPPORT)
+#if !defined(COMPILER_MSVC) || defined(__clang__)
   {
     const bool received_expected_pool_handle =
         pool == kRegularPoolHandle
@@ -341,6 +342,7 @@ void UnmapNow(uintptr_t reservation_start,
               IsManagedByPartitionAllocConfigurablePool(reservation_start));
 #endif
   }
+#endif  // !defined(COMPILER_MSVC) || defined(__clang__)
 #endif  // BUILDFLAG(PA_DCHECK_IS_ON)
 
   PA_DCHECK((reservation_start & kSuperPageOffsetMask) == 0);

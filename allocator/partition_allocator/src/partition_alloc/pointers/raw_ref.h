@@ -70,7 +70,7 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ref {
   // The implementation of operator* provides GetForDereference semantics, and
   // this results in spurious crashes in BRP-ASan builds, so we need to disable
   // hooks that provide BRP-ASan instrumentation for raw_ref.
-  using Inner = raw_ptr<T, Traits | RawPtrTraits::kDisableHooks>;
+  using Inner = raw_ptr<T, ReferenceTraits | raw_ptr_traits::kTypeTraits<T> | RawPtrTraits::kDisableHooks>;
 
   // Some underlying implementations do not clear on move, which produces an
   // inconsistent behaviour. We want consistent behaviour such that using a

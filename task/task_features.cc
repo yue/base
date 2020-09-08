@@ -55,11 +55,7 @@ BASE_FEATURE(kExplicitHighResolutionTimerWin,
 
 BASE_FEATURE(kRunTasksByBatches,
              "RunTasksByBatches",
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_CHROMEOS)
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#else
              base::FEATURE_DISABLED_BY_DEFAULT);
-#endif
 
 BASE_FEATURE(kThreadPoolCap2,
              "ThreadPoolCap2",

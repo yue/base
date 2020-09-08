@@ -4,7 +4,6 @@
 
 #include "base/win/registry.h"
 
-#include <ntstatus.h>
 #include <stddef.h>
 
 #include <algorithm>

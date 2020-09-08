@@ -7,3 +7,11 @@
 // If allocator_shim target's sources has only header files, no object
 // files will be generated and we will see the following error:
 // "lld_link:error: <root>: undefined symbol: _DllMainCRTStartup."
+
+#include "build/build_config.h"
+
+#if BUILDFLAG(IS_WIN)
+__declspec(dllexport)
+void WithoutThisLinkWillFailUnableToFindImportLib2() {
+}
+#endif

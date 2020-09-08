@@ -193,7 +193,9 @@ PersistentSparseHistogramDataManager::LoadRecords(
   // each call. More than this number may be loaded if it takes longer to
   // find at least one matching record for the passed object.
   const size_t kMinimumNumberToLoad = 10;
+#if 0
   const uint64_t match_id = sample_map_records->sample_map_id_;
+#endif
 
   // Loop while no entry is found OR we haven't yet loaded the minimum number.
   // This will continue reading even after a match is found. Note that it is
@@ -217,6 +219,7 @@ PersistentSparseHistogramDataManager::LoadRecords(
     }
     ++new_records;
 
+#if 0
     // The sample-record could be for any sparse histogram. Add the reference
     // to the appropriate collection for later use.
     if (found_id == match_id) {
@@ -228,6 +231,7 @@ PersistentSparseHistogramDataManager::LoadRecords(
       CHECK(samples);
       samples->emplace_back(ref, value);
     }
+#endif
   }
 
   // Return all references found that have not yet been seen by

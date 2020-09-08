@@ -299,7 +299,7 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
   using Impl = typename raw_ptr_traits::ImplForTraits<Traits>;
   // Needed to make gtest Pointee matcher work with raw_ptr.
   using element_type = T;
-  using DanglingType = raw_ptr<T, Traits | RawPtrTraits::kMayDangle>;
+  using DanglingType = raw_ptr<T, PointerTraits | raw_ptr_traits::kTypeTraits<T> | RawPtrTraits::kMayDangle>;
 
 #if !BUILDFLAG(USE_PARTITION_ALLOC)
   // See comment at top about `PA_RAW_PTR_CHECK()`.
@@ -686,6 +686,11 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
     return *this;
   }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-stack-address"
+#endif
+
   template <typename Z,
             typename U = T,
             typename = std::enable_if_t<
@@ -741,6 +746,10 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
     raw_ptr result = Impl::Retreat(p.wrapped_ptr_, delta_elems, false);
     return result;
   }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
   // The "Do not disable operator+() and operator-()" comment above doesn't
   // apply to the delta operator-() below.

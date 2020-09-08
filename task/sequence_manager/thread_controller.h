@@ -391,7 +391,11 @@ class BASE_EXPORT ThreadController {
       // Move-constructible for STL compat. Flags `other.was_moved_` so it noops
       // on destruction after handing off its responsibility. Move-assignment
       // is not necessary nor possible as not all members are assignable.
+#if defined(COMPILER_MSVC)
+      RunLevel(const RunLevel& other);
+#else
       RunLevel(RunLevel&& other);
+#endif
       RunLevel& operator=(RunLevel&&) = delete;
 
       void UpdateState(State new_state, LazyNow& lazy_now);
@@ -443,7 +447,11 @@ class BASE_EXPORT ThreadController {
       class TruePostMove {
        public:
         TruePostMove() = default;
+#if defined(COMPILER_MSVC)
+        TruePostMove(const TruePostMove& other) = default;
+#else
         TruePostMove(TruePostMove&& other) { other.was_moved_ = true; }
+#endif
         // Not necessary for now.
         TruePostMove& operator=(TruePostMove&&) = delete;
 

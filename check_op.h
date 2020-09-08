@@ -17,6 +17,10 @@
 #include "base/strings/to_string.h"
 #include "base/types/supports_ostream_operator.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4018)
+#endif
+
 // This header defines the (DP)CHECK_EQ etc. macros.
 //
 // (DP)CHECK_EQ(x, y) is similar to (DP)CHECK(x == y) but will also log the
@@ -148,21 +152,17 @@ BASE_EXPORT char* CreateCheckOpLogMessageString(const char* expr_str,
         !message_on_fail)                                                    \
       ;                                                                      \
     else                                                                     \
-      check_failure_function(message_on_fail __VA_OPT__(, ) __VA_ARGS__)
+      check_failure_function(message_on_fail)
 
 #if !CHECK_WILL_STREAM()
 
 // Discard log strings to reduce code bloat.
-#define CHECK_OP(name, op, val1, val2, ...)                                \
-  BASE_IF(BASE_IS_EMPTY(__VA_ARGS__), CHECK((val1)op(val2)),               \
-          CHECK_OP_FUNCTION_IMPL(::logging::CheckError::CheckOp, name, op, \
-                                 val1, val2, __VA_ARGS__))
+#define CHECK_OP(name, op, val1, val2) CHECK((val1)op(val2))
 
 #else
 
-#define CHECK_OP(name, op, val1, val2, ...)                              \
-  CHECK_OP_FUNCTION_IMPL(::logging::CheckError::CheckOp, name, op, val1, \
-                         val2 __VA_OPT__(, ) __VA_ARGS__)
+#define CHECK_OP(name, op, val1, val2) \
+  CHECK_OP_FUNCTION_IMPL(::logging::CheckError::CheckOp, name, op, val1, val2)
 
 #endif
 
@@ -195,18 +195,12 @@ DEFINE_CHECK_OP_IMPL(LT, < )
 DEFINE_CHECK_OP_IMPL(GE, >=)
 DEFINE_CHECK_OP_IMPL(GT, > )
 #undef DEFINE_CHECK_OP_IMPL
-#define CHECK_EQ(val1, val2, ...) \
-  CHECK_OP(EQ, ==, val1, val2 __VA_OPT__(, ) __VA_ARGS__)
-#define CHECK_NE(val1, val2, ...) \
-  CHECK_OP(NE, !=, val1, val2 __VA_OPT__(, ) __VA_ARGS__)
-#define CHECK_LE(val1, val2, ...) \
-  CHECK_OP(LE, <=, val1, val2 __VA_OPT__(, ) __VA_ARGS__)
-#define CHECK_LT(val1, val2, ...) \
-  CHECK_OP(LT, < , val1, val2 __VA_OPT__(, ) __VA_ARGS__)
-#define CHECK_GE(val1, val2, ...) \
-  CHECK_OP(GE, >=, val1, val2 __VA_OPT__(, ) __VA_ARGS__)
-#define CHECK_GT(val1, val2, ...) \
-  CHECK_OP(GT, > , val1, val2 __VA_OPT__(, ) __VA_ARGS__)
+#define CHECK_EQ(val1, val2, ...) CHECK_OP(EQ, ==, val1, val2)
+#define CHECK_NE(val1, val2, ...) CHECK_OP(NE, !=, val1, val2)
+#define CHECK_LE(val1, val2, ...) CHECK_OP(LE, <=, val1, val2)
+#define CHECK_LT(val1, val2, ...) CHECK_OP(LT, < , val1, val2)
+#define CHECK_GE(val1, val2, ...) CHECK_OP(GE, >=, val1, val2)
+#define CHECK_GT(val1, val2, ...) CHECK_OP(GT, > , val1, val2)
 // clang-format on
 
 #if DCHECK_IS_ON()

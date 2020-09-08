@@ -1,6 +1,9 @@
 #ifndef GLOG_CONFIG_H
 #define GLOG_CONFIG_H
 
+/* Only built for Linux and ChromeOS so no special export magic needed. */
+#define GLOG_EXPORT
+
 /* Namespace for Google classes */
 #define GOOGLE_NAMESPACE google
 

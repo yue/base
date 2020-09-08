@@ -73,7 +73,7 @@ bool LightweightQuarantineBranch::Quarantine(void* object,
     // synchronization between the root and branch, so `branch_size_in_bytes_`
     // may be larger than `root_.capacity_in_bytes_` at this point.
 
-    slots_.emplace_back(slot_start, usable_size);
+    slots_.push_back({slot_start, usable_size});
 
     // Swap randomly so that the quarantine list remain shuffled.
     // This is not uniformly random, but sufficiently random.

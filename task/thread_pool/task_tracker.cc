@@ -408,9 +408,11 @@ RegisteredTaskSource TaskTracker::RunAndPopNextTask(
   }
 
   if (task) {
+#if defined(__clang__)
     // Skip delayed tasks if shutdown started.
     if (!task->delayed_run_time.is_null() && state_->HasShutdownStarted())
       task->task = base::DoNothingWithBoundArgs(std::move(task->task));
+#endif
 
     // Run the |task| (whether it's a worker task or the Clear() closure).
     RunTask(std::move(task.value()), task_source.get(), traits);

@@ -56,7 +56,7 @@ void LoadAllMimeCacheFiles(MimeTypeMap& map, std::vector<FileInfo>& files) {
   for (const auto& path : GetXDGDataSearchLocations(env.get())) {
     FilePath mime_cache = path.Append("mime/mime.cache");
     if (GetFileInfo(mime_cache, &info) && ParseMimeTypes(mime_cache, map)) {
-      files.emplace_back(mime_cache, info.last_modified);
+      files.push_back({mime_cache, info.last_modified});
     }
   }
 }

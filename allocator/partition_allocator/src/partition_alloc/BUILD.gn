@@ -274,7 +274,7 @@ group("buildflags") {
   public_configs = [ ":public_includes" ]
 }
 
-if (is_clang_or_gcc) {
+if (true) {
   config("partition_alloc_implementation") {
     # See also: `partition_alloc_base/component_export.h`
     defines = [ "IS_PARTITION_ALLOC_IMPL" ]

@@ -16,6 +16,12 @@
 
 namespace base::internal {
 
+#if BUILDFLAG(IS_WIN)
+PA_COMPONENT_EXPORT(RAW_PTR)
+void WithoutThisLinkWillFailUnableToFindImportLib() {
+}
+#endif
+
 #if BUILDFLAG(ENABLE_BACKUP_REF_PTR_INSTANCE_TRACER)
 
 static_assert(BUILDFLAG(ENABLE_BACKUP_REF_PTR_SUPPORT),

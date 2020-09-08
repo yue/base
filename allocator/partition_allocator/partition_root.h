@@ -76,6 +76,10 @@
 #include "base/allocator/partition_allocator/starscan/pcscan.h"
 #endif
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4715)
+#endif
+
 // We use this to make MEMORY_TOOL_REPLACES_ALLOCATOR behave the same for max
 // size as other alloc code.
 #define CHECK_MAX_SIZE_OR_RETURN_NULLPTR(size, flags)        \
@@ -88,6 +92,7 @@
 
 namespace partition_alloc::internal {
 
+#if BUILDFLAG(RECORD_ALLOC_INFO)
 // We want this size to be big enough that we have time to start up other
 // scripts _before_ we wrap around.
 static constexpr size_t kAllocInfoSize = 1 << 24;
@@ -100,7 +105,6 @@ struct AllocInfo {
   } allocs[kAllocInfoSize] = {};
 };
 
-#if BUILDFLAG(RECORD_ALLOC_INFO)
 extern AllocInfo g_allocs;
 
 void RecordAllocOrFree(uintptr_t addr, size_t size);
@@ -585,7 +589,9 @@ struct PA_ALIGNAS(64) PA_COMPONENT_EXPORT(PARTITION_ALLOC) PartitionRoot {
                  bool is_light_dump,
                  PartitionStatsDumper* partition_stats_dumper);
 
+#if 0
   static void DeleteForTesting(PartitionRoot* partition_root);
+#endif
   void ResetForTesting(bool allow_leaks);
   void ResetBookkeepingForTesting();
 

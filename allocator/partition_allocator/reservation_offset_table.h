@@ -99,7 +99,9 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC) ReservationOffsetTable {
   // pool. For this, we need to pad the tables so that the pkey ones start on a
   // page boundary.
   struct _PaddedReservationOffsetTables {
+#if !defined(COMPILER_MSVC) || defined(__clang__)
     char pad_[PA_PKEY_ARRAY_PAD_SZ(_ReservationOffsetTable, kNumPools)] = {};
+#endif
     struct _ReservationOffsetTable tables[kNumPools];
     char pad_after_[PA_PKEY_FILL_PAGE_SZ(sizeof(_ReservationOffsetTable))] = {};
   };

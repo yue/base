@@ -252,8 +252,13 @@ ThreadController::RunLevelTracker::RunLevel::~RunLevel() {
   }
 }
 
+#if defined(COMPILER_MSVC)
+ThreadController::RunLevelTracker::RunLevel::RunLevel(const RunLevel& other) =
+    default;
+#else
 ThreadController::RunLevelTracker::RunLevel::RunLevel(RunLevel&& other) =
     default;
+#endif
 
 void ThreadController::RunLevelTracker::RunLevel::UpdateState(State new_state) {
   // The only state that can be redeclared is idle, anything else should be a

@@ -1491,6 +1491,7 @@ void PartitionRoot<thread_safe>::DumpStats(const char* partition_name,
   dumper->PartitionDumpTotals(partition_name, &stats);
 }
 
+#if 0
 // static
 template <bool thread_safe>
 void PartitionRoot<thread_safe>::DeleteForTesting(
@@ -1504,6 +1505,7 @@ void PartitionRoot<thread_safe>::DeleteForTesting(
 
   delete partition_root;
 }
+#endif
 
 template <bool thread_safe>
 void PartitionRoot<thread_safe>::ResetForTesting(bool allow_leaks) {

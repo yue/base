@@ -48,7 +48,6 @@ NOINLINE void ReportErrorOnScopedHandleOperation(
   base::debug::Alias(&creation_stack_copy);
   base::debug::Alias(&operation);
   CHECK(false) << operation;
-  __builtin_unreachable();
 }
 
 NOINLINE void ReportErrorOnScopedHandleOperation(
@@ -61,7 +60,6 @@ NOINLINE void ReportErrorOnScopedHandleOperation(
   base::debug::Alias(&creation_stack_copy);
   base::debug::Alias(&operation);
   CHECK(false) << operation;
-  __builtin_unreachable();
 }
 
 }  // namespace

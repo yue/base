@@ -81,8 +81,10 @@ OSInfo** OSInfo::GetInstanceStorage() {
   static OSInfo* info = []() {
     _OSVERSIONINFOEXW version_info = {sizeof(version_info)};
 
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
     // GetVersionEx() is deprecated, and the suggested replacement are
     // the IsWindows*OrGreater() functions in VersionHelpers.h. We can't
     // use that because:
@@ -91,7 +93,10 @@ OSInfo** OSInfo::GetInstanceStorage() {
     //   since they sometimes change behavior in ways that matter.
     // - There is no IsWindows11OrGreater() function yet.
     ::GetVersionEx(reinterpret_cast<_OSVERSIONINFOW*>(&version_info));
+#if defined(__clang__)
 #pragma clang diagnostic pop
+#endif
+
 
     DWORD os_type = 0;
     ::GetProductInfo(version_info.dwMajorVersion, version_info.dwMinorVersion,
@@ -227,10 +232,10 @@ Version OSInfo::Kernel32Version() {
 OSInfo::VersionNumber OSInfo::Kernel32VersionNumber() {
   DCHECK_EQ(Kernel32BaseVersion().components().size(), 4u);
   static const VersionNumber version = {
-      .major = Kernel32BaseVersion().components()[0],
-      .minor = Kernel32BaseVersion().components()[1],
-      .build = Kernel32BaseVersion().components()[2],
-      .patch = Kernel32BaseVersion().components()[3]};
+      Kernel32BaseVersion().components()[0],
+      Kernel32BaseVersion().components()[1],
+      Kernel32BaseVersion().components()[2],
+      Kernel32BaseVersion().components()[3]};
   return version;
 }
 

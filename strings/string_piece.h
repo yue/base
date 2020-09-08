@@ -114,14 +114,22 @@ class GSL_POINTER BasicStringPiece {
   using size_type = size_t;
   using difference_type = ptrdiff_t;
 
+#if defined(__clang__)
   constexpr BasicStringPiece() noexcept : ptr_(nullptr), length_(0) {}
+#else
+  BasicStringPiece() : ptr_(nullptr), length_(0) {}
+#endif
   constexpr BasicStringPiece(const BasicStringPiece& other) noexcept = default;
   constexpr BasicStringPiece& operator=(const BasicStringPiece& view) noexcept =
       default;
   constexpr BasicStringPiece(const CharT* s, CheckedNumeric<size_t> count)
       : ptr_(s), length_(count.ValueOrDie()) {}
   // NOLINTNEXTLINE(google-explicit-constructor)
+#if defined(__clang__)
   constexpr BasicStringPiece(const CharT* s)
+#else
+  BasicStringPiece(const CharT* s)
+#endif
       : ptr_(s), length_(s ? traits_type::length(s) : 0) {
     // Intentional STL deviation: Null-check instead of UB.
     CHECK(s);

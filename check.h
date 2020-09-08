@@ -13,6 +13,10 @@
 #include "base/debug/debugging_buildflags.h"
 #include "base/immediate_crash.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4003 4722)
+#endif
+
 // This header defines the CHECK, DCHECK, and DPCHECK macros.
 //
 // CHECK dies with a fatal error if its condition is not true. It is not

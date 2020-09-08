@@ -163,7 +163,9 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC) AddressPoolManager {
   // to be last). For this, we need to add padding in front of the pools so that
   // pkey one starts on a page boundary.
   struct {
+#if !defined(COMPILER_MSVC) || defined(__clang__)
     char pad_[PA_PKEY_ARRAY_PAD_SZ(Pool, kNumPools)] = {};
+#endif
     Pool pools_[kNumPools];
     char pad_after_[PA_PKEY_FILL_PAGE_SZ(sizeof(Pool))] = {};
   } aligned_pools_ PA_PKEY_ALIGN;

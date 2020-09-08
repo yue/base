@@ -160,12 +160,15 @@ std::unique_ptr<base::win::IATPatchFunction> IATPatch(HMODULE module,
     return nullptr;
 
   auto patch = std::make_unique<base::win::IATPatchFunction>();
+#if defined(__clang__)
   __try {
+#endif
     // There is no guarantee that |module| is still loaded at this point.
     if (patch->PatchFromModule(module, "kernel32.dll", function_name,
                                new_function)) {
       return nullptr;
     }
+#if defined(__clang__)
   } __except ((GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ||
                GetExceptionCode() == EXCEPTION_GUARD_PAGE ||
                GetExceptionCode() == EXCEPTION_IN_PAGE_ERROR)
@@ -175,6 +178,7 @@ std::unique_ptr<base::win::IATPatchFunction> IATPatch(HMODULE module,
     std::ignore = patch.release();
     return nullptr;
   }
+#endif
 
   if (!(*old_function)) {
     // Things are probably messed up if each intercepted function points to

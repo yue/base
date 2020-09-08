@@ -994,6 +994,11 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
     return *this += -delta_elems;
   }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-stack-address"
+#endif
+
   // Do not disable operator+() and operator-().
   // They provide OOB checks. Keep them enabled, which may be blocked later when
   // attempting to apply the += or -= operation, when disabled. In the absence
@@ -1010,6 +1015,10 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
     raw_ptr result = p;
     return result -= delta_elems;
   }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
   friend PA_ALWAYS_INLINE ptrdiff_t operator-(const raw_ptr& p1,
                                               const raw_ptr& p2) {

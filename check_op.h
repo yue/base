@@ -16,6 +16,10 @@
 #include "base/memory/raw_ptr_exclusion.h"
 #include "base/template_util.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4018)
+#endif
+
 // This header defines the (DP)CHECK_EQ etc. macros.
 //
 // (DP)CHECK_EQ(x, y) is similar to (DP)CHECK(x == y) but will also log the

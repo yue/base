@@ -7,6 +7,11 @@
 
 #include "build/build_config.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4003 4200 4291 4334)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
 // This is a wrapper around `__has_cpp_attribute`, which can be used to test for
 // the presence of an attribute. In case the compiler does not support this
 // macro it will simply evaluate to 0.

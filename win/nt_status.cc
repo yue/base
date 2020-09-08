@@ -9,7 +9,7 @@
 
 #include "base/check.h"
 
-using GetLastNtStatusFn = NTSTATUS NTAPI (*)();
+typedef NTSTATUS (NTAPI *GetLastNtStatusFn)();
 
 constexpr const wchar_t kNtDllName[] = L"ntdll.dll";
 constexpr const char kLastStatusFnName[] = "RtlGetLastNtStatus";

@@ -10,7 +10,6 @@
 #include "base/check.h"
 #include "base/dcheck_is_on.h"
 #include "base/no_destructor.h"
-#include "base/sampling_heap_profiler/poisson_allocation_sampler.h"
 
 #if BUILDFLAG(USE_PARTITION_ALLOC)
 #include "base/allocator/partition_allocator/partition_alloc.h"

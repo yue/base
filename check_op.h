@@ -17,6 +17,10 @@
 #include "base/strings/to_string.h"
 #include "base/types/supports_ostream_operator.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4018)
+#endif
+
 // This header defines the (DP)CHECK_EQ etc. macros.
 //
 // (DP)CHECK_EQ(x, y) is similar to (DP)CHECK(x == y) but will also log the

@@ -11,7 +11,9 @@
 #include "base/numerics/clamped_math.h"
 
 namespace {
+#if 0
 constexpr int kIntMax = std::numeric_limits<int>::max();
+#endif
 constexpr int64_t kInt64Max = std::numeric_limits<int64_t>::max();
 }  // namespace
 
@@ -19,7 +21,9 @@ namespace base {
 
 MovingAverage::MovingAverage(uint8_t window_size)
     : window_size_(window_size), buffer_(window_size, 0) {
+#if 0
   DCHECK_LE(kIntMax * window_size, kInt64Max);
+#endif
 }
 
 MovingAverage::~MovingAverage() = default;

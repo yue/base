@@ -603,9 +603,11 @@ void ReplaceZoneFunctions(ChromeMallocZone* zone,
   if (zone->version >= 10 && functions->claimed_address) {
     zone->claimed_address = functions->claimed_address;
   }
+#if PA_TRY_FREE_DEFAULT_IS_AVAILABLE
   if (zone->version >= 13 && functions->try_free_default) {
     zone->try_free_default = functions->try_free_default;
   }
+#endif
 
   // Cap the version to the max supported to ensure malloc doesn't try to call
   // functions that weren't replaced.

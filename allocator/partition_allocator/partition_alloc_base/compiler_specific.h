@@ -7,6 +7,11 @@
 
 #include "build/build_config.h"
 
+#if defined(COMPILER_MSVC) && !defined(__clang__)
+#pragma warning(disable: 4003 4200 4291 4334)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
 // A wrapper around `__has_attribute`, similar to HAS_CPP_ATTRIBUTE.
 #if defined(__has_attribute)
 #define PA_HAS_ATTRIBUTE(x) __has_attribute(x)

@@ -100,8 +100,10 @@ class PA_COMPONENT_EXPORT(PARTITION_ALLOC)
   // If thread isolation support is enabled, we need to write-protect the tables
   // of the thread isolated pool. For this, we need to pad the tables so that
   // the thread isolated ones start on a page boundary.
+#if !defined(COMPILER_MSVC) || defined(__clang__)
   char pad_[PA_THREAD_ISOLATED_ARRAY_PAD_SZ(_ReservationOffsetTable,
                                             kNumPools)] = {};
+#endif
   struct _ReservationOffsetTable tables[kNumPools];
   static PA_CONSTINIT ReservationOffsetTable singleton_;
 #else

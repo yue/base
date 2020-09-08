@@ -31,6 +31,10 @@
 #include "base/trace_event/memory_usage_estimator.h"  // no-presubmit-check
 #endif  // BUILDFLAG(ENABLE_BASE_TRACING)
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4065)
+#endif
+
 namespace base {
 
 namespace {
@@ -549,6 +553,7 @@ Value* Value::Dict::Set(StringPiece key, List&& value) & {
   return Set(key, Value(std::move(value)));
 }
 
+#if !defined(COMPILER_MSVC) || defined(__clang__)
 Value::Dict&& Value::Dict::Set(StringPiece key, Value&& value) && {
   DCHECK(IsStringUTF8AllowingNoncharacters(key));
   storage_.insert_or_assign(key, std::make_unique<Value>(std::move(value)));
@@ -598,6 +603,7 @@ Value::Dict&& Value::Dict::Set(StringPiece key, Dict&& value) && {
 Value::Dict&& Value::Dict::Set(StringPiece key, List&& value) && {
   return std::move(*this).Set(key, Value(std::move(value)));
 }
+#endif
 
 bool Value::Dict::Remove(StringPiece key) {
   DCHECK(IsStringUTF8AllowingNoncharacters(key));
@@ -1114,6 +1120,7 @@ void Value::List::Append(List&& value) & {
   storage_.emplace_back(std::move(value));
 }
 
+#if !defined(COMPILER_MSVC) || defined(__clang__)
 Value::List&& Value::List::Append(Value&& value) && {
   storage_.emplace_back(std::move(value));
   return std::move(*this);
@@ -1173,6 +1180,7 @@ Value::List&& Value::List::Append(List&& value) && {
   storage_.emplace_back(std::move(value));
   return std::move(*this);
 }
+#endif
 
 Value::List::iterator Value::List::Insert(const_iterator pos, Value&& value) {
   auto inserted_it =

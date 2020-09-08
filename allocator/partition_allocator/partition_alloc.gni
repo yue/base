@@ -49,7 +49,7 @@ declare_args() {
   #     and doesn't wish to incur the library size increase (crbug.com/674570).
   # 2.  On NaCl (through this declaration), where PartitionAlloc doesn't
   #     build at all.
-  use_partition_alloc = !is_nacl
+  use_partition_alloc = false
 }
 
 declare_args() {

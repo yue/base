@@ -1636,6 +1636,7 @@ void PartitionRoot::DumpStats(const char* partition_name,
   dumper->PartitionDumpTotals(partition_name, &stats);
 }
 
+#if 0
 // static
 void PartitionRoot::DeleteForTesting(PartitionRoot* partition_root) {
   if (partition_root->settings.with_thread_cache) {
@@ -1647,6 +1648,7 @@ void PartitionRoot::DeleteForTesting(PartitionRoot* partition_root) {
 
   delete partition_root;
 }
+#endif
 
 void PartitionRoot::ResetForTesting(bool allow_leaks) {
   if (settings.with_thread_cache) {

@@ -328,7 +328,7 @@ class BASE_EXPORT StatisticsRecorder {
   // histogram map, but on iOS, we have seen hangs when using Absl's
   // implementation. So, use a "normal" fully exclusive lock instead.
   // TODO(crbug.com/1123627): Consider using std::shared_mutex.
-#if !BUILDFLAG(IS_IOS)
+#if !BUILDFLAG(IS_IOS) && !defined(COMPILER_MSVC)
   using SrLock = absl::Mutex;
   using SrAutoReaderLock = absl::ReaderMutexLock;
   using SrAutoWriterLock = absl::MutexLock;

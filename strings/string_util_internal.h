@@ -10,6 +10,10 @@
 #include "base/ranges/algorithm.h"
 #include "base/strings/string_piece.h"
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4310)
+#endif
+
 namespace base::internal {
 
 // ASCII-specific tolower.  The standard library's tolower is locale sensitive,

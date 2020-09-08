@@ -618,6 +618,11 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
     return *this;
   }
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreturn-stack-address"
+#endif
+
   // Do not disable operator+() and operator-().
   // They provide OOB checks, which prevent from assigning an arbitrary value to
   // raw_ptr, leading BRP to modifying arbitrary memory thinking it's ref-count.
@@ -638,6 +643,10 @@ class PA_TRIVIAL_ABI PA_GSL_POINTER raw_ptr {
     raw_ptr result = p;
     return result -= delta_elems;
   }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
   PA_ALWAYS_INLINE friend constexpr ptrdiff_t operator-(const raw_ptr& p1,
                                                         const raw_ptr& p2) {

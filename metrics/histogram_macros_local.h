@@ -9,6 +9,14 @@
 #include "base/metrics/histogram_macros_internal.h"
 #include "base/time/time.h"
 
+namespace base {
+
+// Workaround for MSVC, which expands __VA_ARGS__ as one macro argument. To
+// work around this bug, wrap the entire expression in this macro...
+#define CR_EXPAND_ARG(arg) arg
+
+}  // base
+
 // TODO(rkaplow): Migrate all LOCAL_* usage within Chromium to include this
 // file instead of the histogram_macros.h file.
 
@@ -18,10 +26,10 @@
 // For usage details, see the equivalents in histogram_macros.h.
 
 #define LOCAL_HISTOGRAM_ENUMERATION(name, ...)                          \
-  INTERNAL_UMA_HISTOGRAM_ENUMERATION_GET_MACRO(                         \
+  CR_EXPAND_ARG(INTERNAL_UMA_HISTOGRAM_ENUMERATION_GET_MACRO(           \
       __VA_ARGS__, INTERNAL_UMA_HISTOGRAM_ENUMERATION_SPECIFY_BOUNDARY, \
-      INTERNAL_UMA_HISTOGRAM_ENUMERATION_DEDUCE_BOUNDARY)               \
-  (name, __VA_ARGS__, base::HistogramBase::kNoFlags)
+      INTERNAL_UMA_HISTOGRAM_ENUMERATION_DEDUCE_BOUNDARY)(              \
+      name, __VA_ARGS__, base::HistogramBase::kNoFlags))
 
 #define LOCAL_HISTOGRAM_BOOLEAN(name, sample)                                  \
     STATIC_HISTOGRAM_POINTER_BLOCK(name, AddBoolean(sample),                   \

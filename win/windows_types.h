@@ -212,10 +212,13 @@ struct CHROME_MSG {
 #define REG_BINARY ( 3ul )
 #define REG_NONE ( 0ul )
 
-#ifndef STATUS_PENDING
 // Allow people to include ntstatus.h
+#ifndef STATUS_PENDING
 #define STATUS_PENDING ((DWORD   )0x00000103L)
 #endif  // STATUS_PENDING
+#ifndef STATUS_SUCCESS
+#define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
+#endif  // STATUS_SUCCESS
 #define STILL_ACTIVE STATUS_PENDING
 #define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
 #define FAILED(hr) (((HRESULT)(hr)) < 0)

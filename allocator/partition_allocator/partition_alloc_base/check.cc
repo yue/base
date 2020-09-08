@@ -83,7 +83,11 @@ CheckError::~CheckError() {
 
 void RawCheckFailure(const char* message) {
   RawLog(LOGGING_FATAL, message);
+#if defined(COMPILER_MSVC)
+  __assume(false);
+#else
   __builtin_unreachable();
+#endif
 }
 
 }  // namespace partition_alloc::internal::logging

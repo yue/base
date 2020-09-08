@@ -319,6 +319,7 @@ void UnmapNow(uintptr_t reservation_start,
         ));
   } else
 #endif  // BUILDFLAG(ENABLE_BACKUP_REF_PTR_SUPPORT)
+#if !defined(COMPILER_MSVC) || defined(__clang__)
   {
     PA_DCHECK(pool == kRegularPoolHandle
 #if BUILDFLAG(ENABLE_THREAD_ISOLATION)
@@ -336,6 +337,7 @@ void UnmapNow(uintptr_t reservation_start,
 #endif
               IsManagedByPartitionAllocConfigurablePool(reservation_start));
   }
+#endif  // !defined(COMPILER_MSVC) || defined(__clang__)
 #endif  // BUILDFLAG(PA_DCHECK_IS_ON)
 
   PA_DCHECK((reservation_start & kSuperPageOffsetMask) == 0);

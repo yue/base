@@ -70,7 +70,7 @@ std::string Escape(StringPiece text,
 // Convert a character |c| to a form that will not be mistaken as HTML.
 template <class str>
 void AppendEscapedCharForHTMLImpl(typename str::value_type c, str* output) {
-  static constexpr struct {
+  static struct {
     char key;
     StringPiece replacement;
   } kCharsToEscape[] = {

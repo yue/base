@@ -412,6 +412,7 @@ class BASE_EXPORT GSL_OWNER Value {
     Value* Set(StringPiece key, Dict&& value) &;
     Value* Set(StringPiece key, List&& value) &;
 
+#if !defined(COMPILER_MSVC) || defined(__clang__)
     // Rvalue overrides of the `Set` methods, which allow you to construct
     // a `Value::Dict` builder-style:
     //
@@ -461,6 +462,7 @@ class BASE_EXPORT GSL_OWNER Value {
     Dict&& Set(StringPiece key, BlobStorage&& value) &&;
     Dict&& Set(StringPiece key, Dict&& value) &&;
     Dict&& Set(StringPiece key, List&& value) &&;
+#endif
 
     // Removes the entry corresponding to `key` from this dictionary. Returns
     // true if an entry was removed or false otherwise.
@@ -716,6 +718,7 @@ class BASE_EXPORT GSL_OWNER Value {
     void Append(Dict&& value) &;
     void Append(List&& value) &;
 
+#if !defined(COMPILER_MSVC) || defined(__clang__)
     // Rvalue overrides of the `Append` methods, which allow you to construct
     // a `Value::List` builder-style:
     //
@@ -748,6 +751,7 @@ class BASE_EXPORT GSL_OWNER Value {
     List&& Append(BlobStorage&& value) &&;
     List&& Append(Dict&& value) &&;
     List&& Append(List&& value) &&;
+#endif
 
     // Inserts `value` before `pos` in this list. Returns an iterator to the
     // inserted value.

@@ -11,6 +11,10 @@
 #include "base/check.h"
 #include "base/template_util.h"
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4018)
+#endif
+
 // This header defines the (DP)CHECK_EQ etc. macros.
 //
 // (DP)CHECK_EQ(x, y) is similar to (DP)CHECK(x == y) but will also log the

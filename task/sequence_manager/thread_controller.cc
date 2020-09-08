@@ -104,14 +104,6 @@ ThreadController::RunLevelTracker::RunLevel::~RunLevel() {
   UpdateState(kIdle);
 }
 
-ThreadController::RunLevelTracker::RunLevel::RunLevel(RunLevel&& other)
-    : state_(std::exchange(other.state_, kIdle)) {}
-ThreadController::RunLevelTracker::RunLevel&
-ThreadController::RunLevelTracker::RunLevel::operator=(RunLevel&& other) {
-  state_ = std::exchange(other.state_, kIdle);
-  return *this;
-}
-
 void ThreadController::RunLevelTracker::RunLevel::UpdateState(State new_state) {
   // The only state that can be redeclared is idle, anything else should be a
   // transition.

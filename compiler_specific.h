@@ -7,8 +7,9 @@
 
 #include "build/build_config.h"
 
-#if defined(COMPILER_MSVC) && !defined(__clang__)
-#error "Only clang-cl is supported on Windows, see https://crbug.com/988071"
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4067 4229 4244 4267 4299 4312 4319 4334 4715 4838 4996 26110 26495 26812)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
 // This is a wrapper around `__has_cpp_attribute`, which can be used to test for

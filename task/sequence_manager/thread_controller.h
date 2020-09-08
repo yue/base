@@ -209,11 +209,6 @@ class ThreadController {
       explicit RunLevel(State initial_state);
       ~RunLevel();
 
-      // Moveable for STL compat. Marks |other| as idle so it noops on
-      // destruction after handing off its responsibility.
-      RunLevel(RunLevel&& other);
-      RunLevel& operator=(RunLevel&& other);
-
       void UpdateState(State new_state);
 
       State state() const { return state_; }

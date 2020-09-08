@@ -31,6 +31,10 @@
 #include <cstdlib>
 #include <cstring>
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4067)
+#endif
+
 #include <cassert>
 #ifndef DOUBLE_CONVERSION_ASSERT
 #define DOUBLE_CONVERSION_ASSERT(condition)         \

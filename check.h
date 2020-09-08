@@ -11,6 +11,10 @@
 #include "base/compiler_specific.h"
 #include "base/immediate_crash.h"
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4003)
+#endif
+
 // This header defines the CHECK, DCHECK, and DPCHECK macros.
 //
 // CHECK dies with a fatal error if its condition is not true. It is not

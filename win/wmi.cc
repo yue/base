@@ -151,7 +151,7 @@ WmiComputerSystemInfo WmiComputerSystemInfo::Get() {
 
 void WmiComputerSystemInfo::PopulateModelAndManufacturer(
     const ComPtr<IWbemServices>& services) {
-  static constexpr WStringPiece query_computer_system =
+  static WStringPiece query_computer_system =
       L"SELECT Manufacturer,Model FROM Win32_ComputerSystem";
 
   ComPtr<IEnumWbemClassObject> enumerator_computer_system;
@@ -185,7 +185,7 @@ void WmiComputerSystemInfo::PopulateModelAndManufacturer(
 
 void WmiComputerSystemInfo::PopulateSerialNumber(
     const ComPtr<IWbemServices>& services) {
-  static constexpr WStringPiece query_bios =
+  static WStringPiece query_bios =
       L"SELECT SerialNumber FROM Win32_Bios";
 
   ComPtr<IEnumWbemClassObject> enumerator_bios;

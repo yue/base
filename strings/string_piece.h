@@ -162,12 +162,20 @@ template <typename STRING_TYPE> class BasicStringPiece {
   // We provide non-explicit singleton constructors so users can pass
   // in a "const char*" or a "string" wherever a "StringPiece" is
   // expected (likewise for char16, string16, StringPiece16).
+#if defined(__clang__)
   constexpr BasicStringPiece() : ptr_(NULL), length_(0) {}
+#else
+  BasicStringPiece() : ptr_(NULL), length_(0) {}
+#endif
   // TODO(crbug.com/1049498): Construction from nullptr is not allowed for
   // std::basic_string_view, so remove the special handling for it.
   // Note: This doesn't just use STRING_TYPE::traits_type::length(), since that
   // isn't constexpr until C++17.
+#if defined(__clang__)
   constexpr BasicStringPiece(const value_type* str)
+#else
+  BasicStringPiece(const value_type* str)
+#endif
       : ptr_(str), length_(!str ? 0 : CharTraits<value_type>::length(str)) {}
   // Explicitly disallow construction from nullptr. Note that this does not
   // catch construction from runtime strings that might be null.

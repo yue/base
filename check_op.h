@@ -11,6 +11,10 @@
 #include "base/check.h"
 #include "base/template_util.h"
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4018)
+#endif
+
 // This header defines the (DP)CHECK_EQ etc. macros.
 //
 // (DP)CHECK_EQ(x, y) is similar to (DP)CHECK(x == y) but will also log the
@@ -160,14 +164,14 @@ class CheckOpResult {
 // The int-int overload avoids address-taking static int members.
 #define DEFINE_CHECK_OP_IMPL(name, op)                                         \
   template <typename T, typename U>                                            \
-  constexpr ::logging::CheckOpResult Check##name##Impl(                        \
+  inline ::logging::CheckOpResult Check##name##Impl(                        \
       const T& v1, const U& v2, const char* expr_str) {                        \
     if (ANALYZER_ASSUME_TRUE(v1 op v2))                                        \
       return ::logging::CheckOpResult();                                       \
     return ::logging::CheckOpResult(expr_str, CheckOpValueStr(v1),             \
                                     CheckOpValueStr(v2));                      \
   }                                                                            \
-  constexpr ::logging::CheckOpResult Check##name##Impl(int v1, int v2,         \
+  inline ::logging::CheckOpResult Check##name##Impl(int v1, int v2,         \
                                                        const char* expr_str) { \
     if (ANALYZER_ASSUME_TRUE(v1 op v2))                                        \
       return ::logging::CheckOpResult();                                       \

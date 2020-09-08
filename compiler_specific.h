@@ -7,8 +7,12 @@
 
 #include "build/build_config.h"
 
-#if defined(COMPILER_MSVC) && !defined(__clang__)
-#error "Only clang-cl is supported on Windows, see https://crbug.com/988071"
+// Avoid compiling "#pragma clang max_tokens_here".
+#define NACL_TC_REV
+
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4067 4229 4244 4267 4299 4312 4319 4334 4715 4838 4996 26110 26495 26812)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
 // This is a wrapper around `__has_cpp_attribute`, which can be used to test for
@@ -328,7 +332,7 @@ inline constexpr bool AnalyzerAssumeTrue(bool arg) {
 #endif  // defined(__clang_analyzer__)
 
 // Use nomerge attribute to disable optimization of merging multiple same calls.
-#if defined(__clang__) && __has_attribute(nomerge)
+#if 0
 #define NOMERGE [[clang::nomerge]]
 #else
 #define NOMERGE

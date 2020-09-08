@@ -13,6 +13,10 @@
 #include "base/strings/string_piece.h"
 #include "base/third_party/icu/icu_utf.h"
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4310)
+#endif
+
 namespace base {
 
 namespace internal {

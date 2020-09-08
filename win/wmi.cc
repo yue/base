@@ -150,7 +150,7 @@ WmiComputerSystemInfo WmiComputerSystemInfo::Get() {
 
 void WmiComputerSystemInfo::PopulateSerialNumber(
     const ComPtr<IWbemServices>& services) {
-  static constexpr WStringPiece query_bios =
+  static WStringPiece query_bios =
       L"SELECT SerialNumber FROM Win32_Bios";
 
   ComPtr<IEnumWbemClassObject> enumerator_bios;

@@ -161,7 +161,7 @@
 
 // This is supporting non-chromium user of logging.h to build with MSVC, like
 // pdfium. On MSVC there is no __builtin_unreachable().
-#define IMMEDIATE_CRASH() WRAPPED_TRAP_SEQUENCE_()
+#define IMMEDIATE_CRASH() __debugbreak()
 
 #endif  // defined(__clang__) || defined(COMPILER_GCC)
 

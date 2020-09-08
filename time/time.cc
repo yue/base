@@ -6,12 +6,12 @@
 
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_LINUX)
+#ifndef NACL_TC_REV
 // time.h is a widely included header and its size impacts build time.
 // Try not to raise this limit unless necessary. See
 // https://chromium.googlesource.com/chromium/src/+/HEAD/docs/wmax_tokens.md
 #pragma clang max_tokens_here 390000
-#endif  // BUILDFLAG(IS_LINUX)
+#endif  // NACL_TC_REV
 
 #include <atomic>
 #include <cmath>

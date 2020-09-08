@@ -7,10 +7,12 @@ import("//build/config/jumbo.gni")
 config("config") {
   visibility = [ ":double_conversion" ]
 
-  cflags = [
-    "-Wno-unused-const-variable",
-    "-Wno-unused-function",
-  ]
+  if (is_clang) {
+    cflags = [
+      "-Wno-unused-const-variable",
+      "-Wno-unused-function",
+    ]
+  }
 }
 
 jumbo_source_set("double_conversion") {

@@ -8,11 +8,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "base/allocator/buildflags.h"
 #include "base/bits.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
-#include "base/partition_alloc_buildflags.h"
 #include "base/process/process_handle.h"
 #include "base/rand_util.h"
 #include "base/strings/string_util.h"

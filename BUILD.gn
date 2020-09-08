@@ -566,8 +566,6 @@ jumbo_component("base") {
     "stl_util.h",
     "strings/abseil_string_conversions.cc",
     "strings/abseil_string_conversions.h",
-    "strings/abseil_string_number_conversions.cc",
-    "strings/abseil_string_number_conversions.h",
     "strings/char_traits.h",
     "strings/escape.cc",
     "strings/escape.h",
@@ -964,13 +962,9 @@ jumbo_component("base") {
 
   if (is_win) {
     sources += [
-      "debug/close_handle_hook_win.cc",
-      "debug/close_handle_hook_win.h",
       "debug/debugger_win.cc",
       "debug/gdi_debug_util_win.cc",
       "debug/gdi_debug_util_win.h",
-      "debug/invalid_access_win.cc",
-      "debug/invalid_access_win.h",
       "debug/stack_trace_win.cc",
       "enterprise_util_win.cc",
       "file_version_info_win.cc",
@@ -1938,7 +1932,7 @@ jumbo_component("base") {
     # BUILDFLAG(USE_PARTITION_ALLOC). A linker will remove all
     # partition_alloc code if use_partition_alloc = false because no code uses
     # partition_alloc.
-    public_deps += [ "allocator/partition_allocator:partition_alloc" ]
+    # public_deps += [ "allocator/partition_allocator:partition_alloc" ]
   }
 
   # Windows.

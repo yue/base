@@ -18,7 +18,7 @@ namespace {
 // pointing to the page that is the most relevant to a user trying to change the
 // default handler for `protocol`.
 std::wstring GetTargetForDefaultAppsSettings(base::WStringPiece protocol) {
-  static constexpr base::WStringPiece kSystemSettingsDefaultAppsPrefix(
+  static const base::WStringPiece kSystemSettingsDefaultAppsPrefix(
       L"SystemSettings_DefaultApps_");
   if (base::EqualsCaseInsensitiveASCII(protocol, L"http"))
     return base::StrCat({kSystemSettingsDefaultAppsPrefix, L"Browser"});

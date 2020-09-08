@@ -44,7 +44,6 @@ NOINLINE void ReportErrorOnScopedHandleOperation(
   auto creation_stack_copy = creation_stack;
   base::debug::Alias(&creation_stack_copy);
   CHECK(false);
-  __builtin_unreachable();
 }
 
 NOINLINE void ReportErrorOnScopedHandleOperation(
@@ -55,7 +54,6 @@ NOINLINE void ReportErrorOnScopedHandleOperation(
   auto creation_stack_copy = creation_stack;
   base::debug::Alias(&creation_stack_copy);
   CHECK(false);
-  __builtin_unreachable();
 }
 
 }  // namespace

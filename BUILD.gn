@@ -951,13 +951,9 @@ jumbo_component("base") {
 
   if (is_win) {
     sources += [
-      "debug/close_handle_hook_win.cc",
-      "debug/close_handle_hook_win.h",
       "debug/debugger_win.cc",
       "debug/gdi_debug_util_win.cc",
       "debug/gdi_debug_util_win.h",
-      "debug/invalid_access_win.cc",
-      "debug/invalid_access_win.h",
       "debug/stack_trace_win.cc",
       "enterprise_util_win.cc",
       "file_version_info_win.cc",

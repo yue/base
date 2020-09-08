@@ -623,6 +623,11 @@ class TRIVIAL_ABI raw_ptr {
   RAW_PTR_FUNC_ATTRIBUTES raw_ptr& operator-=(ptrdiff_t delta_elems) {
     return *this += -delta_elems;
   }
+#if defined(OS_WIN) && !defined(__clang__)
+  RAW_PTR_FUNC_ATTRIBUTES T* operator+(size_t delta_elems) const {
+    return Impl::Advance(wrapped_ptr_, delta_elems);
+  }
+#endif
 
   // Comparison operators between raw_ptr and raw_ptr<U>/U*/std::nullptr_t.
   // Strictly speaking, it is not necessary to provide these: the compiler can

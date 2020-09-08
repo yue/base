@@ -322,7 +322,7 @@ HangWatcher::HangWatcher()
   g_instance = this;
 }
 
-#if not defined(OS_NACL)
+#if !defined(OS_NACL)
 debug::ScopedCrashKeyString
 HangWatcher::GetTimeSinceLastCriticalMemoryPressureCrashKey() {
   DCHECK_CALLED_ON_VALID_THREAD(hang_watcher_thread_checker_);

@@ -29,6 +29,7 @@
 #if !BUILDFLAG(USE_ALLOCATOR_SHIM) && defined(LIBC_GLIBC) && !defined(USE_TCMALLOC)
 extern "C" {
 void* __libc_malloc(size_t size);
+void __libc_free(void*);
 }
 #endif
 

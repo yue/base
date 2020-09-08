@@ -111,7 +111,11 @@ class BasicStringPiece {
   using size_type = size_t;
   using difference_type = ptrdiff_t;
 
+#if defined(__clang__)
   constexpr BasicStringPiece() noexcept : ptr_(nullptr), length_(0) {}
+#else
+  BasicStringPiece() : ptr_(nullptr), length_(0) {}
+#endif
   constexpr BasicStringPiece(const BasicStringPiece& other) noexcept = default;
   constexpr BasicStringPiece& operator=(const BasicStringPiece& view) noexcept =
       default;
@@ -119,7 +123,11 @@ class BasicStringPiece {
       : ptr_(s), length_(count) {}
   // Note: This doesn't just use traits_type::length(), since that
   // isn't constexpr until C++17.
+#if defined(__clang__)
   constexpr BasicStringPiece(const CharT* s)
+#else
+  BasicStringPiece(const CharT* s)
+#endif
       : ptr_(s), length_(s ? CharTraits<CharT>::length(s) : 0) {
     // Intentional STL deviation: Null-check instead of UB.
     CHECK(s);

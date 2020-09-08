@@ -38,6 +38,10 @@
 #include "base/trace_event/memory_usage_estimator.h"  // no-presubmit-check
 #endif  // BUILDFLAG(ENABLE_BASE_TRACING)
 
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(disable: 4065)
+#endif
+
 namespace base {
 
 namespace {

@@ -44,4 +44,12 @@ template<typename T>
 inline void ignore_result(const T&) {
 }
 
+namespace base {
+
+// Workaround for MSVC, which expands __VA_ARGS__ as one macro argument. To
+// work around this bug, wrap the entire expression in this macro...
+#define CR_EXPAND_ARG(arg) arg
+
+}  // base
+
 #endif  // BASE_MACROS_H_

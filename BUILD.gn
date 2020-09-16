@@ -489,8 +489,6 @@ component("base") {
     "sequenced_task_runner_helpers.h",
     "single_thread_task_runner.h",
     "stl_util.h",
-    "strings/abseil_string_conversions.cc",
-    "strings/abseil_string_conversions.h",
     "strings/char_traits.h",
     "strings/escape.cc",
     "strings/escape.h",
@@ -1233,7 +1231,6 @@ component("base") {
     ":synchronization_buildflags",
     ":tracing_buildflags",
     "//base/numerics:base_numerics",
-    "//third_party/abseil-cpp:absl",
   ]
 
   # Needed for <atomic> if using newer C++ library than sysroot, except if

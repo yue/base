@@ -8,6 +8,7 @@ import("//build/config/cast.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/dcheck_always_on.gni")
+import("//build/config/jumbo.gni")
 import("//build/config/logging.gni")
 import("../../partition_alloc.gni")
 
@@ -90,7 +91,8 @@ if (!is_debug || partition_alloc_optimized_debug) {
   _add_configs += [ "//build/config/compiler:no_optimize" ]
 }
 
-component("raw_ptr") {
+jumbo_component("raw_ptr") {
+  always_build_jumbo = true
   # `gn check` is unhappy with most `#includes` when PA isn't
   # actually built.
   check_includes = use_partition_alloc
@@ -366,7 +368,8 @@ if (is_clang_or_gcc) {
     ]
   }
 
-  component("allocator_core") {
+  jumbo_component("allocator_core") {
+    always_build_jumbo = true
     visibility = [ ":*" ]
 
     sources = [
@@ -585,7 +588,8 @@ if (is_clang_or_gcc) {
     }
   }
 
-  component("allocator_base") {
+  jumbo_component("allocator_base") {
+    always_build_jumbo = true
     visibility = [ ":*" ]
 
     sources = [
@@ -782,7 +786,8 @@ if (is_clang_or_gcc) {
     configs += [ ":dependants_extra_warnings" ]
   }
 
-  component("allocator_shim") {
+  jumbo_component("allocator_shim") {
+    always_build_jumbo = true
     visibility = [ ":*" ]
 
     sources = []

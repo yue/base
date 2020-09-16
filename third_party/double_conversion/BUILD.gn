@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/config/jumbo.gni")
+
 config("config") {
   visibility = [ ":double_conversion" ]
 
@@ -11,7 +13,10 @@ config("config") {
   ]
 }
 
-static_library("double_conversion") {
+jumbo_source_set("double_conversion") {
+  always_build_jumbo = true
+
+  include_dirs = [ "double-conversion" ]
   sources = [
     "double-conversion/bignum-dtoa.cc",
     "double-conversion/bignum-dtoa.h",

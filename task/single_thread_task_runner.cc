@@ -21,7 +21,7 @@ namespace base {
 namespace {
 
 ABSL_CONST_INIT thread_local SingleThreadTaskRunner::CurrentDefaultHandle*
-    current_default_handle = nullptr;
+    current_default_handle2 = nullptr;
 
 // This function can be removed, and the calls below replaced with direct
 // variable accesses, once the MSAN workaround is not necessary.
@@ -29,10 +29,10 @@ SingleThreadTaskRunner::CurrentDefaultHandle* GetCurrentDefaultHandle() {
   // Workaround false-positive MSAN use-of-uninitialized-value on
   // thread_local storage for loaded libraries:
   // https://github.com/google/sanitizers/issues/1265
-  MSAN_UNPOISON(&current_default_handle,
+  MSAN_UNPOISON(&current_default_handle2,
                 sizeof(SingleThreadTaskRunner::CurrentDefaultHandle*));
 
-  return current_default_handle;
+  return current_default_handle2;
 }
 
 }  // namespace
@@ -72,7 +72,7 @@ SingleThreadTaskRunner::CurrentDefaultHandle::CurrentDefaultHandle(
 
 SingleThreadTaskRunner::CurrentDefaultHandle::~CurrentDefaultHandle() {
   DCHECK_EQ(GetCurrentDefaultHandle(), this);
-  current_default_handle = previous_handle_;
+  current_default_handle2 = previous_handle_;
 }
 
 SingleThreadTaskRunner::CurrentDefaultHandle::CurrentDefaultHandle(
@@ -86,7 +86,7 @@ SingleThreadTaskRunner::CurrentDefaultHandle::CurrentDefaultHandle(
   // Support overriding the current default with a null task runner or a task
   // runner that belongs to the current thread.
   DCHECK(!task_runner_ || task_runner_->BelongsToCurrentThread());
-  current_default_handle = this;
+  current_default_handle2 = this;
 }
 
 SingleThreadTaskRunner::CurrentHandleOverrideForTesting::

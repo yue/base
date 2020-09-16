@@ -22,11 +22,14 @@
 #include "base/logging.h"
 #include "base/memory/raw_ptr.h"
 #include "base/notimplemented.h"
-#include "base/threading/platform_thread_internal_posix.h"
 #include "base/threading/scoped_blocking_call.h"
 #include "base/threading/thread_id_name_manager.h"
 #include "base/threading/thread_restrictions.h"
 #include "build/build_config.h"
+
+#if !BUILDFLAG(IS_APPLE)
+#include "base/threading/platform_thread_internal_posix.h"
+#endif
 
 #if !BUILDFLAG(IS_APPLE) && !BUILDFLAG(IS_FUCHSIA) && !BUILDFLAG(IS_NACL)
 #include "base/posix/can_lower_nice_to.h"

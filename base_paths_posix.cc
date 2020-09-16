@@ -22,11 +22,11 @@
 #include "base/nix/xdg_util.h"
 #include "base/notreached.h"
 #include "base/path_service.h"
-#include "base/posix/sysctl.h"
 #include "base/process/process_metrics.h"
 #include "build/build_config.h"
 
 #if BUILDFLAG(IS_FREEBSD)
+#include "base/posix/sysctl.h"
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #elif BUILDFLAG(IS_SOLARIS) || BUILDFLAG(IS_AIX)

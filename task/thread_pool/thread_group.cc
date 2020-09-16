@@ -26,7 +26,7 @@ namespace internal {
 
 namespace {
 
-constexpr size_t kMaxNumberOfWorkers = 256;
+constexpr size_t kMaxNumberOfWorkers3 = 256;
 
 // In a background thread group:
 // - Blocking calls take more time than in a foreground thread group.
@@ -54,7 +54,7 @@ constexpr TimeDelta kBackgroundMayBlockThreshold = Seconds(10);
 constexpr TimeDelta kBackgroundBlockedWorkersPoll = Seconds(12);
 
 // ThreadGroup that owns the current thread, if any.
-ABSL_CONST_INIT thread_local const ThreadGroup* current_thread_group = nullptr;
+ABSL_CONST_INIT thread_local const ThreadGroup* g_current_thread_group = nullptr;
 
 }  // namespace
 
@@ -189,7 +189,7 @@ void ThreadGroup::StartImpl(
 
   max_tasks_ = max_tasks;
   DCHECK_GE(max_tasks_, 1U);
-  in_start().initial_max_tasks = std::min(max_tasks_, kMaxNumberOfWorkers);
+  in_start().initial_max_tasks = std::min(max_tasks_, kMaxNumberOfWorkers3);
   max_best_effort_tasks_ = max_best_effort_tasks;
   in_start().suggested_reclaim_time = suggested_reclaim_time;
   in_start().worker_environment = worker_environment;
@@ -205,16 +205,16 @@ ThreadGroup::~ThreadGroup() = default;
 
 void ThreadGroup::BindToCurrentThread() {
   DCHECK(!CurrentThreadHasGroup());
-  current_thread_group = this;
+  g_current_thread_group = this;
 }
 
 void ThreadGroup::UnbindFromCurrentThread() {
   DCHECK(IsBoundToCurrentThread());
-  current_thread_group = nullptr;
+  g_current_thread_group = nullptr;
 }
 
 bool ThreadGroup::IsBoundToCurrentThread() const {
-  return current_thread_group == this;
+  return g_current_thread_group == this;
 }
 
 size_t
@@ -400,7 +400,7 @@ void ThreadGroup::HandoffAllTaskSourcesToOtherThreadGroup(
   PriorityQueue new_priority_queue;
   TaskSourceSortKey top_sort_key;
   {
-    CheckedAutoLock current_thread_group_lock(lock_);
+    CheckedAutoLock g_current_thread_group_lock(lock_);
     new_priority_queue.swap(priority_queue_);
   }
   destination_thread_group->EnqueueAllTaskSources(&new_priority_queue);
@@ -412,7 +412,7 @@ void ThreadGroup::HandoffNonUserBlockingTaskSourcesToOtherThreadGroup(
   TaskSourceSortKey top_sort_key;
   {
     // This works because all USER_BLOCKING tasks are at the front of the queue.
-    CheckedAutoLock current_thread_group_lock(lock_);
+    CheckedAutoLock g_current_thread_group_lock(lock_);
     while (!priority_queue_.IsEmpty() &&
            (top_sort_key = priority_queue_.PeekSortKey()).priority() ==
                TaskPriority::USER_BLOCKING) {
@@ -478,7 +478,7 @@ ThreadGroup::GetScopedWindowsThreadEnvironment(WorkerEnvironment environment) {
 
 // static
 bool ThreadGroup::CurrentThreadHasGroup() {
-  return current_thread_group != nullptr;
+  return g_current_thread_group != nullptr;
 }
 
 size_t ThreadGroup::GetMaxTasksForTesting() const {
@@ -574,7 +574,7 @@ size_t ThreadGroup::GetDesiredNumAwakeWorkersLockRequired() const {
 
   return std::min({workers_for_best_effort_task_sources +
                        workers_for_foreground_task_sources,
-                   max_tasks_, kMaxNumberOfWorkers});
+                   max_tasks_, kMaxNumberOfWorkers3});
 }
 
 void ThreadGroup::MaybeScheduleAdjustMaxTasksLockRequired(
@@ -693,7 +693,7 @@ void ThreadGroup::DecrementTasksRunningLockRequired(TaskPriority priority) {
 void ThreadGroup::IncrementTasksRunningLockRequired(TaskPriority priority) {
   ++num_running_tasks_;
   DCHECK_LE(num_running_tasks_, max_tasks_);
-  DCHECK_LE(num_running_tasks_, kMaxNumberOfWorkers);
+  DCHECK_LE(num_running_tasks_, kMaxNumberOfWorkers3);
   if (priority == TaskPriority::BEST_EFFORT) {
     ++num_running_best_effort_tasks_;
     DCHECK_LE(num_running_best_effort_tasks_, num_running_tasks_);

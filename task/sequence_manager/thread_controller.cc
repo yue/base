@@ -434,6 +434,7 @@ void ThreadController::RunLevelTracker::RunLevel::UpdateState(
   if (was_active == is_active)
     return;
 
+#if BUILDFLAG(ENABLE_BASE_TRACING)
   // Change of state.
   if (is_active) {
     LogOnActiveMetrics(lazy_now);
@@ -443,7 +444,6 @@ void ThreadController::RunLevelTracker::RunLevel::UpdateState(
     TRACE_EVENT_BEGIN("base", "ThreadController active", lazy_now.Now(),
                       *terminating_wakeup_flow_lambda_);
 
-#if BUILDFLAG(ENABLE_BASE_TRACING)
     if (ShouldRecordSampleMetadata()) {
       // Overriding the annotation from the previous RunLevel is intentional.
       // Only the top RunLevel is ever updated, which holds the relevant state.

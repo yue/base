@@ -23,7 +23,7 @@ namespace base {
 namespace internal {
 
 namespace {
-constexpr size_t kMaxNumberOfWorkers = 256;
+constexpr size_t kMaxNumberOfWorkers2 = 256;
 }  // namespace
 
 // Upon destruction, executes actions that control the number of active workers.
@@ -427,10 +427,10 @@ void ThreadGroupSemaphore::JoinForTesting() {
 
 void ThreadGroupSemaphore::CreateAndRegisterWorkerLockRequired(
     SemaphoreScopedCommandsExecutor* executor) {
-  if (workers_.size() == kMaxNumberOfWorkers) {
+  if (workers_.size() == kMaxNumberOfWorkers2) {
     return;
   }
-  DCHECK_LT(workers_.size(), kMaxNumberOfWorkers);
+  DCHECK_LT(workers_.size(), kMaxNumberOfWorkers2);
   if (workers_.size() >= max_tasks_) {
     return;
   }

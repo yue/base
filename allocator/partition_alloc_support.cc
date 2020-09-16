@@ -25,8 +25,6 @@
 #include "base/allocator/partition_allocator/src/partition_alloc/partition_root.h"
 #include "base/allocator/partition_allocator/src/partition_alloc/pointers/instance_tracer.h"
 #include "base/allocator/partition_allocator/src/partition_alloc/pointers/raw_ptr.h"
-#include "base/allocator/partition_allocator/src/partition_alloc/shim/allocator_shim.h"
-#include "base/allocator/partition_allocator/src/partition_alloc/shim/allocator_shim_default_dispatch_to_partition_alloc.h"
 #include "base/allocator/partition_allocator/src/partition_alloc/thread_cache.h"
 #include "base/at_exit.h"
 #include "base/check.h"
@@ -76,6 +74,11 @@
 
 #if BUILDFLAG(IS_ANDROID) && BUILDFLAG(HAS_MEMORY_TAGGING)
 #include <sys/system_properties.h>
+#endif
+
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
+#include "base/allocator/partition_allocator/src/partition_alloc/shim/allocator_shim.h"
+#include "base/allocator/partition_allocator/src/partition_alloc/shim/allocator_shim_default_dispatch_to_partition_alloc.h"
 #endif
 
 namespace base::allocator {

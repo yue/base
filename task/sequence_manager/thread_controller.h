@@ -27,6 +27,10 @@
 #include "base/tracing_buildflags.h"
 #include "build/build_config.h"
 
+#if BUILDFLAG(ENABLE_BASE_TRACING)
+#include "base/profiler/sample_metadata.h"
+#endif
+
 namespace base {
 
 class HistogramBase;

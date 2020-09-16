@@ -1475,11 +1475,6 @@ component("base") {
     ]
   }
 
-  # Lacros.
-  if (chromeos_is_browser_only) {
-    sources += [ "system/sys_info_chromeos.cc" ]
-  }
-
   # Fuchsia.
   if (is_fuchsia) {
     sources += [

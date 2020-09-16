@@ -7,9 +7,12 @@
 #include <new>
 
 #include "base/allocator/allocator_interception_mac.h"
-#include "base/allocator/allocator_shim.h"
 #include "base/allocator/buildflags.h"
 #include "build/build_config.h"
+
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
+#include "base/allocator/allocator_shim.h"
+#endif
 
 namespace base {
 

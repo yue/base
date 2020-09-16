@@ -26,6 +26,7 @@ import("//build/config/chromecast_build.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/dcheck_always_on.gni")
+import("//build/config/jumbo.gni")
 import("//build/config/logging.gni")
 import("//build/config/nacl/config.gni")
 import("//build/config/profiling/profiling.gni")
@@ -147,7 +148,9 @@ config("perfetto_config") {
 # base compilation units to be linked in where they wouldn't have otherwise.
 # This does not include test code (test support and anything in the test
 # directory) which should use source_set as is recommended for GN targets).
-component("base") {
+jumbo_component("base") {
+  always_build_jumbo = true
+
   sources = [
     "allocator/allocator_check.cc",
     "allocator/allocator_check.h",
@@ -228,6 +231,7 @@ component("base") {
     "containers/linked_list.cc",
     "containers/linked_list.h",
     "containers/mru_cache.h",
+    "containers/queue.h",
     "containers/small_map.h",
     "containers/span.h",
     "containers/stack.h",
@@ -504,6 +508,7 @@ component("base") {
     "process/process_iterator.h",
     "process/process_metrics.cc",
     "process/process_metrics.h",
+    "process/process_metrics_iocounters.h",
     "rand_util.cc",
     "rand_util.h",
     "rand_util_nacl.cc",
@@ -1808,6 +1813,7 @@ component("base") {
         "allocator/partition_allocator/oom_callback.h",
         "allocator/partition_allocator/page_allocator.cc",
         "allocator/partition_allocator/page_allocator.h",
+        "allocator/partition_allocator/page_allocator_constants.h",
         "allocator/partition_allocator/page_allocator_internal.h",
         "allocator/partition_allocator/partition_address_space.cc",
         "allocator/partition_allocator/partition_address_space.h",

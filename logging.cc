@@ -11,10 +11,6 @@
 #pragma clang max_tokens_here 350000
 #endif  // NACL_TC_REV
 
-#ifdef BASE_CHECK_H_
-#error "logging.h should not include check.h"
-#endif
-
 #include <limits.h>
 #include <stdint.h>
 

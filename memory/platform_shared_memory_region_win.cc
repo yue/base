@@ -8,17 +8,21 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "base/allocator/partition_allocator/page_allocator.h"
 #include "base/bits.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
+#include "base/partition_alloc_buildflags.h"
 #include "base/process/process_handle.h"
 #include "base/rand_util.h"
 #include "base/strings/string_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/win/windows_version.h"
+
+#if BUILDFLAG(USE_PARTITION_ALLOC)
+#include "base/allocator/partition_allocator/page_allocator.h"
+#endif
 
 namespace base {
 namespace subtle {
@@ -205,7 +209,9 @@ bool PlatformSharedMemoryRegion::MapAtInternal(off_t offset,
         static_cast<uint64_t>(offset) >> 32, static_cast<DWORD>(offset), size);
     if (*memory)
       break;
+#if BUILDFLAG(USE_PARTITION_ALLOC)
     ReleaseReservation();
+#endif
   }
   if (!*memory) {
     DPLOG(ERROR) << "Failed executing MapViewOfFile";

@@ -93,14 +93,14 @@ HRESULT EtwTraceController::StartRealtimeSession(const wchar_t* session_name,
   return Start(session_name, &prop);
 }
 
-HRESULT EtwTraceController::EnableProvider(REFGUID provider,
+HRESULT EtwTraceController::EnableProvider(const ::GUID& provider,
                                            UCHAR level,
                                            ULONG flags) {
   ULONG error = ::EnableTrace(TRUE, flags, level, &provider, session_);
   return HRESULT_FROM_WIN32(error);
 }
 
-HRESULT EtwTraceController::DisableProvider(REFGUID provider) {
+HRESULT EtwTraceController::DisableProvider(const ::GUID& provider) {
   ULONG error = ::EnableTrace(FALSE, 0, 0, &provider, session_);
   return HRESULT_FROM_WIN32(error);
 }

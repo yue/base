@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// error C2371: 'UNICODE_STRING': redefinition; different basic types
+#define _NTDEF_
+typedef NTSTATUS *PNTSTATUS;
+
 // #define needed to link in RtlGenRandom(), a.k.a. SystemFunction036.  See the
 // "Community Additions" comment on MSDN here:
 // http://msdn.microsoft.com/en-us/library/windows/desktop/aa387694.aspx
@@ -58,7 +62,7 @@ bool UseBoringSSLForRandBytes() {
 
 namespace {
 
-void RandBytes(void* output, size_t output_length, bool avoid_allocation) {
+void RandBytes2(void* output, size_t output_length, bool avoid_allocation) {
 #if 0
   if (!avoid_allocation && internal::UseBoringSSLForRandBytes()) {
     // Ensure BoringSSL is initialized so it can use things like RDRAND.
@@ -84,14 +88,14 @@ void RandBytes(void* output, size_t output_length, bool avoid_allocation) {
 }  // namespace
 
 void RandBytes(void* output, size_t output_length) {
-  RandBytes(output, output_length, /*avoid_allocation=*/false);
+  RandBytes2(output, output_length, /*avoid_allocation=*/false);
 }
 
 namespace internal {
 
 double RandDoubleAvoidAllocation() {
   uint64_t number;
-  RandBytes(&number, sizeof(number), /*avoid_allocation=*/true);
+  RandBytes2(&number, sizeof(number), /*avoid_allocation=*/true);
   // This transformation is explained in rand_util.cc.
   return (number >> 11) * 0x1.0p-53;
 }

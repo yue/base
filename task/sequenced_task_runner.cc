@@ -17,7 +17,7 @@ namespace base {
 namespace {
 
 ThreadLocalPointer<SequencedTaskRunner::CurrentDefaultHandle>&
-CurrentDefaultHandleTls() {
+CurrentDefaultHandleTls2() {
   static NoDestructor<
       ThreadLocalPointer<SequencedTaskRunner::CurrentDefaultHandle>>
       instance;
@@ -86,7 +86,7 @@ bool SequencedTaskRunner::PostDelayedTaskAt(
 // static
 const scoped_refptr<SequencedTaskRunner>&
 SequencedTaskRunner::GetCurrentDefault() {
-  const CurrentDefaultHandle* current_default = CurrentDefaultHandleTls().Get();
+  const CurrentDefaultHandle* current_default = CurrentDefaultHandleTls2().Get();
   CHECK(current_default)
       << "Error: This caller requires a sequenced context (i.e. the current "
          "task needs to run from a SequencedTaskRunner). If you're in a test "
@@ -96,7 +96,7 @@ SequencedTaskRunner::GetCurrentDefault() {
 
 // static
 bool SequencedTaskRunner::HasCurrentDefault() {
-  return !!CurrentDefaultHandleTls().Get();
+  return !!CurrentDefaultHandleTls2().Get();
 }
 
 SequencedTaskRunner::CurrentDefaultHandle::CurrentDefaultHandle(
@@ -104,13 +104,13 @@ SequencedTaskRunner::CurrentDefaultHandle::CurrentDefaultHandle(
     : task_runner_(std::move(task_runner)) {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
   DCHECK(!SequencedTaskRunner::HasCurrentDefault());
-  CurrentDefaultHandleTls().Set(this);
+  CurrentDefaultHandleTls2().Set(this);
 }
 
 SequencedTaskRunner::CurrentDefaultHandle::~CurrentDefaultHandle() {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
-  DCHECK_EQ(CurrentDefaultHandleTls().Get(), this);
-  CurrentDefaultHandleTls().Set(nullptr);
+  DCHECK_EQ(CurrentDefaultHandleTls2().Get(), this);
+  CurrentDefaultHandleTls2().Set(nullptr);
 }
 
 bool SequencedTaskRunner::DeleteOrReleaseSoonInternal(

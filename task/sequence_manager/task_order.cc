@@ -17,7 +17,7 @@ namespace {
 // Returns true iff `task_order1` Comparator{} `task_order2`. Used to
 // implement other comparison operators.
 template <typename Comparator>
-static bool Compare(const base::sequence_manager::TaskOrder& task_order1,
+static bool Compare2(const base::sequence_manager::TaskOrder& task_order1,
                     const base::sequence_manager::TaskOrder& task_order2) {
   Comparator cmp{};
 
@@ -28,7 +28,7 @@ static bool Compare(const base::sequence_manager::TaskOrder& task_order1,
     return cmp(task_order1.delayed_run_time(), task_order2.delayed_run_time());
 
   // If the times happen to match, then we use the sequence number to decide.
-  // Compare the difference to support integer roll-over.
+  // Compare2 the difference to support integer roll-over.
   return cmp(task_order1.sequence_num() - task_order2.sequence_num(), 0);
 }
 
@@ -60,19 +60,19 @@ TaskOrder& TaskOrder::operator=(const TaskOrder& other) = default;
 TaskOrder::~TaskOrder() = default;
 
 bool TaskOrder::operator>(const TaskOrder& other) const {
-  return Compare<std::greater<>>(*this, other);
+  return Compare2<std::greater<>>(*this, other);
 }
 
 bool TaskOrder::operator<(const TaskOrder& other) const {
-  return Compare<std::less<>>(*this, other);
+  return Compare2<std::less<>>(*this, other);
 }
 
 bool TaskOrder::operator<=(const TaskOrder& other) const {
-  return Compare<std::less_equal<>>(*this, other);
+  return Compare2<std::less_equal<>>(*this, other);
 }
 
 bool TaskOrder::operator>=(const TaskOrder& other) const {
-  return Compare<std::greater_equal<>>(*this, other);
+  return Compare2<std::greater_equal<>>(*this, other);
 }
 
 bool TaskOrder::operator==(const TaskOrder& other) const {

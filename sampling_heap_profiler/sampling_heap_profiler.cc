@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "base/allocator/partition_allocator/partition_alloc.h"
-#include "base/allocator/partition_allocator/shim/allocator_shim.h"
 #include "base/compiler_specific.h"
 #include "base/debug/stack_trace.h"
 #include "base/feature_list.h"
@@ -38,6 +37,10 @@
 #define CFI_BACKTRACE_AVAILABLE 1
 #else
 #define CFI_BACKTRACE_AVAILABLE 0
+#endif
+
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
+#include "base/allocator/partition_allocator/shim/allocator_shim.h"
 #endif
 
 namespace base {

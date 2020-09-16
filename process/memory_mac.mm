@@ -7,10 +7,13 @@
 #include <new>
 
 #include "base/allocator/buildflags.h"
+#include "build/build_config.h"
+
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
 #include "base/allocator/partition_allocator/partition_alloc_buildflags.h"
 #include "base/allocator/partition_allocator/shim/allocator_interception_mac.h"
 #include "base/allocator/partition_allocator/shim/allocator_shim.h"
-#include "build/build_config.h"
+#endif
 
 namespace base {
 

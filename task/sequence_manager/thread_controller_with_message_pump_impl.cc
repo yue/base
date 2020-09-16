@@ -65,14 +65,14 @@ std::atomic_bool g_use_less_high_res_timers = false;
 std::atomic_bool g_align_wake_ups = false;
 std::atomic_bool g_run_tasks_by_batches = false;
 #if BUILDFLAG(IS_WIN)
-bool g_explicit_high_resolution_timer_win = false;
+bool g_explicit_high_resolution_timer_win3 = false;
 #endif  // BUILDFLAG(IS_WIN)
 
 TimeTicks WakeUpRunTime(const WakeUp& wake_up) {
   // Windows relies on the low resolution timer rather than manual wake up
   // alignment.
 #if BUILDFLAG(IS_WIN)
-  if (g_explicit_high_resolution_timer_win)
+  if (g_explicit_high_resolution_timer_win3)
     return wake_up.earliest_time();
 #else  // BUILDFLAG(IS_WIN)
   if (g_align_wake_ups.load(std::memory_order_relaxed)) {
@@ -92,7 +92,7 @@ void ThreadControllerWithMessagePumpImpl::InitializeFeatures() {
   g_run_tasks_by_batches.store(FeatureList::IsEnabled(kRunTasksByBatches),
                                std::memory_order_relaxed);
 #if BUILDFLAG(IS_WIN)
-  g_explicit_high_resolution_timer_win =
+  g_explicit_high_resolution_timer_win3 =
       FeatureList::IsEnabled(kExplicitHighResolutionTimerWin);
   g_use_less_high_res_timers.store(
       FeatureList::IsEnabled(kUseLessHighResTimers), std::memory_order_relaxed);

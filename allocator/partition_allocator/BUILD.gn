@@ -7,6 +7,7 @@ import("//build/buildflag_header.gni")
 import("//build/config/chromecast_build.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/dcheck_always_on.gni")
+import("//build/config/jumbo.gni")
 import("//build/config/logging.gni")
 
 # Add partition_alloc.gni and import it for partition_alloc configs.
@@ -46,7 +47,9 @@ if (enable_pkeys && is_debug) {
   }
 }
 
-component("partition_alloc") {
+jumbo_component("partition_alloc") {
+  always_build_jumbo = true
+
   sources = [
     "address_pool_manager.cc",
     "address_pool_manager.h",

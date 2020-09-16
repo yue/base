@@ -27,6 +27,7 @@ import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/ios/config.gni")
+import("//build/config/jumbo.gni")
 import("//build/config/logging.gni")
 import("//build/config/nacl/config.gni")
 import("//build/config/profiling/profiling.gni")
@@ -177,7 +178,9 @@ buildflag_header("ios_cronet_buildflags") {
 #
 # mixed_component is a regular C++ "component", but may have some Rust files
 # if Rust is enabled.
-mixed_component("base") {
+jumbo_component("base") {
+  always_build_jumbo = true
+
   sources = [
     "allocator/allocator_check.cc",
     "allocator/allocator_check.h",
@@ -256,6 +259,7 @@ mixed_component("base") {
     "containers/linked_list.cc",
     "containers/linked_list.h",
     "containers/lru_cache.h",
+    "containers/queue.h",
     "containers/small_map.h",
     "containers/span.h",
     "containers/stack.h",
@@ -1364,8 +1368,10 @@ mixed_component("base") {
   # module, to avoid increasing Chrome's executable size.
   assert_no_deps = [ ":native_unwinder_android" ]
 
-  rs_crate_root = "base.rs"
-  rs_sources = [ "base.rs" ]
+  if (enable_rust) {
+    rs_crate_root = "base.rs"
+    rs_sources = [ "base.rs" ]
+  }
 
   if (build_rust_json_parser) {
     # TODO(crbug.com/1298039): The BUILDFLAG should be used instead.

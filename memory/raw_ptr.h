@@ -14,7 +14,9 @@
 #include <utility>
 
 #include "base/allocator/buildflags.h"
+#if BUILDFLAG(USE_PARTITION_ALLOC)
 #include "base/allocator/partition_allocator/partition_alloc_config.h"
+#endif
 #include "base/check.h"
 #include "base/compiler_specific.h"
 #include "base/dcheck_is_on.h"

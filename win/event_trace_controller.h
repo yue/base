@@ -109,11 +109,11 @@ class BASE_EXPORT EtwTraceController {
   // Enables "provider" at "level" for this session.
   // This will cause all providers registered with the GUID
   // "provider" to start tracing at the new level, systemwide.
-  HRESULT EnableProvider(const GUID& provider,
+  HRESULT EnableProvider(const ::GUID& provider,
                          UCHAR level,
                          ULONG flags = 0xFFFFFFFF);
   // Disables "provider".
-  HRESULT DisableProvider(const GUID& provider);
+  HRESULT DisableProvider(const ::GUID& provider);
 
   // Stops our session and retrieve the new properties of the session,
   // properties may be NULL.

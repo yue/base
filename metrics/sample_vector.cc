@@ -32,9 +32,9 @@ namespace {
 
 // An iterator for sample vectors.
 template <typename T>
-class IteratorTemplate : public SampleCountIterator {
+class IteratorTemplate3 : public SampleCountIterator {
  public:
-  IteratorTemplate(T* counts,
+  IteratorTemplate3(T* counts,
                    size_t counts_size,
                    const BucketRanges* bucket_ranges)
       : counts_(counts),
@@ -44,7 +44,7 @@ class IteratorTemplate : public SampleCountIterator {
     SkipEmptyBuckets();
   }
 
-  ~IteratorTemplate() override;
+  ~IteratorTemplate3() override;
 
   // SampleCountIterator:
   bool Done() const override { return index_ >= counts_size_; }
@@ -87,10 +87,10 @@ class IteratorTemplate : public SampleCountIterator {
   size_t index_ = 0;
 };
 
-typedef IteratorTemplate<const HistogramBase::AtomicCount> SampleVectorIterator;
+typedef IteratorTemplate3<const HistogramBase::AtomicCount> SampleVectorIterator;
 
 template <>
-SampleVectorIterator::~IteratorTemplate() = default;
+SampleVectorIterator::~IteratorTemplate3() = default;
 
 // Get() for an iterator of a SampleVector.
 template <>
@@ -103,11 +103,11 @@ void SampleVectorIterator::Get(HistogramBase::Sample* min,
   *count = subtle::NoBarrier_Load(&counts_[index_]);
 }
 
-typedef IteratorTemplate<HistogramBase::AtomicCount>
+typedef IteratorTemplate3<HistogramBase::AtomicCount>
     ExtractingSampleVectorIterator;
 
 template <>
-ExtractingSampleVectorIterator::~IteratorTemplate() {
+ExtractingSampleVectorIterator::~IteratorTemplate3() {
   // Ensure that the user has consumed all the samples in order to ensure no
   // samples are lost.
   DCHECK(Done());

@@ -12,7 +12,7 @@ namespace win {
 TRACE_GUID_REGISTRATION EtwTraceProvider::obligatory_guid_registration_ = {
     &GUID_NULL, nullptr};
 
-EtwTraceProvider::EtwTraceProvider(const GUID& provider_name)
+EtwTraceProvider::EtwTraceProvider(const ::GUID& provider_name)
     : provider_name_(provider_name) {}
 
 EtwTraceProvider::EtwTraceProvider() = default;

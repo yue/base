@@ -307,6 +307,7 @@ void ThreadController::RunLevelTracker::RunLevel::UpdateState(State new_state) {
   if (was_active == is_active)
     return;
 
+#if BUILDFLAG(ENABLE_BASE_TRACING)
   // Change of state.
   if (is_active) {
     // Flow emission is found at
@@ -314,7 +315,6 @@ void ThreadController::RunLevelTracker::RunLevel::UpdateState(State new_state) {
     TRACE_EVENT_BEGIN("base", "ThreadController active",
                       *terminating_wakeup_flow_lambda_);
 
-#if BUILDFLAG(ENABLE_BASE_TRACING)
     if (ShouldRecordSampleMetadata()) {
       // Overriding the annotation from the previous RunLevel is intentional.
       // Only the top RunLevel is ever updated, which holds the relevant state.

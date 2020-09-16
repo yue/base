@@ -7,7 +7,7 @@
 #include "base/allocator/partition_allocator/partition_alloc_buildflags.h"
 #include "build/build_config.h"
 
-#if BUILDFLAG(IS_WIN)
+#if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_ALLOCATOR_SHIM)
 #include "base/allocator/partition_allocator/shim/winheap_stubs_win.h"
 #endif
 

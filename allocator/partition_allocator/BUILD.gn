@@ -9,6 +9,7 @@ import("//build/config/chromecast_build.gni")
 import("//build/config/chromeos/ui_mode.gni")
 import("//build/config/compiler/compiler.gni")
 import("//build/config/dcheck_always_on.gni")
+import("//build/config/jumbo.gni")
 import("//build/config/logging.gni")
 
 # Add partition_alloc.gni and import it for partition_alloc configs.
@@ -116,7 +117,8 @@ component("partition_alloc") {
 # Only usable when pointers are 64-bit.
 use_freelist_pool_offsets = has_64_bit_pointers && false
 
-source_set("allocator_core") {
+jumbo_source_set("allocator_core") {
+  always_build_jumbo = true
   visibility = [ ":*" ]
 
   sources = [
@@ -191,6 +193,9 @@ source_set("allocator_core") {
     "spinning_mutex.h",
     "tagging.cc",
     "tagging.h",
+    "third_party/apple_apsl/CFBase.h",
+    "third_party/apple_apsl/CFRuntime.h",
+    "third_party/apple_apsl/malloc.h",
     "thread_cache.cc",
     "thread_cache.h",
     "thread_isolation/alignment.h",
@@ -332,7 +337,8 @@ source_set("allocator_core") {
   }
 }
 
-source_set("allocator_base") {
+jumbo_source_set("allocator_base") {
+  always_build_jumbo = true
   visibility = [ ":*" ]
 
   sources = [
@@ -507,7 +513,8 @@ source_set("allocator_base") {
   configs += _add_configs
 }
 
-source_set("allocator_shim") {
+jumbo_source_set("allocator_shim") {
+  always_build_jumbo = true
   visibility = [ ":*" ]
 
   sources = []
@@ -606,7 +613,8 @@ source_set("allocator_shim") {
   }
 }
 
-source_set("raw_ptr") {
+jumbo_source_set("raw_ptr") {
+  always_build_jumbo = true
   # `gn check` is unhappy with most `#includes` when PA isn't
   # actually built.
   check_includes = use_partition_alloc

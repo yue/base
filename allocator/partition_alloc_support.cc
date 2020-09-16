@@ -23,8 +23,6 @@
 #include "base/allocator/partition_allocator/partition_lock.h"
 #include "base/allocator/partition_allocator/partition_root.h"
 #include "base/allocator/partition_allocator/pointers/raw_ptr.h"
-#include "base/allocator/partition_allocator/shim/allocator_shim.h"
-#include "base/allocator/partition_allocator/shim/allocator_shim_default_dispatch_to_partition_alloc.h"
 #include "base/allocator/partition_allocator/thread_cache.h"
 #include "base/at_exit.h"
 #include "base/check.h"
@@ -70,6 +68,11 @@
 
 #if BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 #include "base/allocator/partition_allocator/memory_reclaimer.h"
+#endif
+
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
+#include "base/allocator/partition_allocator/shim/allocator_shim.h"
+#include "base/allocator/partition_allocator/shim/allocator_shim_default_dispatch_to_partition_alloc.h"
 #endif
 
 namespace base::allocator {

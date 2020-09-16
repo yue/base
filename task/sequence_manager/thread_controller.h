@@ -14,7 +14,6 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/message_loop/message_pump.h"
-#include "base/profiler/sample_metadata.h"
 #include "base/run_loop.h"
 #include "base/task/common/lazy_now.h"
 #include "base/task/sequence_manager/associated_thread_id.h"
@@ -26,6 +25,10 @@
 #include "base/tracing_buildflags.h"
 #include "build/build_config.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
+
+#if BUILDFLAG(ENABLE_BASE_TRACING)
+#include "base/profiler/sample_metadata.h"
+#endif
 
 namespace base {
 

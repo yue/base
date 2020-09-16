@@ -19,7 +19,7 @@ namespace base {
 
 namespace {
 
-ABSL_CONST_INIT thread_local RunLoop::Delegate* delegate = nullptr;
+ABSL_CONST_INIT thread_local RunLoop::Delegate* g_delegate = nullptr;
 ABSL_CONST_INIT thread_local const RunLoop::RunLoopTimeout* run_loop_timeout =
     nullptr;
 
@@ -56,8 +56,8 @@ RunLoop::Delegate::~Delegate() {
   // be on its creation thread (e.g. a Thread that fails to start) and
   // shouldn't disrupt that thread's state.
   if (bound_) {
-    DCHECK_EQ(this, delegate);
-    delegate = nullptr;
+    DCHECK_EQ(this, g_delegate);
+    g_delegate = nullptr;
   }
 }
 
@@ -78,16 +78,16 @@ void RunLoop::RegisterDelegateForCurrentThread(Delegate* new_delegate) {
   DCHECK_CALLED_ON_VALID_THREAD(new_delegate->bound_thread_checker_);
 
   // There can only be one RunLoop::Delegate per thread.
-  DCHECK(!delegate)
+  DCHECK(!g_delegate)
       << "Error: Multiple RunLoop::Delegates registered on the same thread.\n\n"
          "Hint: You perhaps instantiated a second "
          "MessageLoop/TaskEnvironment on a thread that already had one?";
-  delegate = new_delegate;
-  delegate->bound_ = true;
+  g_delegate = new_delegate;
+  g_delegate->bound_ = true;
 }
 
 RunLoop::RunLoop(Type type)
-    : delegate_(delegate),
+    : delegate_(g_delegate),
       type_(type),
       origin_task_runner_(SingleThreadTaskRunner::GetCurrentDefault()) {
   DCHECK(delegate_) << "A RunLoop::Delegate must be bound to this thread prior "
@@ -226,41 +226,41 @@ bool RunLoop::AnyQuitCalled() {
 
 // static
 bool RunLoop::IsRunningOnCurrentThread() {
-  return delegate && !delegate->active_run_loops_.empty();
+  return g_delegate && !g_delegate->active_run_loops_.empty();
 }
 
 // static
 bool RunLoop::IsNestedOnCurrentThread() {
-  return delegate && delegate->active_run_loops_.size() > 1;
+  return g_delegate && g_delegate->active_run_loops_.size() > 1;
 }
 
 // static
 void RunLoop::AddNestingObserverOnCurrentThread(NestingObserver* observer) {
-  DCHECK(delegate);
-  delegate->nesting_observers_.AddObserver(observer);
+  DCHECK(g_delegate);
+  g_delegate->nesting_observers_.AddObserver(observer);
 }
 
 // static
 void RunLoop::RemoveNestingObserverOnCurrentThread(NestingObserver* observer) {
-  DCHECK(delegate);
-  delegate->nesting_observers_.RemoveObserver(observer);
+  DCHECK(g_delegate);
+  g_delegate->nesting_observers_.RemoveObserver(observer);
 }
 
 // static
 void RunLoop::QuitCurrentDeprecated() {
   DCHECK(IsRunningOnCurrentThread());
-  DCHECK(delegate->active_run_loops_.top()->allow_quit_current_deprecated_)
+  DCHECK(g_delegate->active_run_loops_.top()->allow_quit_current_deprecated_)
       << "Please migrate off QuitCurrentDeprecated(), e.g. to QuitClosure().";
-  delegate->active_run_loops_.top()->Quit();
+  g_delegate->active_run_loops_.top()->Quit();
 }
 
 // static
 void RunLoop::QuitCurrentWhenIdleDeprecated() {
   DCHECK(IsRunningOnCurrentThread());
-  DCHECK(delegate->active_run_loops_.top()->allow_quit_current_deprecated_)
+  DCHECK(g_delegate->active_run_loops_.top()->allow_quit_current_deprecated_)
       << "Please migrate off QuitCurrentWhenIdleDeprecated(), e.g. to "
          "QuitWhenIdleClosure().";
-  delegate->active_run_loops_.top()->QuitWhenIdle();
+  g_delegate->active_run_loops_.top()->QuitWhenIdle();
 }
 
 // static
@@ -274,7 +274,7 @@ RepeatingClosure RunLoop::QuitCurrentWhenIdleClosureDeprecated() {
 
 #if DCHECK_IS_ON()
 ScopedDisallowRunningRunLoop::ScopedDisallowRunningRunLoop()
-    : current_delegate_(delegate),
+    : current_delegate_(g_delegate),
       previous_run_allowance_(current_delegate_ &&
                               current_delegate_->allow_running_for_testing_) {
   if (current_delegate_)
@@ -282,7 +282,7 @@ ScopedDisallowRunningRunLoop::ScopedDisallowRunningRunLoop()
 }
 
 ScopedDisallowRunningRunLoop::~ScopedDisallowRunningRunLoop() {
-  DCHECK_EQ(current_delegate_, delegate);
+  DCHECK_EQ(current_delegate_, g_delegate);
   if (current_delegate_)
     current_delegate_->allow_running_for_testing_ = previous_run_allowance_;
 }

@@ -4,15 +4,6 @@
 
 #include "base/allocator/partition_allocator/partition_alloc_base/logging.h"
 
-// TODO(1151236): After finishing copying //base files to PA library, remove
-// defined(BASE_CHECK_H_) from here.
-#if defined(                                                             \
-    BASE_ALLOCATOR_PARTITION_ALLOCATOR_PARTITION_ALLOC_BASE_CHECK_H_) || \
-    defined(BASE_CHECK_H_) ||                                            \
-    defined(BASE_ALLOCATOR_PARTITION_ALLOCATOR_PARTITION_ALLOC_CHECK_H_)
-#error "logging.h should not include check.h"
-#endif
-
 #include "base/allocator/partition_allocator/partition_alloc_base/component_export.h"
 #include "base/allocator/partition_allocator/partition_alloc_base/debug/alias.h"
 #include "base/allocator/partition_allocator/partition_alloc_base/immediate_crash.h"

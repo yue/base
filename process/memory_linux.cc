@@ -9,7 +9,6 @@
 #include <new>
 
 #include "base/allocator/partition_allocator/partition_alloc_buildflags.h"
-#include "base/allocator/partition_allocator/shim/allocator_shim.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/logging.h"
@@ -17,6 +16,17 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/threading/thread_restrictions.h"
 #include "build/build_config.h"
+
+#if BUILDFLAG(USE_ALLOCATOR_SHIM)
+#include "base/allocator/partition_allocator/shim/allocator_shim.h"
+#endif
+
+
+#if !BUILDFLAG(USE_ALLOCATOR_SHIM) && defined(LIBC_GLIBC) && !defined(USE_TCMALLOC)
+extern "C" {
+void* __libc_malloc(size_t size);
+}
+#endif
 
 namespace base {
 

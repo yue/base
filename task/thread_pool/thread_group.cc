@@ -25,7 +25,7 @@ namespace internal {
 namespace {
 
 // ThreadGroup that owns the current thread, if any.
-ABSL_CONST_INIT thread_local const ThreadGroup* current_thread_group = nullptr;
+ABSL_CONST_INIT thread_local const ThreadGroup* g_current_thread_group = nullptr;
 
 }  // namespace
 
@@ -77,16 +77,16 @@ ThreadGroup::~ThreadGroup() = default;
 
 void ThreadGroup::BindToCurrentThread() {
   DCHECK(!CurrentThreadHasGroup());
-  current_thread_group = this;
+  g_current_thread_group = this;
 }
 
 void ThreadGroup::UnbindFromCurrentThread() {
   DCHECK(IsBoundToCurrentThread());
-  current_thread_group = nullptr;
+  g_current_thread_group = nullptr;
 }
 
 bool ThreadGroup::IsBoundToCurrentThread() const {
-  return current_thread_group == this;
+  return g_current_thread_group == this;
 }
 
 void ThreadGroup::Start() {
@@ -261,7 +261,7 @@ void ThreadGroup::PushTaskSourceAndWakeUpWorkersImpl(
 
 void ThreadGroup::InvalidateAndHandoffAllTaskSourcesToOtherThreadGroup(
     ThreadGroup* destination_thread_group) {
-  CheckedAutoLock current_thread_group_lock(lock_);
+  CheckedAutoLock g_current_thread_group_lock(lock_);
   CheckedAutoLock destination_thread_group_lock(
       destination_thread_group->lock_);
   destination_thread_group->priority_queue_ = std::move(priority_queue_);
@@ -270,7 +270,7 @@ void ThreadGroup::InvalidateAndHandoffAllTaskSourcesToOtherThreadGroup(
 
 void ThreadGroup::HandoffNonUserBlockingTaskSourcesToOtherThreadGroup(
     ThreadGroup* destination_thread_group) {
-  CheckedAutoLock current_thread_group_lock(lock_);
+  CheckedAutoLock g_current_thread_group_lock(lock_);
   CheckedAutoLock destination_thread_group_lock(
       destination_thread_group->lock_);
   PriorityQueue new_priority_queue;
@@ -340,7 +340,7 @@ ThreadGroup::GetScopedWindowsThreadEnvironment(WorkerEnvironment environment) {
 
 // static
 bool ThreadGroup::CurrentThreadHasGroup() {
-  return current_thread_group != nullptr;
+  return g_current_thread_group != nullptr;
 }
 
 }  // namespace internal

@@ -30,6 +30,7 @@ import("//build/config/compiler/compiler.gni")
 import("//build/config/cronet/config.gni")
 import("//build/config/dcheck_always_on.gni")
 import("//build/config/ios/config.gni")
+import("//build/config/jumbo.gni")
 import("//build/config/logging.gni")
 import("//build/config/nacl/config.gni")
 import("//build/config/profiling/profiling.gni")
@@ -212,7 +213,9 @@ buildflag_header("message_pump_buildflags") {
 # base compilation units to be linked in where they wouldn't have otherwise.
 # This does not include test code (test support and anything in the test
 # directory) which should use source_set as is recommended for GN targets).
-component("base") {
+jumbo_component("base") {
+  always_build_jumbo = true
+
   sources = [
     "allocator/allocator_check.cc",
     "allocator/allocator_check.h",
@@ -296,6 +299,7 @@ component("base") {
     "containers/linked_list.cc",
     "containers/linked_list.h",
     "containers/lru_cache.h",
+    "containers/queue.h",
     "containers/small_map.h",
     "containers/span.h",
     "containers/stack.h",
@@ -891,8 +895,6 @@ component("base") {
     "trace_event/heap_profiler_allocation_context_tracker.h",
     "trace_event/memory_allocator_dump_guid.cc",
     "trace_event/memory_allocator_dump_guid.h",
-    "trace_event/trace_id_helper.cc",
-    "trace_event/trace_id_helper.h",
     "traits_bag.h",
     "tuple.h",
     "types/always_false.h",
@@ -1757,6 +1759,7 @@ component("base") {
       "win/dark_mode_support.h",
       "win/default_apps_util.cc",
       "win/default_apps_util.h",
+      "win/scoped_devinfo.h",
       "win/embedded_i18n/language_selector.cc",
       "win/embedded_i18n/language_selector.h",
       "win/enum_variant.cc",
@@ -1913,6 +1916,7 @@ component("base") {
       "apple/osstatus_logging.mm",
       "apple/owned_objc.h",
       "apple/owned_objc.mm",
+      "apple/owned_objc_types.h",
       "apple/scoped_cffiledescriptorref.h",
       "apple/scoped_cftyperef.h",
       "apple/scoped_dispatch_object.h",
@@ -2288,6 +2292,8 @@ component("base") {
       "trace_event/trace_event_impl.h",
       "trace_event/trace_event_memory_overhead.cc",
       "trace_event/trace_event_memory_overhead.h",
+      "trace_event/trace_id_helper.cc",
+      "trace_event/trace_id_helper.h",
       "trace_event/trace_log.cc",
       "trace_event/trace_log.h",
       "trace_event/trace_log_constants.cc",

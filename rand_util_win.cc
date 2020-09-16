@@ -69,7 +69,7 @@ decltype(&ProcessPrng) GetProcessPrng() {
   return process_prng_fn;
 }
 
-void RandBytes(void* output, size_t output_length, bool avoid_allocation) {
+void RandBytes2(void* output, size_t output_length, bool avoid_allocation) {
 #if 0
   if (!avoid_allocation && internal::UseBoringSSLForRandBytes()) {
     // Ensure BoringSSL is initialized so it can use things like RDRAND.
@@ -89,14 +89,14 @@ void RandBytes(void* output, size_t output_length, bool avoid_allocation) {
 }  // namespace
 
 void RandBytes(void* output, size_t output_length) {
-  RandBytes(output, output_length, /*avoid_allocation=*/false);
+  RandBytes2(output, output_length, /*avoid_allocation=*/false);
 }
 
 namespace internal {
 
 double RandDoubleAvoidAllocation() {
   uint64_t number;
-  RandBytes(&number, sizeof(number), /*avoid_allocation=*/true);
+  RandBytes2(&number, sizeof(number), /*avoid_allocation=*/true);
   // This transformation is explained in rand_util.cc.
   return (number >> 11) * 0x1.0p-53;
 }

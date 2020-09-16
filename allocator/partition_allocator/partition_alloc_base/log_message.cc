@@ -10,7 +10,6 @@
     BASE_ALLOCATOR_PARTITION_ALLOCATOR_PARTITION_ALLOC_BASE_CHECK_H_) || \
     defined(BASE_CHECK_H_) ||                                            \
     defined(BASE_ALLOCATOR_PARTITION_ALLOCATOR_PARTITION_ALLOC_CHECK_H_)
-#error "log_message.h should not include check.h"
 #endif
 
 #include "base/allocator/partition_allocator/partition_alloc_base/component_export.h"

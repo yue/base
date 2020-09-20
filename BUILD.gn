@@ -101,6 +101,8 @@ config("base_flags") {
       # requirement.
       # https://groups.google.com/a/chromium.org/d/topic/chromium-dev/B9Q5KTD7iCo/discussion
       "-Wglobal-constructors",
+      # Error when building on XCode 12 beta.
+      "-Wno-range-loop-analysis",
     ]
   }
 }

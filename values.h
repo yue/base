@@ -89,9 +89,6 @@ class BASE_EXPORT Value {
   using ListView = CheckedContiguousRange<ListStorage>;
   using ConstListView = CheckedContiguousConstRange<ListStorage>;
 
-  // See technical note below explaining why this is used.
-  using DoubleStorage = struct { alignas(4) char v[sizeof(double)]; };
-
   enum class Type : unsigned char {
     NONE = 0,
     BOOLEAN,
@@ -552,7 +549,7 @@ class BASE_EXPORT Value {
   union {
     bool bool_value_;
     int int_value_;
-    DoubleStorage double_value_;
+    double double_value_;
     std::string string_value_;
     BlobStorage binary_value_;
     DictStorage dict_;

@@ -33,23 +33,6 @@
 
 namespace base {
 
-// base::Value must be standard layout to guarantee that writing to
-// |bool_type_| then reading |type_| is defined behaviour. See:
-//
-// [class.union]:
-//   If a standard-layout union contains several standard-layout structs that
-//   share a common initial sequence (9.2), and if an object of this
-//   standard-layout union type contains one of the standard-layout structs,
-//   it is permitted to inspect the common initial sequence of any of
-//   standard-layout struct members;
-//
-static_assert(std::is_standard_layout<Value>::value,
-              "base::Value should be a standard-layout C++ class in order "
-              "to avoid undefined behaviour in its implementation!");
-
-static_assert(sizeof(Value::DoubleStorage) == sizeof(double),
-              "The double and DoubleStorage types should have the same size");
-
 namespace {
 
 const char* const kTypeNames[] = {"null",   "boolean", "integer",    "double",
@@ -186,7 +169,7 @@ Value::Value(Type type) : type_(type) {
       int_value_ = 0;
       return;
     case Type::DOUBLE:
-      double_value_ = bit_cast<DoubleStorage>(0.0);
+      double_value_ = 0.0;
       return;
     case Type::STRING:
       new (&string_value_) std::string();
@@ -215,11 +198,11 @@ Value::Value(bool in_bool) : type_(Type::BOOLEAN), bool_value_(in_bool) {}
 Value::Value(int in_int) : type_(Type::INTEGER), int_value_(in_int) {}
 
 Value::Value(double in_double)
-    : type_(Type::DOUBLE), double_value_(bit_cast<DoubleStorage>(in_double)) {
+    : type_(Type::DOUBLE), double_value_(in_double) {
   if (!std::isfinite(in_double)) {
     NOTREACHED() << "Non-finite (i.e. NaN or positive/negative infinity) "
                  << "values cannot be represented in JSON";
-    double_value_ = bit_cast<DoubleStorage>(0.0);
+    double_value_ = 0.0;
   }
 }
 

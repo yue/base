@@ -22,7 +22,6 @@
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/tracing_buildflags.h"
-#include "third_party/abseil-cpp/absl/types/variant.h"
 
 #if BUILDFLAG(ENABLE_BASE_TRACING)
 #include "base/trace_event/memory_usage_estimator.h"  // no-presubmit-check
@@ -147,36 +146,38 @@ const ListValue& Value::AsListValue(const Value& val) {
   return static_cast<const ListValue&>(val);
 }
 
-Value::Value() noexcept = default;
+Value::Value() noexcept {}
 
-Value::Value(Value&& that) noexcept = default;
+Value::Value(Value&& that) noexcept {
+  InternalMoveConstructFrom(std::move(that));
+}
 
-Value::Value(Type type) {
+Value::Value(Type type) : type_(type) {
   // Initialize with the default value.
   switch (type) {
     case Type::NONE:
       return;
 
     case Type::BOOLEAN:
-      data_.emplace<bool>(false);
+      bool_value_ = false;
       return;
     case Type::INTEGER:
-      data_.emplace<int>(0);
+      int_value_ = 0;
       return;
     case Type::DOUBLE:
-      data_.emplace<DoubleStorage>(bit_cast<DoubleStorage>(0.0));
+      double_value_ = 0.0;
       return;
     case Type::STRING:
-      data_.emplace<std::string>();
+      new (&string_value_) std::string();
       return;
     case Type::BINARY:
-      data_.emplace<BlobStorage>();
+      new (&binary_value_) BlobStorage();
       return;
     case Type::DICTIONARY:
-      data_.emplace<LegacyDictStorage>();
+      new (&dict_) LegacyDictStorage();
       return;
     case Type::LIST:
-      data_.emplace<ListStorage>();
+      new (&list_) ListStorage();
       return;
     // TODO(crbug.com/859477): Remove after root cause is found.
     case Type::DEAD:
@@ -188,15 +189,15 @@ Value::Value(Type type) {
   CHECK(false);
 }
 
-Value::Value(bool in_bool) : data_(in_bool) {}
+Value::Value(bool in_bool) : type_(Type::BOOLEAN), bool_value_(in_bool) {}
 
-Value::Value(int in_int) : data_(in_int) {}
+Value::Value(int in_int) : type_(Type::INTEGER), int_value_(in_int) {}
 
-Value::Value(double in_double) : data_(bit_cast<DoubleStorage>(in_double)) {
+Value::Value(double in_double) : type_(Type::DOUBLE), double_value_(in_double) {
   if (!std::isfinite(in_double)) {
     NOTREACHED() << "Non-finite (i.e. NaN or positive/negative infinity) "
                  << "values cannot be represented in JSON";
-    data_ = bit_cast<DoubleStorage>(0.0);
+    double_value_ = 0.0;
   }
 }
 
@@ -204,7 +205,8 @@ Value::Value(const char* in_string) : Value(std::string(in_string)) {}
 
 Value::Value(StringPiece in_string) : Value(std::string(in_string)) {}
 
-Value::Value(std::string&& in_string) noexcept : data_(std::move(in_string)) {
+Value::Value(std::string&& in_string) noexcept
+    : type_(Type::STRING), string_value_(std::move(in_string)) {
   DCHECK(IsStringUTF8AllowingNoncharacters(GetString()));
 }
 
@@ -213,19 +215,16 @@ Value::Value(const char16* in_string16) : Value(StringPiece16(in_string16)) {}
 Value::Value(StringPiece16 in_string16) : Value(UTF16ToUTF8(in_string16)) {}
 
 Value::Value(const std::vector<char>& in_blob)
-    : data_(absl::in_place_type_t<BlobStorage>(),
-            in_blob.begin(),
-            in_blob.end()) {}
+    : type_(Type::BINARY), binary_value_(in_blob.begin(), in_blob.end()) {}
 
 Value::Value(base::span<const uint8_t> in_blob)
-    : data_(absl::in_place_type_t<BlobStorage>(),
-            in_blob.begin(),
-            in_blob.end()) {}
+    : type_(Type::BINARY), binary_value_(in_blob.begin(), in_blob.end()) {}
 
-Value::Value(BlobStorage&& in_blob) noexcept : data_(std::move(in_blob)) {}
+Value::Value(BlobStorage&& in_blob) noexcept
+    : type_(Type::BINARY), binary_value_(std::move(in_blob)) {}
 
 Value::Value(const DictStorage& in_dict)
-    : data_(absl::in_place_type_t<LegacyDictStorage>()) {
+    : type_(Type::DICTIONARY), dict_() {
   dict().reserve(in_dict.size());
   for (const auto& it : in_dict) {
     dict().try_emplace(dict().end(), it.first,
@@ -234,7 +233,7 @@ Value::Value(const DictStorage& in_dict)
 }
 
 Value::Value(DictStorage&& in_dict) noexcept
-    : data_(absl::in_place_type_t<LegacyDictStorage>()) {
+    : type_(Type::DICTIONARY), dict_() {
   dict().reserve(in_dict.size());
   for (auto& it : in_dict) {
     dict().try_emplace(dict().end(), std::move(it.first),
@@ -243,18 +242,23 @@ Value::Value(DictStorage&& in_dict) noexcept
 }
 
 Value::Value(span<const Value> in_list)
-    : data_(absl::in_place_type_t<ListStorage>()) {
+    : type_(Type::LIST), list_() {
   list().reserve(in_list.size());
   for (const auto& val : in_list)
     list().emplace_back(val.Clone());
 }
 
-Value::Value(ListStorage&& in_list) noexcept : data_(std::move(in_list)) {}
+Value::Value(ListStorage&& in_list) noexcept
+    : type_(Type::LIST), list_(std::move(in_list)) {}
 
-Value& Value::operator=(Value&& that) noexcept = default;
+Value& Value::operator=(Value&& that) noexcept {
+  InternalCleanup();
+  InternalMoveConstructFrom(std::move(that));
+  return *this;
+}
 
 Value::Value(const LegacyDictStorage& storage)
-    : data_(absl::in_place_type_t<LegacyDictStorage>()) {
+    : type_(Type::DICTIONARY), dict_() {
   dict().reserve(storage.size());
   for (const auto& it : storage) {
     dict().try_emplace(dict().end(), it.first,
@@ -263,21 +267,46 @@ Value::Value(const LegacyDictStorage& storage)
 }
 
 Value::Value(LegacyDictStorage&& storage) noexcept
-    : data_(std::move(storage)) {}
-
-Value::Value(absl::monostate) {}
-
-Value::Value(DoubleStorage storage) : data_(std::move(storage)) {}
+    : type_(Type::DICTIONARY), dict_(std::move(storage)) {}
 
 double Value::AsDoubleInternal() const {
-  return bit_cast<double>(absl::get<DoubleStorage>(data_));
+  return double_value_;
 }
 
 Value Value::Clone() const {
-  return absl::visit([](const auto& member) { return Value(member); }, data_);
+  switch (type_) {
+    case Type::NONE:
+      return Value();
+    case Type::BOOLEAN:
+      return Value(bool_value_);
+    case Type::INTEGER:
+      return Value(int_value_);
+    case Type::DOUBLE:
+      return Value(AsDoubleInternal());
+    case Type::STRING:
+      return Value(string_value_);
+    case Type::BINARY:
+      return Value(binary_value_);
+    case Type::DICTIONARY:
+      return Value(dict_);
+    case Type::LIST:
+      return Value(list_);
+      // TODO(crbug.com/859477): Remove after root cause is found.
+    case Type::DEAD:
+      CHECK(false);
+      return Value();
+  }
+
+  // TODO(crbug.com/859477): Revert to NOTREACHED() after root cause is found.
+  CHECK(false);
+  return Value();
 }
 
-Value::~Value() = default;
+Value::~Value() {
+  InternalCleanup();
+  // TODO(crbug.com/859477): Remove after root cause is found.
+  type_ = Type::DEAD;
+}
 
 // static
 const char* Value::GetTypeName(Value::Type type) {
@@ -287,11 +316,13 @@ const char* Value::GetTypeName(Value::Type type) {
 }
 
 bool Value::GetBool() const {
-  return absl::get<bool>(data_);
+  CHECK(is_bool());
+  return bool_value_;
 }
 
 int Value::GetInt() const {
-  return absl::get<int>(data_);
+  CHECK(is_int());
+  return int_value_;
 }
 
 double Value::GetDouble() const {
@@ -304,74 +335,91 @@ double Value::GetDouble() const {
 }
 
 const std::string& Value::GetString() const {
-  return absl::get<std::string>(data_);
+  CHECK(is_string());
+  return string_value_;
 }
 
 std::string& Value::GetString() {
-  return absl::get<std::string>(data_);
+  CHECK(is_string());
+  return string_value_;
 }
 
 const Value::BlobStorage& Value::GetBlob() const {
-  return absl::get<BlobStorage>(data_);
+  CHECK(is_blob());
+  return binary_value_;
 }
 
 Value::ListView Value::GetList() {
+  CHECK(is_list());
   return list();
 }
 
 Value::ConstListView Value::GetList() const {
+  CHECK(is_list());
   return list();
 }
 
 Value::ListStorage Value::TakeList() {
-  return std::exchange(list(), {});
+  CHECK(is_list());
+  return std::exchange(list(), ListStorage());
 }
 
 void Value::Append(bool value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(int value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(double value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(const char* value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(StringPiece value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(std::string&& value) {
+  CHECK(is_list());
   list().emplace_back(std::move(value));
 }
 
 void Value::Append(const char16* value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(StringPiece16 value) {
+  CHECK(is_list());
   list().emplace_back(value);
 }
 
 void Value::Append(Value&& value) {
+  CHECK(is_list());
   list().emplace_back(std::move(value));
 }
 
 CheckedContiguousIterator<Value> Value::Insert(
     CheckedContiguousConstIterator<Value> pos,
     Value&& value) {
+  CHECK(is_list());
   const auto offset = pos - make_span(list()).begin();
   list().insert(list().begin() + offset, std::move(value));
   return make_span(list()).begin() + offset;
 }
 
 bool Value::EraseListIter(CheckedContiguousConstIterator<Value> iter) {
+  CHECK(is_list());
   const auto offset = iter - ListView(list()).begin();
   auto list_iter = list().begin() + offset;
   if (list_iter == list().end())
@@ -386,6 +434,7 @@ size_t Value::EraseListValue(const Value& val) {
 }
 
 void Value::ClearList() {
+  CHECK(is_list());
   list().clear();
 }
 
@@ -394,6 +443,7 @@ Value* Value::FindKey(StringPiece key) {
 }
 
 const Value* Value::FindKey(StringPiece key) const {
+  CHECK(is_dict());
   auto found = dict().find(key);
   if (found == dict().end())
     return nullptr;
@@ -431,8 +481,8 @@ base::Optional<double> Value::FindDoubleKey(StringPiece key) const {
 }
 
 const std::string* Value::FindStringKey(StringPiece key) const {
-  const Value* result = FindKey(key);
-  return result ? absl::get_if<std::string>(&result->data_) : nullptr;
+  const Value* result = FindKeyOfType(key, Type::STRING);
+  return result ? &result->string_value_ : nullptr;
 }
 
 std::string* Value::FindStringKey(StringPiece key) {
@@ -440,8 +490,8 @@ std::string* Value::FindStringKey(StringPiece key) {
 }
 
 const Value::BlobStorage* Value::FindBlobKey(StringPiece key) const {
-  const Value* result = FindKey(key);
-  return result ? absl::get_if<BlobStorage>(&result->data_) : nullptr;
+  const Value* value = FindKeyOfType(key, Type::BINARY);
+  return value ? &value->binary_value_ : nullptr;
 }
 
 const Value* Value::FindDictKey(StringPiece key) const {
@@ -465,6 +515,7 @@ Value* Value::SetKey(StringPiece key, Value&& value) {
 }
 
 Value* Value::SetKey(std::string&& key, Value&& value) {
+  CHECK(is_dict());
   return dict()
       .insert_or_assign(std::move(key),
                         std::make_unique<Value>(std::move(value)))
@@ -504,10 +555,12 @@ Value* Value::SetStringKey(StringPiece key, std::string&& value) {
 }
 
 bool Value::RemoveKey(StringPiece key) {
+  CHECK(is_dict());
   return dict().erase(key) != 0;
 }
 
 Optional<Value> Value::ExtractKey(StringPiece key) {
+  CHECK(is_dict());
   auto found = dict().find(key);
   if (found == dict().end())
     return nullopt;
@@ -567,8 +620,10 @@ base::Optional<double> Value::FindDoublePath(StringPiece path) const {
 }
 
 const std::string* Value::FindStringPath(StringPiece path) const {
-  const Value* result = FindPath(path);
-  return result ? absl::get_if<std::string>(&result->data_) : nullptr;
+  const Value* cur = FindPath(path);
+  if (!cur || !cur->is_string())
+    return nullptr;
+  return &cur->string_value_;
 }
 
 std::string* Value::FindStringPath(StringPiece path) {
@@ -576,8 +631,10 @@ std::string* Value::FindStringPath(StringPiece path) {
 }
 
 const Value::BlobStorage* Value::FindBlobPath(StringPiece path) const {
-  const Value* result = FindPath(path);
-  return result ? absl::get_if<BlobStorage>(&result->data_) : nullptr;
+  const Value* cur = FindPath(path);
+  if (!cur || !cur->is_blob())
+    return nullptr;
+  return &cur->binary_value_;
 }
 
 const Value* Value::FindDictPath(StringPiece path) const {
@@ -736,14 +793,17 @@ Value* Value::SetPath(span<const StringPiece> path, Value&& value) {
 }
 
 Value::dict_iterator_proxy Value::DictItems() {
+  CHECK(is_dict());
   return dict_iterator_proxy(&dict());
 }
 
 Value::const_dict_iterator_proxy Value::DictItems() const {
+  CHECK(is_dict());
   return const_dict_iterator_proxy(&dict());
 }
 
 Value::DictStorage Value::TakeDict() {
+  CHECK(is_dict());
   DictStorage storage;
   storage.reserve(dict().size());
   for (auto& pair : dict()) {
@@ -756,18 +816,23 @@ Value::DictStorage Value::TakeDict() {
 }
 
 size_t Value::DictSize() const {
+  CHECK(is_dict());
   return dict().size();
 }
 
 bool Value::DictEmpty() const {
+  CHECK(is_dict());
   return dict().empty();
 }
 
 void Value::DictClear() {
+  CHECK(is_dict());
   dict().clear();
 }
 
 void Value::MergeDictionary(const Value* dictionary) {
+  CHECK(is_dict());
+  CHECK(dictionary->is_dict());
   for (const auto& pair : dictionary->dict()) {
     const auto& key = pair.first;
     const auto& val = pair.second;
@@ -998,6 +1063,74 @@ size_t Value::EstimateMemoryUsage() const {
     default:
       return 0;
   }
+}
+
+void Value::InternalMoveConstructFrom(Value&& that) {
+  type_ = that.type_;
+
+  switch (type_) {
+    case Type::NONE:
+      return;
+    case Type::BOOLEAN:
+      bool_value_ = that.bool_value_;
+      return;
+    case Type::INTEGER:
+      int_value_ = that.int_value_;
+      return;
+    case Type::DOUBLE:
+      double_value_ = that.double_value_;
+      return;
+    case Type::STRING:
+      new (&string_value_) std::string(std::move(that.string_value_));
+      return;
+    case Type::BINARY:
+      new (&binary_value_) BlobStorage(std::move(that.binary_value_));
+      return;
+    case Type::DICTIONARY:
+      new (&dict_) LegacyDictStorage(std::move(that.dict_));
+      return;
+    case Type::LIST:
+      new (&list_) ListStorage(std::move(that.list_));
+      return;
+      // TODO(crbug.com/859477): Remove after root cause is found.
+    case Type::DEAD:
+      CHECK(false);
+      return;
+  }
+
+  // TODO(crbug.com/859477): Revert to NOTREACHED() after root cause is found.
+  CHECK(false);
+}
+
+void Value::InternalCleanup() {
+  switch (type_) {
+    case Type::NONE:
+    case Type::BOOLEAN:
+    case Type::INTEGER:
+    case Type::DOUBLE:
+      // Nothing to do
+      return;
+
+    case Type::STRING:
+      string_value_.~basic_string();
+      return;
+    case Type::BINARY:
+      binary_value_.~BlobStorage();
+      return;
+    case Type::DICTIONARY:
+      dict_.~LegacyDictStorage();
+      return;
+    case Type::LIST:
+      list_.~ListStorage();
+      return;
+      // TODO(crbug.com/859477): Remove after root cause is found.
+    case Type::DEAD:
+      CHECK(false);
+      return;
+  }
+
+  // TODO(crbug.com/859477): Revert to NOTREACHED() after root cause is found.
+  CHECK(false);
 }
 
 std::string Value::DebugString() const {

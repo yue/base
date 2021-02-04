@@ -39,7 +39,6 @@
 #include "base/strings/string16.h"
 #include "base/strings/string_piece.h"
 #include "base/value_iterators.h"
-#include "third_party/abseil-cpp/absl/types/variant.h"
 
 namespace base {
 
@@ -175,7 +174,7 @@ class BASE_EXPORT Value {
   static const char* GetTypeName(Type type);
 
   // Returns the type of the value stored by the current Value object.
-  Type type() const { return static_cast<Type>(data_.index()); }
+  Type type() const { return type_; }
 
   // Returns true if the current object represents a given type.
   bool is_none() const { return type() == Type::NONE; }
@@ -556,49 +555,37 @@ class BASE_EXPORT Value {
 
  protected:
   // Checked convenience accessors for dict and list.
-  const LegacyDictStorage& dict() const {
-    return absl::get<LegacyDictStorage>(data_);
-  }
-  LegacyDictStorage& dict() { return absl::get<LegacyDictStorage>(data_); }
-  const ListStorage& list() const { return absl::get<ListStorage>(data_); }
-  ListStorage& list() { return absl::get<ListStorage>(data_); }
+  const LegacyDictStorage& dict() const { return dict_; }
+  LegacyDictStorage& dict() { return dict_; }
+  const ListStorage& list() const { return list_; }
+  ListStorage& list() { return list_; }
 
   // Internal constructors, allowing the simplify the implementation of Clone().
   explicit Value(const LegacyDictStorage& storage);
   explicit Value(LegacyDictStorage&& storage) noexcept;
 
  private:
-  // Special case for doubles, which are aligned to 8 bytes on some
-  // 32-bit architectures. In this case, a simple declaration as a
-  // double member would make the whole union 8 byte-aligned, which
-  // would also force 4 bytes of wasted padding space before it in
-  // the Value layout.
-  //
-  // To override this, store the value as an array of 32-bit integers, and
-  // perform the appropriate bit casts when reading / writing to it.
-  using DoubleStorage = struct { alignas(4) char v[sizeof(double)]; };
-
-  // Internal constructors, allowing the simplify the implementation of Clone().
-  explicit Value(absl::monostate);
-  explicit Value(DoubleStorage storage);
-
   friend class ValuesTest_SizeOfValue_Test;
   double AsDoubleInternal() const;
+  void InternalMoveConstructFrom(Value&& that);
+  void InternalCleanup();
 
   // NOTE: Using a movable reference here is done for performance (it avoids
   // creating + moving + destroying a temporary unique ptr).
   Value* SetKeyInternal(StringPiece key, std::unique_ptr<Value>&& val_ptr);
   Value* SetPathInternal(StringPiece path, std::unique_ptr<Value>&& value_ptr);
 
-  absl::variant<absl::monostate,
-                bool,
-                int,
-                DoubleStorage,
-                std::string,
-                BlobStorage,
-                LegacyDictStorage,
-                ListStorage>
-      data_;
+  Type type_ = Type::NONE;
+
+  union {
+    bool bool_value_;
+    int int_value_;
+    double double_value_;
+    std::string string_value_;
+    BlobStorage binary_value_;
+    LegacyDictStorage dict_;
+    ListStorage list_;
+  };
 };
 
 // DictionaryValue provides a key-value dictionary with (optional) "path"

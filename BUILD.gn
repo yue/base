@@ -1887,7 +1887,7 @@ mixed_component("base") {
     "hash/md5_constexpr_internal.h",
     "hash/sha1.h",
   ]
-  if (is_nacl) {
+  if (true) {
     sources += [
       "hash/md5_nacl.cc",
       "hash/md5_nacl.h",

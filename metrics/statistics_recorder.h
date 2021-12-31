@@ -334,7 +334,7 @@ class BASE_EXPORT StatisticsRecorder {
   // to provide support for all future calls.
   //
   // Precondition: The global lock is already acquired.
-  StatisticsRecorder();
+  StatisticsRecorder() EXCLUSIVE_LOCKS_REQUIRED(lock_);
 
   // Initialize implementation but without lock. Caller should guard
   // StatisticsRecorder by itself if needed (it isn't in unit tests).

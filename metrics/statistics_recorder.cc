@@ -348,11 +348,7 @@ void StatisticsRecorder::ForgetHistogramForTesting(base::StringPiece name) {
 std::unique_ptr<StatisticsRecorder>
 StatisticsRecorder::CreateTemporaryForTesting() {
   const AutoLock auto_lock(lock_.Get());
-  std::unique_ptr<StatisticsRecorder> temporary_recorder =
-      WrapUnique(new StatisticsRecorder());
-  temporary_recorder->ranges_manager_
-      .DoNotReleaseRangesOnDestroyForTesting();  // IN-TEST
-  return temporary_recorder;
+  return WrapUnique(new StatisticsRecorder());
 }
 
 // static

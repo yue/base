@@ -2220,7 +2220,7 @@ component("base") {
   }
 
   if (dep_libevent) {
-    deps += [ "//third_party/libevent" ]
+    deps += [ "//base/third_party/libevent" ]
   }
 
   if (use_libevent) {
@@ -3916,7 +3916,7 @@ test("base_unittests") {
     sources += [ "message_loop/message_pump_libevent_unittest.cc" ]
     deps += [
       ":message_pump_buildflags",
-      "//third_party/libevent",
+      "//base/third_party/libevent",
     ]
   }
 

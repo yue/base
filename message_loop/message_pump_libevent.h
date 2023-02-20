@@ -16,8 +16,8 @@
 #include "base/message_loop/message_pump.h"
 #include "base/message_loop/message_pump_buildflags.h"
 #include "base/message_loop/watchable_io_message_pump_posix.h"
+#include "base/third_party/libevent/event.h"
 #include "base/threading/thread_checker.h"
-#include "third_party/libevent/event.h"
 
 // Declare structs we need from libevent.h rather than including it
 struct event_base;

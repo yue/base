@@ -250,10 +250,11 @@ ThreadController::RunLevelTracker::RunLevel::RunLevel(
 #endif
     )
     : is_nested_(is_nested),
-      time_keeper_(time_keeper),
+      time_keeper_(time_keeper)
+#if BUILDFLAG(ENABLE_BASE_TRACING)
+      ,
       thread_controller_sample_metadata_("ThreadController active",
                                          base::SampleMetadataScope::kThread)
-#if BUILDFLAG(ENABLE_BASE_TRACING)
       ,
       terminating_wakeup_flow_lambda_(terminating_wakeup_flow_lambda)
 #endif
@@ -276,6 +277,7 @@ ThreadController::RunLevelTracker::RunLevel::~RunLevel() {
       // applied on the final pop().
       time_keeper_->RecordEndOfPhase(kNested, *exit_lazy_now_);
 
+#if BUILDFLAG(ENABLE_BASE_TRACING)
       if (ShouldRecordSampleMetadata()) {
         // Intentionally ordered after UpdateState(kIdle), reinstantiates
         // thread_controller_sample_metadata_ when yielding back to a parent
@@ -284,6 +286,7 @@ ThreadController::RunLevelTracker::RunLevel::~RunLevel() {
         thread_controller_sample_metadata_.Set(
             static_cast<int64_t>(++thread_controller_active_id_));
       }
+#endif
     }
   }
 }
@@ -311,6 +314,7 @@ void ThreadController::RunLevelTracker::RunLevel::UpdateState(State new_state) {
     TRACE_EVENT_BEGIN("base", "ThreadController active",
                       *terminating_wakeup_flow_lambda_);
 
+#if BUILDFLAG(ENABLE_BASE_TRACING)
     if (ShouldRecordSampleMetadata()) {
       // Overriding the annotation from the previous RunLevel is intentional.
       // Only the top RunLevel is ever updated, which holds the relevant state.
@@ -325,6 +329,7 @@ void ThreadController::RunLevelTracker::RunLevel::UpdateState(State new_state) {
     // TODO(crbug.com/1021571): Remove this once fixed.
     PERFETTO_INTERNAL_ADD_EMPTY_EVENT();
   }
+#endif
 
   if (trace_observer_for_testing_) {
     if (is_active)

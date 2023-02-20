@@ -14,7 +14,7 @@
 #include "base/base_export.h"
 #include "base/containers/span.h"
 #include "build/build_config.h"
-#if BUILDFLAG(IS_NACL)
+#if 1
 #include "base/hash/sha1_nacl.h"
 #else
 #include "base/hash/sha1_boringssl.h"

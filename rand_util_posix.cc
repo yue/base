@@ -31,7 +31,7 @@
 #include <sys/random.h>
 #endif
 
-#if !BUILDFLAG(IS_NACL)
+#if 0
 #include "third_party/boringssl/src/include/openssl/crypto.h"
 #include "third_party/boringssl/src/include/openssl/rand.h"
 #endif
@@ -177,7 +177,7 @@ bool UseBoringSSLForRandBytes() {
 namespace {
 
 void RandBytes(span<uint8_t> output, bool avoid_allocation) {
-#if !BUILDFLAG(IS_NACL)
+#if 0
   // The BoringSSL experiment takes priority over everything else.
   if (!avoid_allocation && internal::UseBoringSSLForRandBytes()) {
     // Ensure BoringSSL is initialized so it can use things like RDRAND.

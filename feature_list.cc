@@ -606,7 +606,7 @@ void FeatureList::SetInstance(std::unique_ptr<FeatureList> instance) {
   // FeatureList instance, as the state of the involved Features might change
   // with the final FeatureList for this process.
   if (!g_feature_list_instance->IsEarlyAccessInstance()) {
-#if !BUILDFLAG(IS_NACL)
+#if 0
     // Configured first because it takes precedence over the getrandom() trial.
     internal::ConfigureBoringSSLBackedRandBytesFieldTrial();
 #endif

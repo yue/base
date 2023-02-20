@@ -21,12 +21,15 @@
 #include <limits>
 
 #include "base/check.h"
+#if 0
 #include "base/feature_list.h"
 #include "third_party/boringssl/src/include/openssl/crypto.h"
 #include "third_party/boringssl/src/include/openssl/rand.h"
+#endif
 
 namespace base {
 
+#if 0
 namespace internal {
 
 namespace {
@@ -51,10 +54,12 @@ bool UseBoringSSLForRandBytes() {
 }
 
 }  // namespace internal
+#endif
 
 namespace {
 
 void RandBytes(void* output, size_t output_length, bool avoid_allocation) {
+#if 0
   if (!avoid_allocation && internal::UseBoringSSLForRandBytes()) {
     // Ensure BoringSSL is initialized so it can use things like RDRAND.
     CRYPTO_library_init();
@@ -62,6 +67,7 @@ void RandBytes(void* output, size_t output_length, bool avoid_allocation) {
     (void)RAND_bytes(static_cast<uint8_t*>(output), output_length);
     return;
   }
+#endif
 
   char* output_ptr = static_cast<char*>(output);
   while (output_length > 0) {

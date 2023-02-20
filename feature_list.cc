@@ -580,7 +580,7 @@ void FeatureList::SetInstance(std::unique_ptr<FeatureList> instance) {
 
   EarlyFeatureAccessTracker::GetInstance()->AssertNoAccess();
 
-#if !BUILDFLAG(IS_NACL)
+#if 0
   // Configured first because it takes precedence over the getrandom() trial.
   internal::ConfigureBoringSSLBackedRandBytesFieldTrial();
 #endif

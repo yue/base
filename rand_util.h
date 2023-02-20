@@ -16,7 +16,7 @@
 #include "base/gtest_prod_util.h"
 #include "build/build_config.h"
 
-#if !BUILDFLAG(IS_NACL)
+#if 0
 #include "third_party/boringssl/src/include/openssl/rand.h"
 #endif
 
@@ -30,7 +30,7 @@ namespace internal {
 void ConfigureRandBytesFieldTrial();
 #endif
 
-#if !BUILDFLAG(IS_NACL)
+#if 0
 void ConfigureBoringSSLBackedRandBytesFieldTrial();
 #endif
 
@@ -93,7 +93,7 @@ class RandomBitGenerator {
   ~RandomBitGenerator() = default;
 };
 
-#if !BUILDFLAG(IS_NACL)
+#if 0
 class NonAllocatingRandomBitGenerator {
  public:
   using result_type = uint64_t;

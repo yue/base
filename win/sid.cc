@@ -22,8 +22,6 @@
 #include "base/win/scoped_handle.h"
 #include "base/win/scoped_localalloc.h"
 #include "base/win/windows_version.h"
-#include "third_party/boringssl/src/include/openssl/crypto.h"
-#include "third_party/boringssl/src/include/openssl/sha.h"
 
 namespace base::win {
 
@@ -100,6 +98,7 @@ Sid Sid::FromKnownCapability(WellKnownCapability capability) {
 }
 
 Sid Sid::FromNamedCapability(const std::wstring& capability_name) {
+#if 0
   static const base::NoDestructor<std::map<std::wstring, WellKnownCapability>>
       known_capabilities(
           {{L"INTERNETCLIENT", WellKnownCapability::kInternetClient},
@@ -136,6 +135,52 @@ Sid Sid::FromNamedCapability(const std::wstring& capability_name) {
          reinterpret_cast<uint8_t*>(&rids[2]));
   return FromSubAuthorities(SECURITY_APP_PACKAGE_AUTHORITY, std::size(rids),
                             rids);
+#endif
+  DCHECK_GE(GetVersion(), Version::WIN10);
+
+  typedef decltype(
+      ::DeriveCapabilitySidsFromName)* DeriveCapabilitySidsFromNameFunc;
+  static const DeriveCapabilitySidsFromNameFunc derive_capability_sids =
+      []() -> DeriveCapabilitySidsFromNameFunc {
+    HMODULE module = GetModuleHandle(L"api-ms-win-security-base-l1-2-2.dll");
+    if (!module)
+      return nullptr;
+
+    return reinterpret_cast<DeriveCapabilitySidsFromNameFunc>(
+        ::GetProcAddress(module, "DeriveCapabilitySidsFromName"));
+  }();
+  if (!derive_capability_sids)
+    return Sid(WellKnownSid::kNull);
+
+  // Pre-reserve some space for SID deleters.
+  std::vector<ScopedLocalAlloc> deleter_list;
+  deleter_list.reserve(16);
+
+  PSID* capability_groups = nullptr;
+  DWORD capability_group_count = 0;
+  PSID* capability_sids = nullptr;
+  DWORD capability_sid_count = 0;
+
+  if (!derive_capability_sids(capability_name.c_str(), &capability_groups,
+                              &capability_group_count, &capability_sids,
+                              &capability_sid_count)) {
+    return Sid(WellKnownSid::kNull);
+  }
+
+  deleter_list.emplace_back(capability_groups);
+  deleter_list.emplace_back(capability_sids);
+
+  for (DWORD i = 0; i < capability_group_count; ++i) {
+    deleter_list.emplace_back(capability_groups[i]);
+  }
+  for (DWORD i = 0; i < capability_sid_count; ++i) {
+    deleter_list.emplace_back(capability_sids[i]);
+  }
+
+  if (capability_sid_count < 1)
+    return Sid(WellKnownSid::kNull);
+
+  return FromPSID(capability_sids[0]).value_or(Sid(WellKnownSid::kNull));
 }
 
 Sid Sid::FromKnownSid(WellKnownSid type) {

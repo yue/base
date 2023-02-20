@@ -411,9 +411,9 @@ class BASE_EXPORT ThreadController {
       // Must be set shortly before ~RunLevel.
       raw_ptr<LazyNow> exit_lazy_now_ = nullptr;
 
+#if BUILDFLAG(ENABLE_BASE_TRACING)
       SampleMetadata thread_controller_sample_metadata_;
       size_t thread_controller_active_id_ = 0;
-#if BUILDFLAG(ENABLE_BASE_TRACING)
       TerminatingFlowLambda& terminating_wakeup_flow_lambda_;
 #endif
 

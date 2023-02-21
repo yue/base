@@ -38,7 +38,7 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "third_party/apple_apsl/CFBase.h"
+#include "base/third_party/apple_apsl/CFBase.h"
 
 #if BUILDFLAG(IS_IOS)
 #include "base/allocator/partition_allocator/partition_alloc_base/ios/ios_util.h"

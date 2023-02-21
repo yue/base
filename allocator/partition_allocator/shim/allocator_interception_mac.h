@@ -8,7 +8,7 @@
 #include <stddef.h>
 
 #include "base/base_export.h"
-#include "third_party/apple_apsl/malloc.h"
+#include "base/third_party/apple_apsl/malloc.h"
 
 namespace allocator_shim {
 

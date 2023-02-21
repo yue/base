@@ -9,7 +9,7 @@
 #include "base/check.h"
 #include "base/numerics/checked_math.h"
 #include "base/strings/string_util.h"
-#include "third_party/modp_b64/modp_b64.h"
+#include "base/third_party/modp_b64/modp_b64.h"
 
 namespace base {
 
